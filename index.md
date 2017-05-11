@@ -3,10 +3,6 @@ layout: default
 ---
 
 <div class="home">
-
-  <!-- <h1 class="page-heading">Posts</h1> -->
-
-
     {% for post in site.posts %}
 
         <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
@@ -16,6 +12,4 @@ layout: default
         </h2>
 
     {% endfor %}
-
-
 </div>
