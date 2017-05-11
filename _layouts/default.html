@@ -14,21 +14,19 @@
     <div class="wrapper">
       <header>
         <a href="http://benrodenhaeuser.github.io">
-          <h1>{{ site.title | default: site.github.repository_name }}
-          </h1>
+          <h1>{{ site.title }}</h1>
         </a>
-        <p>{{ site.description | default: site.github.project_tagline }}</p>
+        <p>{{ site.description }}</p>
         <p>
           <small>
             {% for post in site.posts %}
-                <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+
                 <h4>
-                  <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+                  <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> {{ post.date | date: "%b %-d, %Y" }}
                 </h4>
             {% endfor %}
           </small>
         </p>
-
 
         {% if site.show_downloads %}
           <ul>
