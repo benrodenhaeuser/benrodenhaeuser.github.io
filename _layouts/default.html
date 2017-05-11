@@ -17,15 +17,14 @@
           <h1>{{ site.title }}</h1>
         </a>
         <p>{{ site.description }}</p>
+        <hr />
         <p>
-          <small>
             {% for post in site.posts %}
 
                 <h4>
-                  <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> {{ post.date | date: "%b %-d, %Y" }}
+                  <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> ({{ post.date | date: "%b %-d, %Y" }})
                 </h4>
             {% endfor %}
-          </small>
         </p>
 
         {% if site.show_downloads %}
