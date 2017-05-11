@@ -21,9 +21,9 @@
         <p>
             {% for post in site.posts %}
 
-                <h4>
+                <h3>
                   <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> ({{ post.date | date: "%b %-d, %Y" }})
-                </h4>
+                </h3>
             {% endfor %}
         </p>
 
