@@ -197,8 +197,8 @@ hr {
 }
 
 footer {
-  width:270px;
-  float:left;
+  width:260px;
+  float:right;
   position:fixed;
   bottom:50px;
   -webkit-font-smoothing:subpixel-antialiased;
@@ -217,9 +217,9 @@ footer {
     width:auto;
   }
 
-  header {
-    padding-left:320px;
-  }
+  // header {
+  //   padding-right:320px;
+  // }
 
   section {
     border:1px solid #e5e5e5;
