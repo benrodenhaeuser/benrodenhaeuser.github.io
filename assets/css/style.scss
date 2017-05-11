@@ -47,8 +47,8 @@ a {
 }
 
 a:hover, a:focus {
-  color:#069;
-  font-weight: bold;
+  color: #494949;
+  // font-weight: bold;
 }
 
 a small {
@@ -58,9 +58,9 @@ a small {
   display:block;
 }
 
-a:hover small {
-  color:#777;
-}
+// a:hover small {
+//   color:#777;
+// }
 
 .wrapper {
   width:1000px;
