@@ -2,7 +2,7 @@
 layout: default
 ---
 
-<div class="home">
+<!-- <div class="home">
     {% for post in site.posts %}
 
         <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
@@ -12,4 +12,4 @@ layout: default
         </h2>
 
     {% endfor %}
-</div>
+</div> -->
