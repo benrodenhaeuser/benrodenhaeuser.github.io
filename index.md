@@ -1,6 +1,3 @@
----
----
-
 # Hello World
 
 Lorem ipsum.
