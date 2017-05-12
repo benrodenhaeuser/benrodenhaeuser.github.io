@@ -211,6 +211,11 @@ footer {
     margin:0;
   }
 
+  header {
+    border:1px solid #e5e5e5;
+    border-width:1px 0;
+  }
+
   header, section, footer {
     float:none;
     position:static;
