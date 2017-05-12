@@ -5,7 +5,7 @@
     <div class="wrapper">
       <section>
       {% assign post = site.posts.first %}
-      <small>{{ post.date | date_to_long_string }}</small>
+      <small>{{ post.date | date_to_long_string }} | Ben Rodenhäuser</small>
       {{ post.content }}
       </section>
       {% include header.html %}
