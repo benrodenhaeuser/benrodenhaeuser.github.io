@@ -1,0 +1,17 @@
+<header>
+  <a href="http://benrodenhaeuser.github.io">
+    <h1>{{ site.title }}</h1>
+  </a>
+  <p>{{ site.description }}</p>
+  <hr />
+  <p>
+      {% for post in site.posts %}
+
+          <h3>
+            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="pad"></span><small> {{ post.date | date: "%b %-d, %Y" }}</small>
+          </h3>
+      {% endfor %}
+  </p>
+  <hr />
+  <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+</header>
