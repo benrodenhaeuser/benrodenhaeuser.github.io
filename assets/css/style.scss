@@ -115,9 +115,9 @@ img {
 header {
   width:260px;
   float:right;
-  position: webkit-sticky;
+  position: -webkit-sticky;
   position: sticky;
-  top: 0;
+  top: 10px;
   -webkit-font-smoothing:subpixel-antialiased;
 }
 
