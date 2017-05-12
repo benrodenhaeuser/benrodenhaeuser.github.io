@@ -1,6 +1,6 @@
 ---
-layout: post
+layout: default
 ---
 
 {% assign post = site.posts.first %}
-{% assign content = post.content %}
+{{ post.content }}
