@@ -4,12 +4,10 @@
   <body>
     <div class="wrapper">
       <section>
+      {{ post.date }}
       {{ content }}
       </section>
       {% include header.html %}
-      <!-- <footer>
-        <p><small>Ben Rodenhäuser 2017 | <a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
-      </footer> -->
     </div>
     <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
   {% include google-analytics.html %}
