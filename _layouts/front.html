@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  {% include head.html %}
+  <body>
+    <div class="wrapper">
+      <section>
+      {% assign post = site.posts.first %}
+      <small>{{ post.date | date_to_long_string }}</small>
+      {{ post.content }}
+      </section>
+      {% include header.html %}
+      {% include footer.html %}
+    </div>
+    <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
+  {% include google-analytics.html %}
+  </body>
+</html>
