@@ -114,10 +114,10 @@ img {
 
 header {
   width:260px;
-  float:right;
-  // position: webkit-sticky;
-  // position: sticky;
-  // top: 10px;
+  float:left;
+  position: webkit-sticky;
+  position: sticky;
+  top: 0;
   -webkit-font-smoothing:subpixel-antialiased;
 }
 
