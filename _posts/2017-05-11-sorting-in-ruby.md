@@ -1,4 +1,4 @@
-# sort and sort_by
+# Sorting in Ruby
 
 This is a test.
 
