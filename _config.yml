@@ -2,7 +2,6 @@ theme: jekyll-theme-minimal
 title: Ben Rodenhäuser
 description: Learning to program
 permalink: pretty
-markdown: redcarpet
 defaults:
   -
     scope:
