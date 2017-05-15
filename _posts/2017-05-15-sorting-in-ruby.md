@@ -1,6 +1,6 @@
 # Sorting in Ruby
 
-Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module. This means that any Ruby class can use these built-in sorting methods as long as it implements an `each` method for iterating over a given instance, and a three-way comparison method `<=>`. My question for this post is this: why would there be two sort methods rather than just one?
+Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module, which any Ruby class can include as long as it implements a an `each` method for iterating over given instance. To use the sort methods, the class also needs to implement a three-way comparison method `<=>` (the "spaceship operator"). My question for this post is this: why would there be two sort methods rather than just one?
 
 ## Exploring `sort_by`
 
@@ -108,4 +108,4 @@ list.map { |elem| [elem, key(elem)] }
 end
 ```
 
-Obviously, this involves $n$ calls to the `key` method, assuming that the length of `list` is $n$. However, when using `sort`, the number of calls to the `key` method may be quite a bit larger. As observed above, we are relying on quicksort here, so sorting our list involves $n\log n$ comparisons on average, and even $n^2$ comparisons in the worst case. And each comparison will involve two calls to the `key` method. If `key` itself is a time-consuming transformation, having to perform $2n^2$ transformations (or $2n\log n$, for that matter) could make a big difference indeed! On the other hand – [as is also pointed out in the Ruby Docs](http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by) – if the transformation is trivial, `sort` may still be faster, since creating a list of tuples may then be more costly than performing an excess number of comparisons.
+Obviously, this involves $n$ calls to the `key` method, assuming that the length of `list` is $n$. However, when using `sort`, the number of calls to the `key` method may be quite a bit larger. As observed earlier, we are relying on quicksort here, so sorting our list involves $n\log n$ comparisons on average, and even $n^2$ comparisons in the worst case. And each comparison will involve two calls to the `key` method. If `key` itself is a time-consuming transformation, having to perform $2n^2$ transformations (or $2n\log n$, for that matter) rather than merely $n$ transformations could make a big difference indeed! On the other hand – [as is also pointed out in the Ruby Docs](http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by) – if the transformation is trivial, `sort` may still be faster, since creating a list of tuples may then be more costly than performing an excess number of comparisons.
