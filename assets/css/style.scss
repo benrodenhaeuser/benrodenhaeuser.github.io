@@ -78,10 +78,13 @@ blockquote {
   font-style:italic;
 }
 
+p code {
+  font-size:14px;
+}
+
 code, pre {
   font-family: 'Roboto Mono', monospace;
   color:#333;
-  // font-size:14px;
 }
 
 pre {
