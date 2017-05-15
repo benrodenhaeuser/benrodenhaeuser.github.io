@@ -111,6 +111,6 @@ So we have reinvented the wheel. Nice!
 
 Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting has a lower bound of $n \log n$, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario.  
 
-Presumably, Ruby uses one internal sorting mechanism that underlies both `sort` and `sort_by`. Why bother using `sort_by`, then? The answer is that – as our above example illustrates –, in practice, we are often not merely interested in sorting per se, but in sorting based on a particular criterion of interest. We may want to sort strings based on their numerical values, user entries based on the user's last name, or perhaps game moves based on their expected utility.  
+Presumably, Ruby uses a single sorting algorithm that underlies both `sort` and `sort_by` – quicksort, perhaps. So both methods should perform the same efficiency-wise, right? The answer is no. And the reason is that the picture is complicated by the fact that we often do not wish to sort a given collection *as is*, but rather relying on some *sort criterion*. We may want to sort user entries based on the user's last name, or perhaps game moves based on their expected utility. Sorting strings based on their numerical values, as considered above, is another instance of this.
 
 So we have to perform some sort of transformation on the values we want to sort. Transforming those values takes time. And here, `sort` and `sort_by` differ.
