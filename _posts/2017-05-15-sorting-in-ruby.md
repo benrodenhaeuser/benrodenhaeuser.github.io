@@ -1,10 +1,10 @@
 # Sorting in Ruby
 
-Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module which any Ruby class can include as long as it implements a three-way comparison (`<=>`, often called the "spaceship operator") and an `each` method for iterating over the collection. My question for today is this: why would there be two sort methods rather than just one?
+Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module which any Ruby class can include as long as it implements a three-way comparison (`<=>`, often called the "spaceship operator") and an `each` method for iterating over given instance. My question for this post is this: why would there be two sort methods rather than just one?
 
 ## Exploring `sort_by`
 
-Let's first try to gain an understanding of how `sort_by` works. Start with an example: sort the following array by the *numerical values* of its elements:
+Let's first try to understanding better how `sort_by` works. Start with an example. Say we would like to sort the following array by the *numerical values* of its string elements:
 
 ```ruby
 arr = ['0', '10', '3']
@@ -49,9 +49,7 @@ arr.map { |elem| [elem, elem.to_i] } # step (1)
 # => ['0', '3', '10']
 ```
 
-Note that we have replaced the invocation of `sort_by` with calls to `map`, `sort` and `<=>`. This is obviously a lot more cumbersome than using `sort_by` itself, but it paves the way towards our reimplementation.
-
-Generalizing the above approach to our example, here is an implementation of a method `Enumerable#my_sort_by`:
+Note that we have replaced the invocation of `sort_by` with calls to `map`, `sort` and `<=>`. This is obviously a lot more cumbersome than using `sort_by` itself – but it makes it fairly clear how our re-implementation of `sort_by` should look like. Here it is:
 
 ```ruby
 module Enumerable
@@ -63,7 +61,7 @@ module Enumerable
 end
 ```
 
-Looking at the [Rubinius code for `sort_by`](https://github.com/rubinius/rubinius/blob/f9c2dffa4c894eea88abe1e476688df549a2bc4b/core/enumerable.rb#L351) – a hint I got from one of the instructors at [Launch School](http://launchschool.com) when sharing a draft of this post – we see just this pattern: a `map` invocation followed by a `sort` invocation followed by a `map` invocation. Rubinius even has a special class for representing tuples of this kind, equipped with a `<=>` method that compares them based on the value of the second element of the pair.
+Looking at the [Rubinius code for `sort_by`](https://github.com/rubinius/rubinius/blob/f9c2dffa4c894eea88abe1e476688df549a2bc4b/core/enumerable.rb#L351) – a hint I got from one of the instructors at [Launch School](http://launchschool.com) when sharing a draft of this post – we see just this pattern: a `map` invocation followed by a `sort` invocation followed by a `map` invocation. Rubinius even has a special class for representing tuples of the required kind. It is called `SortedElement` and comes with a `<=>` method that compares instances based on the value of the second element of the tuple.
 
 For our running example, `my_sort_by` yields the desired return value:
 
@@ -83,13 +81,13 @@ Let's now return to our original question: why would Ruby have two sort methods 
 
 It turns out that there is a reason for favouring `sort_by` over `sort`, at least in certain scenarios: efficiency.
 
-Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting [has a lower bound](https://www.cs.cmu.edu/~avrim/451f11/lectures/lect0913.pdf) of $n \log n$ in the worst case, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario. The reason is that, in the worst case, $n \log n$ comparisons have to be made in order to arrive at a sorted array. Internally, Ruby [uses quicksort for sorting](https://www.igvita.com/2009/03/26/ruby-algorithms-sorting-trie-heaps/), an algorithm that has a worst case complexity of $n^2$, but is $n \log n$ on average (which is the lower bound for the average case as well).
+Both `sort` and `sort_by` are based on comparisons of elements of the collection we want to sort. Comparison-based sorting [has a lower bound of $n \log n$](https://www.cs.cmu.edu/~avrim/451f11/lectures/lect0913.pdf) in the worst case, which is to say that it is not possible to come up with an algorithm for sorting that performs better (in a worst-case scenario). The reason is that, in the worst case, $n \log n$ comparisons of elements have to be made in order to determine the correct sort order. Internally, Ruby [uses quicksort for sorting](https://www.igvita.com/2009/03/26/ruby-algorithms-sorting-trie-heaps/), an algorithm that has a worst case complexity of $n^2$, but is $n \log n$ on average (as it turns out, $n \log n$ is the lower bound for the average case as well, so quicksort is optimal in this sense).
 
-Since quicksort is the sort algorithm powering both `sort` and `sort_by`, wouldn't it be reasonable to think that both methods should have the same performance? The answer is no. The reason is that the picture is complicated by the fact that we often do not wish to sort a given collection *as is* (i.e., relying on the comparison operator the elements of the collection come with), but rather relying on some specific property of these objects, i.e., a sort criterion, or *sort key*. We may want to sort user entries based on the user's last name, perhaps game moves based on their expected utility – or strings based on their integer value, as in our running example above.
+Since quicksort is the sort algorithm powering both `sort` and `sort_by`, wouldn't it be reasonable to think that both methods should have the same performance? The answer is no, and the reason is that the overall picture is complicated by the fact that we often do not wish to sort a given collection *as is* (i.e., relying on the `<=>` operator the elements of the collection come with), but rather relying on some special "property" of its elements, i.e., a sort criterion, or *sort key*. For example, we may want to sort user profiles based on a user's last name, or game moves based on their expected utility for a player – or strings based on their integer value, as in our running example above.
 
-Now unless the values we want to sort already come *equipped* with a sort key, we will have to generate the keys ourselves. This takes time. And this is where `sort` and `sort_by` differ.
+Now unless the sort keys are simply given to us along with the values we want to sort, we will have to generate the keys on the fly. This takes time above and beyond the actual sorting. And this is where `sort` and `sort_by` differ.
 
-Both of these methods allow us to do key-based sorting by passing a block with the method invocation. Suppose we have a method `key` that transforms the elements of `list` to sort keys of the required kind. Then we can sort our list with the `sort` method as follows:  
+Both of these methods allow us to do key-based sorting by passing a block with the method invocation. Suppose we have a method `key` that transforms the elements of a collection `list` to sort keys of the required kind. Then we can sort our list with the `sort` method as follows:  
 
 ```ruby
 list.sort { |elem1, elem2| key(elem1) <=> key(elem2) }
@@ -101,7 +99,7 @@ Using `sort_by`, as we have seen above, we would do it like this:
 list.sort_by { |elem| key(elem) }
 ```
 
-It looks like using `sort_by` saves a little bit of typing. But we are also saving a lot of computation time, potentially. Remember: what is happening "under the hood", when we invoke `sort_by` in the way just described, is something like this:
+It looks like using `sort_by` saves a little bit of typing. But we are also saving a lot of computation time, potentially. Remember from above: what is happening "under the hood", when we invoke `sort_by` in the way just described, is something like this:
 
 ```ruby
 list.map { |elem| [elem, key(elem)] }
@@ -110,4 +108,4 @@ list.map { |elem| [elem, key(elem)] }
 end
 ```
 
-Obviously, this involves $n$ calls to the `key` method, assuming that the length of `list` is $n$. However, when using `sort`, the number of calls to the `key` method may be quite a bit larger. As observed above, we are relying on quicksort here, so sorting our list involves `n\log n` comparisons on average, and even `n^2` comparisons in the worst case. And each comparison will involve two calls to the `key` method. If `key` itself is a time-consuming transformation, having to perform $n^2$ transformations (or $n\log n$, for that matter) could make a big difference indeed! On the other hand – [as pointed out in the Ruby Docs](http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by) – if the transformation is trivial, `sort` may still be faster, since creating a list of tuples may then be more costly than performing an excess number of comparisons.
+Obviously, this involves $n$ calls to the `key` method, assuming that the length of `list` is $n$. However, when using `sort`, the number of calls to the `key` method may be quite a bit larger. As observed above, we are relying on quicksort here, so sorting our list involves $n\log n$ comparisons on average, and even $n^2$ comparisons in the worst case. And each comparison will involve two calls to the `key` method. If `key` itself is a time-consuming transformation, having to perform $2n^2$ transformations (or $2n\log n$, for that matter) could make a big difference indeed! On the other hand – [as is also pointed out in the Ruby Docs](http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by) – if the transformation is trivial, `sort` may still be faster, since creating a list of tuples may then be more costly than performing an excess number of comparisons.
