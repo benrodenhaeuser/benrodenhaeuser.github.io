@@ -1,6 +1,6 @@
 # Sorting in Ruby
 
-This is a test.
+Testing.
 
 $$a^2 + b^2 = c^2$$
 
