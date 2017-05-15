@@ -6,7 +6,7 @@ $$a^2 + b^2 = c^2$$
 
 Ruby does not have only one built-in method for sorting collections, it has two: `sort` and `sort_by`. Both are contained in the `Enumerable` module which any Ruby class can include as long as it implements three-way comparison (`<=>`, often called the "spaceship operator" and an `each` method for iterating over the collection. Why two sort methods rather than just one? Let's explore.
 
-## How `sort_by` works
+## Exploring `sort_by`
 
 Start with an example: Let's sort the following array by the *numerical values* of its elements:
 
@@ -107,7 +107,7 @@ arr.my_sort_by(&:to_i) # => ['0', '3', '10']
 
 So we have reinvented the wheel. Nice!
 
-## What's the point?
+## The cost of transformation
 
 Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting has a lower bound of $$n log n$$, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario.  
 
