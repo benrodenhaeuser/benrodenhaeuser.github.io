@@ -6,7 +6,7 @@ My question for this post is this: why would there be two sort methods rather th
 
 ## Exploring `sort_by`
 
-Let's first try to understanding better how `sort_by` works. Start with an example. Say we would like to sort the following array by the *numerical values* of its string elements:
+Let's first try to get a clear picture how `sort_by` works. Start with an example. Say we would like to sort the following array by the *numerical values* of its string elements:
 
 ```ruby
 arr = ['0', '10', '3']
