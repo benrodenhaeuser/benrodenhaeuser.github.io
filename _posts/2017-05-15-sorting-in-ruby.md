@@ -1,6 +1,6 @@
 # Sorting in Ruby
 
-Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module which any Ruby class can include as long as it implements a three-way comparison (`<=>`, often called the "spaceship operator") and an `each` method for iterating over given instance. My question for this post is this: why would there be two sort methods rather than just one?
+Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module. This means that any Ruby class can use these built-in sorting methods as long as it implements an `each` method for iterating over a given instance, and a three-way comparison method `<=>`. My question for this post is this: why would there be two sort methods rather than just one?
 
 ## Exploring `sort_by`
 
