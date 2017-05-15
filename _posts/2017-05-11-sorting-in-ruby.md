@@ -109,7 +109,7 @@ So we have reinvented the wheel. Nice!
 
 ## The cost of transformation
 
-Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting has a lower bound of $$n log n$$, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario.  
+Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting has a lower bound of $n \log n$, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario.  
 
 Presumably, Ruby uses one internal sorting mechanism that underlies both `sort` and `sort_by`. Why bother using `sort_by`, then? The answer is that – as our above example illustrates –, in practice, we are often not merely interested in sorting per se, but in sorting based on a particular criterion of interest. We may want to sort strings based on their numerical values, user entries based on the user's last name, or perhaps game moves based on their expected utility.  
 
