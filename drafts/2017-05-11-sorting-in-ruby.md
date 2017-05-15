@@ -1,10 +1,10 @@
 # Sorting in Ruby
 
-Ruby does not have only one built-in method for sorting collections, it has two: `sort` and `sort_by`. Both are contained in the `Enumerable` module which any Ruby class can include as long as it implements three-way comparison (`<=>`, often called the "spaceship operator" and an `each` method for iterating over the collection. Why two sort methods rather than just one? Let's explore.
+Ruby has two built-in methods for sorting collections: `sort` and `sort_by`. Both are contained in the `Enumerable` module which any Ruby class can include as long as it implements three-way comparison (`<=>`, often called the "spaceship operator" and an `each` method for iterating over the collection. Why would there be two sort methods rather than just one? Let's explore.
 
 ## Exploring `sort_by`
 
-Start with an example: Let's sort the following array by the *numerical values* of its elements:
+Let's first try to gain an understanding of how `sort_by` works. Start with an example: sort the following array by the *numerical values* of its elements:
 
 ```ruby
 arr = ['0', '10', '3']
@@ -105,8 +105,11 @@ So we have reinvented the wheel. Nice!
 
 ## The cost of transformation
 
-Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting has a lower bound of $n \log n$, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario.  
+Returning to our original question: it turns out that the main reason to use `sort_by` rather than `sort` is efficiency.
 
-Presumably, Ruby uses a single sorting algorithm that underlies both `sort` and `sort_by` – quicksort, perhaps. So both methods should perform the same efficiency-wise, right? The answer is no. And the reason is that the picture is complicated by the fact that we often do not wish to sort a given collection *as is*, but rather relying on some *sort criterion*. We may want to sort user entries based on the user's last name, or perhaps game moves based on their expected utility. Sorting strings based on their numerical values, as considered above, is another instance of this.
+That may be surprising given well-known facts about sorting algorithms. Both `sort` and `sort_by` are based on comparisons. Comparison-based sorting [has a lower bound](https://www.cs.cmu.edu/~avrim/451f11/lectures/lect0913.pdf) of $n \log n$, which is to say that it is not possible to come up with an algorithm for sorting that performs better in a worst-case scenario. Ruby [uses quicksort internally](https://www.igvita.com/2009/03/26/ruby-algorithms-sorting-trie-heaps/), which has a worst case complexity of $n^2$, but is $n \log n$ on average.
+It seems a reasonable guess, then, that quicksort is the sort algorithm powering both `sort` and `sort_by`.
+
+But wouldn't that imply that both methods should perform the same efficiency-wise, right? The answer is no. The reason is that the picture is complicated by the fact that we often do not wish to sort a given collection *as is*, but rather relying on some *sort criterion*. We may want to sort user entries based on the user's last name, or perhaps game moves based on their expected utility.
 
 So we have to perform some sort of transformation on the values we want to sort. Transforming those values takes time. And here, `sort` and `sort_by` differ.
