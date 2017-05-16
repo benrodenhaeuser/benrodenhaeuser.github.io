@@ -99,7 +99,7 @@ Using `sort_by`, as we have seen above, we would do it like this:
 list.sort_by { |elem| key(elem) }
 ```
 
-It looks like using `sort_by` saves us a little bit of typing. But we are also saving a lot of computation time, potentially. Remember from above: what is happening "under the hood" when we invoke `sort_by` in the way just described is something like this:
+It looks like using `sort_by` saves us a little bit of typing. But we are also saving a lot of computation steps, potentially. Remember from above: what is happening "under the hood" when we invoke `sort_by` in the way just described is something like this:
 
 ```ruby
 list.map { |elem| [elem, key(elem)] }
