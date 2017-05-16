@@ -27,7 +27,7 @@ arr.sort_by(&:to_i)
 # => ['0', '3', '10']
 ```
 
-Now the question is: how does `sort_by` do its magic? My initial hunch when exploring this topic was that `sort_by` seems fairly closely related to the functionality provided by the `map` method, also contained in `Enumerable`. There is a hint in the Ruby Docs that points in the same direction: ["The current implementation of `sort_by` generates an array of tuples containing the original collection element and the mapped value"](http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by).
+Now the question is: how does `sort_by` do its magic? My initial hunch when exploring this topic was that `sort_by` seems fairly closely related to the functionality provided by the `map` method, also contained in `Enumerable`. There is [a hint in the Ruby Docs](http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by) that points in the same direction: "The current implementation of `sort_by` generates an array of tuples containing the original collection element and the mapped value."
 
 Based on this, it looks like what `sort_by` must be doing is something like this:
 
