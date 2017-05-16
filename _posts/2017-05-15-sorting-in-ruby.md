@@ -16,7 +16,6 @@ This can be achieved using `sort_by` as follows:
 
 ```ruby
 arr.sort_by { |string| string.to_i }
-end
 # => ['0', '3', '10']
 ```
 
