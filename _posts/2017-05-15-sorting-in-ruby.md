@@ -10,6 +10,8 @@ Let's first try to get a clearer picture how `sort_by` works. Start with an exam
 
 ```ruby
 arr = ['0', '10', '3']
+arr2 = ['ben', 'julia']
+arr3 = [3, 5, 7]
 ```
 
 This can be achieved using `sort_by` as follows:
