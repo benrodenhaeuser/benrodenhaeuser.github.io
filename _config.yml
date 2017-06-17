@@ -3,6 +3,7 @@ title: Ben Rodenhäuser
 description: Learning to program
 permalink: pretty
 google_analytics: UA-99334571-1
+github: [metadata]
 defaults:
   -
     scope:
