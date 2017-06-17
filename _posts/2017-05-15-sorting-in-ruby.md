@@ -105,7 +105,6 @@ It looks like using `sort_by` saves us a little bit of typing. But we are also s
 list.map { |elem| [elem, key(elem)] }
   .sort { |pair1, pair2| pair1.last <=> pair2.last }
   .map { |pair| pair.first }
-end
 ```
 
 Clearly, this procedure involves $n$ calls to the `key` method, assuming that the length of `list` is $n$: we call `key` once for each element `elem` of `list`, storing the pair `[elem, key(elem)]` in our intermediate array. However, when using `sort`, the number of calls to the `key` method may be quite a bit larger. As observed earlier, sorting our list involves making $O(n\log n)$ comparisons on average, and even $O(n^2)$ comparisons in the worst case (since quicksort is Ruby's search algorithm of choice). If we use `sort`, each such comparison will require two *on the fly* calls to the `key` method. In cases where `key` itself is a time-consuming transformation, having to perform it $O(n\log n)$ times (or even $O(n^2)$, in the worst case) rather than merely $O(n)$ times will make a big difference indeed.
