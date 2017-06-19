@@ -2,7 +2,7 @@
 @import url(syntax.css);
 body { background-color: #fff; padding: 50px; font: 16px/1.5 'Open Sans', sans-serif; color: #595959; font-weight: 400; }
 
-h1, h2, h3, h4, h5, h6 { color: #383838; margin: 0 0 20px; font-weight: normal; }
+h1, h2, h3, h4, h5, h6 { color: #252525; margin: 0 0 20px; font-weight: normal; }
 
 h2 code { color: #000; }
 
@@ -12,9 +12,7 @@ h1, h2, h3 { line-height: 1.1; }
 
 h1 { font-size: 28px; }
 
-h2 { color: #393939; }
-
-h3, h4, h5, h6 { color: #494949; }
+h2 { font-size: 20px; margin-top: 45px; }
 
 .pad { padding: 5px; }
 

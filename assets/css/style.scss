@@ -1,7 +1,6 @@
 ---
 ---
 
-// @import "rouge-github";
 @import "syntax.css";
 
 body {
@@ -13,7 +12,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color:#383838;
+  // color:#383838;
+  color: #252525;
   margin:0 0 20px;
   font-weight: normal;
 }
@@ -31,16 +31,22 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size:28px;
+  font-size: 28px;
 }
 
+// Want this?
 h2 {
-  color:#393939;
+  font-size: 20px;
+  margin-top: 45px;
 }
 
-h3, h4, h5, h6 {
-  color:#494949;
-}
+// h2 {
+//   color:#393939;
+// }
+//
+// h3, h4, h5, h6 {
+//   color:#494949;
+// }
 
 .pad {
   padding: 5px;

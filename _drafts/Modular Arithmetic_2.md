@@ -1,7 +1,5 @@
 # Modular Arithmetic
 
-## The modulo operator
-
 If we increase an integer $x$ by a multiple of $y$, then we end up in the same spot modulo $y$:  
 
 $$x\bmod y = (x + ky) \bmod y$$
@@ -12,7 +10,7 @@ $$-5 \bmod 3 = (-5 + 2 \cdot 3) \bmod 3 = (-5 + 6) \bmod 3 = 1\bmod 3 = 1$$
 
 This leads to the visualization of the modulo operation using a "clock" (see [here](https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/what-is-modular-arithmetic), e.g.).
 
-### Negation
+## Negation
 
 The following equality holds for any natural numbers $x$ and $y$:
 
@@ -28,7 +26,7 @@ If, on the other hand, $x\bmod y > 0$, then the following also holds:
 
 $$-x \bmod y = y - (x \bmod y)$$
 
-### Addition
+## Addition
 
 The modulo operator distributes over addition:
 
