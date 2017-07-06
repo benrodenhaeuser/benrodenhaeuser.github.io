@@ -213,11 +213,15 @@ small {
   font-size:11px;
 }
 
-hr {
+// hr {
+//   // background:#e5e5e5;
+//   // height:3x;
+//   // margin:0 0 20px;
+// }
+
+hr.line {
   border:0;
-  background:#e5e5e5;
-  height:1px;
-  margin:0 0 20px;
+  border-top: 3px double #e5e5e5;
 }
 
 footer {

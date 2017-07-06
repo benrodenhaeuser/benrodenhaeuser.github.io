@@ -72,7 +72,7 @@ section { width: 650px; float: left; padding-bottom: 50px; }
 
 small { font-size: 11px; }
 
-hr { border: 0; background: #e5e5e5; height: 1px; margin: 0 0 20px; }
+hr.line { border: 0; border-top: 3px double #e5e5e5; }
 
 footer { width: 260px; float: right; position: fixed; bottom: 50px; -webkit-font-smoothing: subpixel-antialiased; }
 

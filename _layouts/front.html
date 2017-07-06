@@ -8,7 +8,7 @@
       {% for post in site.posts %}
       <small>{{ post.date | date_to_long_string }}</small>
       {{ post.content }}
-      <div class="pad"></div><hr /><div class="triplepad"></div>
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       {% endfor %}
       </section>
       {% include header.html %}
