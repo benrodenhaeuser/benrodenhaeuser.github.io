@@ -16,6 +16,8 @@ h2 { font-size: 20px; margin-top: 45px; }
 
 .pad { padding: 5px; }
 
+.triplepad { padding: 15px; }
+
 a { color: #FF7F50; text-decoration: none; }
 
 a:hover, a:focus { color: #494949; }
@@ -75,9 +77,8 @@ hr { border: 0; background: #e5e5e5; height: 1px; margin: 0 0 20px; }
 footer { width: 260px; float: right; position: fixed; bottom: 50px; -webkit-font-smoothing: subpixel-antialiased; }
 
 @media print, screen and (max-width: 1100px) { div.wrapper { width: auto; margin: 0; }
-  section { border-bottom: 1px solid #e5e5e5; border-width: 1px 0; padding-bottom: 20px 0; }
   header, section, footer { float: none; position: static; width: auto; }
-  section { padding: 20px 0; margin: 0 0 20px; }
+  section { margin: 0 0 20px; }
   header a small { display: inline; }
   header ul { position: absolute; right: 50px; top: 52px; } }
 @media print, screen and (max-width: 720px) { body { word-wrap: break-word; }

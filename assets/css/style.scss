@@ -52,6 +52,10 @@ h2 {
   padding: 5px;
 }
 
+.triplepad {
+  padding: 15px;
+}
+
 a {
   color: #FF7F50;
   text-decoration:none;
@@ -231,12 +235,6 @@ footer {
     margin:0;
   }
 
-  section {
-    border-bottom:1px solid #e5e5e5;
-    border-width:1px 0;
-    padding-bottom: 20px 0;
-  }
-
   header, section, footer {
     float:none;
     position:static;
@@ -250,7 +248,7 @@ footer {
   section {
     // border:1px solid #e5e5e5;
     // border-width:1px 0;
-    padding:20px 0;
+    // padding:20px 0;
     margin:0 0 20px;
   }
 

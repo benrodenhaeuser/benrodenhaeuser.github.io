@@ -4,9 +4,12 @@
   <body>
     <div class="wrapper">
       <section>
-      {% assign post = site.posts.first %}
+      <!-- {% assign post = site.posts.first %} -->
+      {% for post in site.posts %}
       <small>{{ post.date | date_to_long_string }}</small>
       {{ post.content }}
+      <div class="pad"></div><hr /><div class="triplepad"></div>
+      {% endfor %}
       </section>
       {% include header.html %}
       {% include footer.html %}
