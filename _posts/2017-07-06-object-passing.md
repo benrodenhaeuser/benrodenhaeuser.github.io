@@ -1,6 +1,6 @@
 # Object Passing in Ruby
 
-The following is a description of the object passing strategy followed by Ruby.
+The following is a characterization of the object passing strategy followed by Ruby.
 
 ## Pass-by-reference vs pass-by-value
 
