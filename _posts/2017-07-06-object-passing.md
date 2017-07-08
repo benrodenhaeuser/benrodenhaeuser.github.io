@@ -24,7 +24,7 @@ Ruby does not use pass-by-reference. It uses pass-by-value. However, to get a be
 1. *Pass-value-by-value:* In pass-value-by-value, the procedure receives a *copy of the objects* passed to it. There is thus no relationship between either the variables or the objects referenced by the values by the function and the caller. Nothing that happens to one will affect the other.
 2. *Pass-reference-by-value:* On the pass-reference-by-value model, a procedure receives a reference to the same object in memory that is used by the caller, i.e., caller and callee *share* the object. However, the variable the procedure uses is *not* merely an alias for the variable used by the caller. The procedure has its own ("fresh") variable, which merely happens to point to the same object as the caller variable. This means that changes made to the *object* made inside the procedure will be visible to the caller. But changes made to the *variable* inside the procedure will not be.
 
-Java and C follow the first model. How does Ruby do it? *Ruby follows the second model.* So the variable passed into a Ruby method is not a "complete alias" for the original variable. It is distinct. But the method variable and the variable used by the caller *share a single value*.
+How does Ruby do it? *Ruby follows the second model.* So the variable passed into a Ruby method is not a "complete alias" for the original variable. It is distinct. But the method variable and the variable used by the caller *share a single value*.
 
 ## Examples
 
