@@ -44,7 +44,7 @@ In this example, the `reassign` method reassigns the variable it receives to ano
 
 So the last line of the above code evaluates to `[1]`, not to `[10]` as we would expect on the pass-by-reference model. *Reassigning a variable within a method will have no effect on the caller in Ruby.*
 
-Let's now contrast Ruby with the pass-value-by-value strategy used by Java and C.
+Let's now contrast Ruby with the pass-value-by-value strategy used by Java.
 
 ```ruby
 def mutate(array)
