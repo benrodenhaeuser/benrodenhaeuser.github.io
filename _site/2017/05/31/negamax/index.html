@@ -55,7 +55,18 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>Here is an implementation of the Negamax algorithm for Tic Tac Toe in Ruby:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">terminal?</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
     <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
   <span class="k">else</span>
@@ -67,15 +78,17 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
     <span class="k">end</span><span class="p">.</span><span class="nf">max</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>The method returns the value of a game state <code class="highlighter-rouge">state</code> for the player <code class="highlighter-rouge">player</code>, assumed to be the player who moves next. This value is the highest payoff that <code class="highlighter-rouge">player</code> can be guaranteed to achieve with optimal play, and it is denoted  with the variable <code class="highlighter-rouge">best_value</code>.</p>
 
 <p>For terminal states, the value of <code class="highlighter-rouge">state</code> for <code class="highlighter-rouge">player</code> is given by the Tic Tac Toe payoff function — that’s the first branch of the conditional:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>For non-terminal states, <code class="highlighter-rouge">player</code> has to evaluate all available choices. Suppose she is at the moment looking at one particular move <code class="highlighter-rouge">move</code>. She makes the move (that’s the line <code class="highlighter-rouge">make(move, player, state)</code>, which updates <code class="highlighter-rouge">state</code> as a side-effect), and evaluates the resulting position. She uses our <code class="highlighter-rouge">nega_max</code> method to do this. Assume that the method tells her that the best her opponent can do in the successor state (referenced by <code class="highlighter-rouge">state</code> at this point) is $n$. So what can <code class="highlighter-rouge">player</code> herself achieve by choosing <code class="highlighter-rouge">move</code>? It’s $-n$. Here is why:</p>
@@ -88,8 +101,9 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>So the best <code class="highlighter-rouge">player</code> can guarantee to achieve when choosing <code class="highlighter-rouge">move</code> is indeed $-n$. This explains the crucial line of the method containing the recursive call:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Notice that this only works because Tic Tac Toe is <em>zero-sum</em>, i.e., one player’s loss is another player’s gain: the payoffs of both players always add up to 0.</p>
@@ -241,6 +255,16 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
   <p>Learning to program</p>
   <hr class="line" />
   <p>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/02/a-bag-of-sets/">A Bag Of Sets</a><span class="pad"></span><small>02 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
+          </h3>
       
 
           <h3>

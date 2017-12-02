@@ -65,36 +65,50 @@
   <li><em>Pass-reference-by-value:</em> On the pass-reference-by-value model, a procedure receives a reference to the same object in memory that is used by the caller, i.e., caller and callee <em>share</em> the object. However, the variable the procedure uses is <em>not</em> merely an alias for the variable used by the caller. The procedure has its own (“fresh”) variable, which merely happens to point to the same object as the caller variable. This means that changes made to the <em>object</em> made inside the procedure will be visible to the caller. But changes made to the <em>variable</em> inside the procedure will not be.</li>
 </ol>
 
-<p>Java and C follow the first model. How does Ruby do it? <em>Ruby follows the second model.</em> So the variable passed into a Ruby method is not a “complete alias” for the original variable. It is distinct. But the method variable and the variable used by the caller <em>share a single value</em>.</p>
+<p>How does Ruby do it? <em>Ruby follows the second model.</em> So the variable passed into a Ruby method is not a “complete alias” for the original variable. It is distinct. But the method variable and the variable used by the caller <em>share a single value</em>.</p>
 
 <h2 id="examples">Examples</h2>
 
 <p>Let’s see the consequences of this with two examples. First, contrast Ruby with the pass-by-reference model.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">reassign</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">reassign</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
   <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 <span class="k">end</span>
 
 <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">reassign</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
 <span class="n">array</span> <span class="c1">#=&gt; [1]</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>In this example, the <code class="highlighter-rouge">reassign</code> method reassigns the variable it receives to another object. In a pass-by-reference language, this would have the effect of reassigning the caller variable <code class="highlighter-rouge">array</code> as well (because the variable used by the caller and the variable used by the method are <em>the same</em>, except for the superficial property of not having the same name). But not so in Ruby: the method uses its own variable, distinct from the variable used by the caller.</p>
 
 <p>So the last line of the above code evaluates to <code class="highlighter-rouge">[1]</code>, not to <code class="highlighter-rouge">[10]</code> as we would expect on the pass-by-reference model. <em>Reassigning a variable within a method will have no effect on the caller in Ruby.</em></p>
 
-<p>Let’s now contrast Ruby with the pass-value-by-value strategy used by Java and C.</p>
+<p>Let’s now contrast Ruby with the pass-value-by-value strategy used by Java.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
   <span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 <span class="k">end</span>
 
 <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">mutate</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
 <span class="n">array</span> <span class="c1">#=&gt; [10]</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>In this example, the <code class="highlighter-rouge">mutate</code> method mutates the object it receives. In a pass-value-by-value language, this change would not be visible to the caller, since the object used by the method, and the object used by the caller are <em>distinct</em>. But not so in Ruby: the object is shared between caller variable and method variable, so the mutation of the array object will be visible to the caller.</p>
@@ -115,6 +129,16 @@
   <p>Learning to program</p>
   <hr class="line" />
   <p>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/02/a-bag-of-sets/">A Bag Of Sets</a><span class="pad"></span><small>02 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
+          </h3>
       
 
           <h3>

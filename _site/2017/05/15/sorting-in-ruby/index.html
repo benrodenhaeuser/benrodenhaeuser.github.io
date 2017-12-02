@@ -43,22 +43,27 @@
 
 <p>Let’s first try to get a clearer picture how <code class="highlighter-rouge">sort_by</code> works. Start with an example. Suppose we would like to sort the following array <em>by the numerical values</em> of its string elements:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">,</span> <span class="s1">'3'</span><span class="p">]</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">,</span> <span class="s1">'3'</span><span class="p">]</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>This can be achieved using <code class="highlighter-rouge">sort_by</code> as follows:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">string</span><span class="o">|</span> <span class="n">string</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">string</span><span class="o">|</span> <span class="n">string</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Or using shorthand:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Now the question is: how does <code class="highlighter-rouge">sort_by</code> do its magic? My initial hunch when exploring this topic was that <code class="highlighter-rouge">sort_by</code> seems fairly closely related to the functionality provided by the <code class="highlighter-rouge">map</code> method, also contained in <code class="highlighter-rouge">Enumerable</code>. There is <a href="http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by">a hint in the Ruby Docs</a> that points in the same direction: “The current implementation of <code class="highlighter-rouge">sort_by</code> generates an array of tuples containing the original collection element and the mapped value.”</p>
@@ -79,37 +84,50 @@
 
 <p>First, we observe that we can actually express the above three steps in Ruby code fairly easily – this is where the <code class="highlighter-rouge">map</code> method comes into play. For our running example, observe that the sorted array can be obtained as follows:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span><span class="p">]</span> <span class="p">}</span> <span class="c1"># step (1)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span><span class="p">]</span> <span class="p">}</span> <span class="c1"># step (1)</span>
   <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span> <span class="c1"># step (2)</span>
   <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span> <span class="c1"># step (3)</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Notice that we have replaced the invocation of <code class="highlighter-rouge">sort_by</code> with calls to <code class="highlighter-rouge">map</code>, <code class="highlighter-rouge">sort</code> and <code class="highlighter-rouge">&lt;=&gt;</code>. This is obviously a lot more cumbersome than using <code class="highlighter-rouge">sort_by</code> itself – but it makes it fairly clear how our re-implementation of <code class="highlighter-rouge">sort_by</code> should look like. Here it is:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Enumerable</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">module</span> <span class="nn">Enumerable</span>
   <span class="k">def</span> <span class="nf">my_sort_by</span>
     <span class="nb">self</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="k">yield</span><span class="p">(</span><span class="n">elem</span><span class="p">)]</span> <span class="p">}</span>
       <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span>
       <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Looking at the <a href="https://github.com/rubinius/rubinius/blob/f9c2dffa4c894eea88abe1e476688df549a2bc4b/core/enumerable.rb#L351">Rubinius code for <code class="highlighter-rouge">sort_by</code></a> – a hint I got from one of the instructors at Launch School when sharing a draft of this post – we see just this pattern: a <code class="highlighter-rouge">map</code> invocation followed by a <code class="highlighter-rouge">sort</code> invocation followed by a <code class="highlighter-rouge">map</code> invocation. Rubinius even has a special class for representing tuples of the required kind. It is called <code class="highlighter-rouge">SortedElement</code> and comes with a <code class="highlighter-rouge">&lt;=&gt;</code> method that compares instances based on the value of the second element of the tuple.</p>
 
 <p>For our running example, <code class="highlighter-rouge">my_sort_by</code> yields the desired return value:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Or, using shorthand:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Let’s now return to our original question: why would Ruby have two sort methods rather than just one?</p>
@@ -126,22 +144,27 @@
 
 <p>Both of these methods allow us to do key-based sorting by passing a block with the method invocation. Suppose we have a method <code class="highlighter-rouge">key</code> that transforms the elements of a collection <code class="highlighter-rouge">list</code> to sort keys of the required kind (in our running example, the relevant transformation is simply to convert strings to integers, because numeric values are what we want to sort by). Then we can sort our list with the <code class="highlighter-rouge">sort</code> method as follows:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">list</span><span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem1</span><span class="p">,</span> <span class="n">elem2</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem1</span><span class="p">)</span> <span class="o">&lt;=&gt;</span> <span class="n">key</span><span class="p">(</span><span class="n">elem2</span><span class="p">)</span> <span class="p">}</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">list</span><span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem1</span><span class="p">,</span> <span class="n">elem2</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem1</span><span class="p">)</span> <span class="o">&lt;=&gt;</span> <span class="n">key</span><span class="p">(</span><span class="n">elem2</span><span class="p">)</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Using <code class="highlighter-rouge">sort_by</code>, as we have seen above, we would do it like this:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">list</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">}</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">list</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>It looks like using <code class="highlighter-rouge">sort_by</code> saves us a little bit of typing. But we are also saving a lot of computation steps, potentially. Remember from above: what is happening “under the hood” when we invoke <code class="highlighter-rouge">sort_by</code> in the way just described is something like this:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">list</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)]</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="n">list</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)]</span> <span class="p">}</span>
   <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span>
   <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Clearly, this procedure involves $n$ calls to the <code class="highlighter-rouge">key</code> method, assuming that the length of <code class="highlighter-rouge">list</code> is $n$: we call <code class="highlighter-rouge">key</code> once for each element <code class="highlighter-rouge">elem</code> of <code class="highlighter-rouge">list</code>, storing the pair <code class="highlighter-rouge">[elem, key(elem)]</code> in our intermediate array. However, when using <code class="highlighter-rouge">sort</code>, the number of calls to the <code class="highlighter-rouge">key</code> method may be quite a bit larger. As observed earlier, sorting our list involves making $O(n\log n)$ comparisons on average, and even $O(n^2)$ comparisons in the worst case (since quicksort is Ruby’s search algorithm of choice). If we use <code class="highlighter-rouge">sort</code>, each such comparison will require two <em>on the fly</em> calls to the <code class="highlighter-rouge">key</code> method. In cases where <code class="highlighter-rouge">key</code> itself is a time-consuming transformation, having to perform it $O(n\log n)$ times (or even $O(n^2)$, in the worst case) rather than merely $O(n)$ times will make a big difference indeed.</p>
@@ -160,6 +183,16 @@
   <p>Learning to program</p>
   <hr class="line" />
   <p>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/02/a-bag-of-sets/">A Bag Of Sets</a><span class="pad"></span><small>02 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
+          </h3>
       
 
           <h3>

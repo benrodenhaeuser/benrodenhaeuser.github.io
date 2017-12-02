@@ -34,6 +34,197 @@
       <section>
       <!--  -->
       
+      <small>02 December 2017</small>
+      <h1 id="a-bag-of-sets">A Bag of Sets</h1>
+
+<p><a href="https://pdxwolfy.wordpress.com">Pete</a> mentioned Ruby’s Set library the other day on the Slack channel, and how it internally uses a hash to store the elements of a set. He also pointed out that hashes can be used for representing multisets (or <em>bags</em>, as multisets are also called). This piqued my interest.</p>
+
+<p>More specifically, I thought that it should be possible to have <code class="highlighter-rouge">Set</code> and <code class="highlighter-rouge">Bag</code> classes share a lot, even most of the same code, as an exercise in <a href="http://www.stroustrup.com/glossary.html#Gpolymorphism">polymorphism</a>.</p>
+
+<p>After all, bags and sets have pretty much the same interface:</p>
+
+<ul>
+  <li>we can <em>add</em> elements to, or <em>delete</em> elements from a bag, same as from a set,</li>
+  <li>bags can be <em>subsets</em>, or <em>supersets</em> of one another, just as sets,</li>
+  <li>we can take the <em>union</em>, <em>intersection</em>, or <em>difference</em> of two bags, just as we can for two sets.</li>
+</ul>
+
+<p>The main difference between the two lies in how they count, so this should be the only point were we need code that is specific to each type of object. This post is an account of how I implemented this idea.</p>
+
+<h2 id="sets-and-bags">Sets and bags</h2>
+
+<p>Sets are unordered collections for which element count does not matter. So</p>
+
+<ul>
+  <li>$\lbrace a, b, c\rbrace$ and $\lbrace a, c, b\rbrace$ represent the same set (since order does not matter),</li>
+  <li>$\lbrace a, b, c\rbrace$ and $\lbrace a, b, c, c\rbrace$ represent the same set (since element count does not matter).</li>
+</ul>
+
+<!-- A first smal digression is in order here. Notice that the preceding examples suggest that $\lbrace a, b, c, c\rbrace$ is a perfectly legal set, which is, however, set-theoretically equivalent to the more canonical representation $\lbrace a, b, c\rbrace$. This is not the only perspective one can take on the matter. There is another view according to which "the same element shall not be allowed to appear more than once" in a set. According to that view, $\lbrace a, b, c, c\rbrace$ would not even be a set! However, for our purposes, it is more natural to take the liberal stance of allowing sets with repeated occurences of elements like $\lbrace a, c, b\rbrace$ while identifying them $\lbrace a, c, b\rbrace$. One reason why this is more natural is that it is pretty much how our implementation of sets will turn out to work. -->
+
+<p>For bags, on the other hand, element count does matter. That is,</p>
+
+<ul>
+  <li>$\lbrace a, b, c\rbrace$ and $\lbrace a, c, b\rbrace$ represent the same bag, since order (still) does not matter,</li>
+  <li>but $\lbrace a, b, c\rbrace$ and $\lbrace a, b, c, c\rbrace$ <em>do not</em> represent the same bag.</li>
+</ul>
+
+<p>The number of times an element occurs in a bag is called the <em>multiplicity</em> of that element, and the size of the bag is the sum of the multiplicity of its elements.</p>
+
+<h2 id="characteristic-functions-and-multiplicity-functions">Characteristic functions and multiplicity functions</h2>
+
+<p>Sets whose elements are drawn from a given domain (i.e., another set) can be represented by what is called a <em>characteristic function</em>, which specifies for each element of the domain whether it is an element of the set in question.</p>
+
+<p>Suppose that our domain is the characters in the Roman alphabet. Then we can represent the set $\lbrace a, b, c\rbrace$ by means of the function that maps the characters $a$, $b$ and $c$ to $1$ (indicating that they are elements of the set), while mapping all other characters to $0$ (indicating that they are not elements of the set). So sets can be defined as maps from a given universe of objects to the set $\lbrace 0, 1\rbrace$.</p>
+
+<p>This approach can be generalized to bags. Instead of mapping elements to either one of $0$ or $1$, we map them to their element count in the bag. This means that the bag $\lbrace a, b, c, c\rbrace$ would be defined by the function that maps $a$ and $b$ to $1$, $c$ to $2$, and all other characters in the Roman alphabet to $0$.</p>
+
+<p>Such a function is called a multiplicity function.</p>
+
+<p>This perspective on the matter is useful for our purposes for two reasons. First, a characteristic function (be it for a set or a bag) can be neatly captured by a hash table, which is just what we are after. Second, viewing sets and bags through the lens of characteristic functions paves the way towards implementing operations on both types of objects in a uniform way.</p>
+
+<p>As an example, consider the union operation. For two sets given by their characteristic function.</p>
+
+<h2 id="setting-up-the-bag-and-set-classes">Setting up the Bag and Set classes</h2>
+
+<p>Let’s start with the basic setup of our <code class="highlighter-rouge">Bag</code> and <code class="highlighter-rouge">Set</code> classes. We will expand the capabilities of both classes as we go along.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Bag</span>
+  <span class="kp">include</span> <span class="no">Enumerable</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">enum</span> <span class="o">=</span> <span class="p">[])</span>
+    <span class="vi">@hash</span> <span class="o">=</span> <span class="no">Hash</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">merge</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="vi">@hash</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">elem</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+    <span class="n">elem</span> <span class="p">?</span> <span class="n">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">:</span> <span class="n">size</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">each</span>
+    <span class="k">return</span> <span class="n">to_enum</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:each</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">block_given?</span>
+    <span class="vi">@hash</span><span class="p">.</span><span class="nf">each_key</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">count</span><span class="p">(</span><span class="n">elem</span><span class="p">).</span><span class="nf">times</span> <span class="p">{</span> <span class="k">yield</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Set</span> <span class="o">&lt;</span> <span class="no">Bag</span>
+  <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="vi">@hash</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>As announced, we use a hash, referenced by the instance variable <code class="highlighter-rouge">@hash</code>, as an internal storage device for <code class="highlighter-rouge">Bag</code> objects. The intent is that <code class="highlighter-rouge">@hash[elem] == 0</code> indicates that a given <code class="highlighter-rouge">elem</code> is <em>not</em> a member of our collection, while <code class="highlighter-rouge">@hash[elem] &gt; 0</code> indicates that <code class="highlighter-rouge">elem</code> <em>is</em> a member of our collection.</p>
+
+<p>The intent is that the presence of a particular hash key indicates that the object given by the key is part of the set, and the value for a particular key indicates the count of the object.</p>
+
+<p>For plain sets, this is really all we need to know. For multisets, or bags, as they are also called, their count also matters. The count will be given by the value stored in a hash for a particular key. To see how this works out, lets implement a couple more methods.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9</pre></td><td class="code"><pre><span class="n">enum</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">set</span> <span class="o">=</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
+<span class="n">bag</span> <span class="o">=</span> <span class="no">Bag</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
+
+<span class="n">set</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">elem</span> <span class="p">}</span> <span class="c1"># output: 1 2 3</span>
+<span class="n">bag</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">elem</span> <span class="p">}</span> <span class="c1"># output: 1 2 3 3</span>
+
+<span class="n">set</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 1</span>
+<span class="n">bag</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 2</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<h2 id="topics-for-discussion">Topics for discussion</h2>
+
+<ul>
+  <li>definition of <code class="highlighter-rouge">count</code> in terms of <code class="highlighter-rouge">indicator</code></li>
+  <li>illustrate the consequences: <code class="highlighter-rouge">each</code></li>
+  <li>set interface: like multiset, but don’t care about values in internal hash –
+override <code class="highlighter-rouge">count</code> method</li>
+  <li>interface difference: each: yield without repetitions</li>
+  <li>use of eql? and hash methods</li>
+  <li>set equality can be defined in terms of subset relation</li>
+</ul>
+
+<p>Maybe build both classes (bag and set) as we go?</p>
+
+<p>… For recapitulation, this is the code we have so far:</p>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
+      <small>28 October 2017</small>
+      <h1 id="on-subproblems">On Subproblems</h1>
+
+<h2 id="subroutines">Subroutines</h2>
+
+<p>Breaking down a problem into smaller pieces necessary to solve it.</p>
+
+<p>Big problems as collections of small problems.</p>
+
+<p>Subroutines!</p>
+
+<h2 id="subinstances">Subinstances</h2>
+
+<ul>
+  <li>Non-overlapping subproblems:
+    <ul>
+      <li>Mergesort</li>
+    </ul>
+  </li>
+  <li>Overlapping subproblems:
+    <ul>
+      <li>Fibonacci</li>
+      <li>TicTacToe</li>
+      <li>Dynamic Programming</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="objects">Objects</h2>
+
+<p>=&gt; Objects break down a problem into “responsibilities”.</p>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
       <small>06 July 2017</small>
       <h1 id="object-passing-in-ruby">Object Passing in Ruby</h1>
 
@@ -67,36 +258,50 @@
   <li><em>Pass-reference-by-value:</em> On the pass-reference-by-value model, a procedure receives a reference to the same object in memory that is used by the caller, i.e., caller and callee <em>share</em> the object. However, the variable the procedure uses is <em>not</em> merely an alias for the variable used by the caller. The procedure has its own (“fresh”) variable, which merely happens to point to the same object as the caller variable. This means that changes made to the <em>object</em> made inside the procedure will be visible to the caller. But changes made to the <em>variable</em> inside the procedure will not be.</li>
 </ol>
 
-<p>Java and C follow the first model. How does Ruby do it? <em>Ruby follows the second model.</em> So the variable passed into a Ruby method is not a “complete alias” for the original variable. It is distinct. But the method variable and the variable used by the caller <em>share a single value</em>.</p>
+<p>How does Ruby do it? <em>Ruby follows the second model.</em> So the variable passed into a Ruby method is not a “complete alias” for the original variable. It is distinct. But the method variable and the variable used by the caller <em>share a single value</em>.</p>
 
 <h2 id="examples">Examples</h2>
 
 <p>Let’s see the consequences of this with two examples. First, contrast Ruby with the pass-by-reference model.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">reassign</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">reassign</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
   <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 <span class="k">end</span>
 
 <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">reassign</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
 <span class="n">array</span> <span class="c1">#=&gt; [1]</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>In this example, the <code class="highlighter-rouge">reassign</code> method reassigns the variable it receives to another object. In a pass-by-reference language, this would have the effect of reassigning the caller variable <code class="highlighter-rouge">array</code> as well (because the variable used by the caller and the variable used by the method are <em>the same</em>, except for the superficial property of not having the same name). But not so in Ruby: the method uses its own variable, distinct from the variable used by the caller.</p>
 
 <p>So the last line of the above code evaluates to <code class="highlighter-rouge">[1]</code>, not to <code class="highlighter-rouge">[10]</code> as we would expect on the pass-by-reference model. <em>Reassigning a variable within a method will have no effect on the caller in Ruby.</em></p>
 
-<p>Let’s now contrast Ruby with the pass-value-by-value strategy used by Java and C.</p>
+<p>Let’s now contrast Ruby with the pass-value-by-value strategy used by Java.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
   <span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 <span class="k">end</span>
 
 <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">mutate</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
 <span class="n">array</span> <span class="c1">#=&gt; [10]</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>In this example, the <code class="highlighter-rouge">mutate</code> method mutates the object it receives. In a pass-value-by-value language, this change would not be visible to the caller, since the object used by the method, and the object used by the caller are <em>distinct</em>. But not so in Ruby: the object is shared between caller variable and method variable, so the mutation of the array object will be visible to the caller.</p>
@@ -132,7 +337,18 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>Here is an implementation of the Negamax algorithm for Tic Tac Toe in Ruby:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">terminal?</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
     <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
   <span class="k">else</span>
@@ -144,15 +360,17 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
     <span class="k">end</span><span class="p">.</span><span class="nf">max</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>The method returns the value of a game state <code class="highlighter-rouge">state</code> for the player <code class="highlighter-rouge">player</code>, assumed to be the player who moves next. This value is the highest payoff that <code class="highlighter-rouge">player</code> can be guaranteed to achieve with optimal play, and it is denoted  with the variable <code class="highlighter-rouge">best_value</code>.</p>
 
 <p>For terminal states, the value of <code class="highlighter-rouge">state</code> for <code class="highlighter-rouge">player</code> is given by the Tic Tac Toe payoff function — that’s the first branch of the conditional:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>For non-terminal states, <code class="highlighter-rouge">player</code> has to evaluate all available choices. Suppose she is at the moment looking at one particular move <code class="highlighter-rouge">move</code>. She makes the move (that’s the line <code class="highlighter-rouge">make(move, player, state)</code>, which updates <code class="highlighter-rouge">state</code> as a side-effect), and evaluates the resulting position. She uses our <code class="highlighter-rouge">nega_max</code> method to do this. Assume that the method tells her that the best her opponent can do in the successor state (referenced by <code class="highlighter-rouge">state</code> at this point) is $n$. So what can <code class="highlighter-rouge">player</code> herself achieve by choosing <code class="highlighter-rouge">move</code>? It’s $-n$. Here is why:</p>
@@ -165,8 +383,9 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>So the best <code class="highlighter-rouge">player</code> can guarantee to achieve when choosing <code class="highlighter-rouge">move</code> is indeed $-n$. This explains the crucial line of the method containing the recursive call:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Notice that this only works because Tic Tac Toe is <em>zero-sum</em>, i.e., one player’s loss is another player’s gain: the payoffs of both players always add up to 0.</p>
@@ -321,22 +540,27 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>Let’s first try to get a clearer picture how <code class="highlighter-rouge">sort_by</code> works. Start with an example. Suppose we would like to sort the following array <em>by the numerical values</em> of its string elements:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">,</span> <span class="s1">'3'</span><span class="p">]</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">,</span> <span class="s1">'3'</span><span class="p">]</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>This can be achieved using <code class="highlighter-rouge">sort_by</code> as follows:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">string</span><span class="o">|</span> <span class="n">string</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">string</span><span class="o">|</span> <span class="n">string</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Or using shorthand:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Now the question is: how does <code class="highlighter-rouge">sort_by</code> do its magic? My initial hunch when exploring this topic was that <code class="highlighter-rouge">sort_by</code> seems fairly closely related to the functionality provided by the <code class="highlighter-rouge">map</code> method, also contained in <code class="highlighter-rouge">Enumerable</code>. There is <a href="http://ruby-doc.org/core-2.4.1/Enumerable.html#method-i-sort_by">a hint in the Ruby Docs</a> that points in the same direction: “The current implementation of <code class="highlighter-rouge">sort_by</code> generates an array of tuples containing the original collection element and the mapped value.”</p>
@@ -357,37 +581,50 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>First, we observe that we can actually express the above three steps in Ruby code fairly easily – this is where the <code class="highlighter-rouge">map</code> method comes into play. For our running example, observe that the sorted array can be obtained as follows:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span><span class="p">]</span> <span class="p">}</span> <span class="c1"># step (1)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span><span class="p">]</span> <span class="p">}</span> <span class="c1"># step (1)</span>
   <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span> <span class="c1"># step (2)</span>
   <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span> <span class="c1"># step (3)</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Notice that we have replaced the invocation of <code class="highlighter-rouge">sort_by</code> with calls to <code class="highlighter-rouge">map</code>, <code class="highlighter-rouge">sort</code> and <code class="highlighter-rouge">&lt;=&gt;</code>. This is obviously a lot more cumbersome than using <code class="highlighter-rouge">sort_by</code> itself – but it makes it fairly clear how our re-implementation of <code class="highlighter-rouge">sort_by</code> should look like. Here it is:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Enumerable</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">module</span> <span class="nn">Enumerable</span>
   <span class="k">def</span> <span class="nf">my_sort_by</span>
     <span class="nb">self</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="k">yield</span><span class="p">(</span><span class="n">elem</span><span class="p">)]</span> <span class="p">}</span>
       <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span>
       <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Looking at the <a href="https://github.com/rubinius/rubinius/blob/f9c2dffa4c894eea88abe1e476688df549a2bc4b/core/enumerable.rb#L351">Rubinius code for <code class="highlighter-rouge">sort_by</code></a> – a hint I got from one of the instructors at Launch School when sharing a draft of this post – we see just this pattern: a <code class="highlighter-rouge">map</code> invocation followed by a <code class="highlighter-rouge">sort</code> invocation followed by a <code class="highlighter-rouge">map</code> invocation. Rubinius even has a special class for representing tuples of the required kind. It is called <code class="highlighter-rouge">SortedElement</code> and comes with a <code class="highlighter-rouge">&lt;=&gt;</code> method that compares instances based on the value of the second element of the tuple.</p>
 
 <p>For our running example, <code class="highlighter-rouge">my_sort_by</code> yields the desired return value:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span> <span class="p">}</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Or, using shorthand:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">my_sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span> <span class="c1"># =&gt; ['0', '3', '10']</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Let’s now return to our original question: why would Ruby have two sort methods rather than just one?</p>
@@ -404,22 +641,27 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
 <p>Both of these methods allow us to do key-based sorting by passing a block with the method invocation. Suppose we have a method <code class="highlighter-rouge">key</code> that transforms the elements of a collection <code class="highlighter-rouge">list</code> to sort keys of the required kind (in our running example, the relevant transformation is simply to convert strings to integers, because numeric values are what we want to sort by). Then we can sort our list with the <code class="highlighter-rouge">sort</code> method as follows:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">list</span><span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem1</span><span class="p">,</span> <span class="n">elem2</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem1</span><span class="p">)</span> <span class="o">&lt;=&gt;</span> <span class="n">key</span><span class="p">(</span><span class="n">elem2</span><span class="p">)</span> <span class="p">}</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">list</span><span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem1</span><span class="p">,</span> <span class="n">elem2</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem1</span><span class="p">)</span> <span class="o">&lt;=&gt;</span> <span class="n">key</span><span class="p">(</span><span class="n">elem2</span><span class="p">)</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Using <code class="highlighter-rouge">sort_by</code>, as we have seen above, we would do it like this:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">list</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">}</span>
-</code></pre>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">list</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>It looks like using <code class="highlighter-rouge">sort_by</code> saves us a little bit of typing. But we are also saving a lot of computation steps, potentially. Remember from above: what is happening “under the hood” when we invoke <code class="highlighter-rouge">sort_by</code> in the way just described is something like this:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">list</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)]</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="n">list</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">key</span><span class="p">(</span><span class="n">elem</span><span class="p">)]</span> <span class="p">}</span>
   <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span>
   <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span>
-</code></pre>
+</pre></td></tr></tbody></table>
+</div>
 </div>
 
 <p>Clearly, this procedure involves $n$ calls to the <code class="highlighter-rouge">key</code> method, assuming that the length of <code class="highlighter-rouge">list</code> is $n$: we call <code class="highlighter-rouge">key</code> once for each element <code class="highlighter-rouge">elem</code> of <code class="highlighter-rouge">list</code>, storing the pair <code class="highlighter-rouge">[elem, key(elem)]</code> in our intermediate array. However, when using <code class="highlighter-rouge">sort</code>, the number of calls to the <code class="highlighter-rouge">key</code> method may be quite a bit larger. As observed earlier, sorting our list involves making $O(n\log n)$ comparisons on average, and even $O(n^2)$ comparisons in the worst case (since quicksort is Ruby’s search algorithm of choice). If we use <code class="highlighter-rouge">sort</code>, each such comparison will require two <em>on the fly</em> calls to the <code class="highlighter-rouge">key</code> method. In cases where <code class="highlighter-rouge">key</code> itself is a time-consuming transformation, having to perform it $O(n\log n)$ times (or even $O(n^2)$, in the worst case) rather than merely $O(n)$ times will make a big difference indeed.</p>
@@ -439,6 +681,16 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
   <p>Learning to program</p>
   <hr class="line" />
   <p>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/02/a-bag-of-sets/">A Bag Of Sets</a><span class="pad"></span><small>02 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
+          </h3>
       
 
           <h3>
