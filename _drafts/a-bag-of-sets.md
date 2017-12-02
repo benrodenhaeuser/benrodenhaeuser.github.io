@@ -8,7 +8,7 @@ After all, bags and sets have pretty much the same interface:
 
 - we can *add* elements to, or *delete* elements from a bag, same as from a set,
 - bags can be *subsets*, or *supersets* of one another, just as sets,
-- we can take the *union*, *intersection*, or *difference* of two bags, just as we can for two sets.
+- we can take the *union*, *intersection*, or *difference* of two bags, just as we can take the union, intersection or difference of two bags.
 
 The main difference between the two lies in how they count, so this should be the only point were we need code that is specific to each type of object. This post is an account of how I implemented this idea.
 
