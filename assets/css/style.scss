@@ -233,22 +233,22 @@ footer {
   -webkit-font-smoothing:subpixel-antialiased;
 }
 
-// styling line numbers
+// styling code blocks with line numbers
 
-.highlight {
-  width: 100%;
-}
-
-.gutter {
-  padding-right: 1px;
-  padding-left: 0;
-}
-
-.code {
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-}
+// .highlight {
+//   width: 100%;
+// }
+//
+// .gutter {
+//   padding-right: 1px;
+//   padding-left: 0;
+// }
+//
+// .code {
+//   width: 100%;
+//   padding-left: 0;
+//   padding-right: 0;
+// }
 
 @media print, screen and (max-width: 1100px) {
 
