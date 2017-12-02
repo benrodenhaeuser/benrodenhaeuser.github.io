@@ -76,7 +76,7 @@ hr.line { border: 0; border-top: 3px double #e5e5e5; }
 
 footer { width: 260px; float: right; position: fixed; bottom: 50px; -webkit-font-smoothing: subpixel-antialiased; }
 
-pre.highlight { width: 100%; padding: 0; }
+pre.highlight { width: 100%; padding: 0; margin: 0; }
 
 .gutter, .rouge-gutter { padding-right: 1px; padding-left: 0; }
 
