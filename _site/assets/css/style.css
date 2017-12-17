@@ -4,13 +4,19 @@ body { background-color: #fff; padding: 50px; font: 16px/1.5 'Open Sans', sans-s
 
 h1, h2, h3, h4, h5, h6 { color: #252525; margin: 0 0 20px; font-weight: normal; }
 
-h2 code { color: #000; }
+h1 { font-weight: bold; padding-bottom: 25px; }
 
-p, ul, ol, table, pre, dl { margin: 0 0 20px; }
+h2 { color: #FF7F50; font-weight: bold; }
+
+a code { color: #FF7F50; }
+
+h2 code { color: #FF7F50; font-weight: normal; }
+
+p, ul, ol, pre, dl { margin-top: 20px; margin-left: 0; margin-right: 0; margin-bottom: 0; }
 
 h1, h2, h3 { line-height: 1.1; }
 
-h1 { font-size: 28px; }
+h1 { font-size: 29px; }
 
 h2 { font-size: 20px; margin-top: 45px; }
 
@@ -72,7 +78,7 @@ section { width: 650px; float: left; padding-bottom: 50px; }
 
 small { font-size: 11px; }
 
-hr.line { border: 0; border-top: 3px double #e5e5e5; }
+hr.line { border: 0; border-top: 1px solid #FF7F50; }
 
 footer { width: 260px; float: right; position: fixed; bottom: 50px; -webkit-font-smoothing: subpixel-antialiased; }
 

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title>Ben Rodenhäuser</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto+Mono" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css?v=">
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntilConfig">
+  </script>
+  <script src="/assets/jax/config.js"></script>
+
+  <meta name="viewport" content="width=device-width">
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-99334571-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+  
+</head>
+
+  <body>
+    <div class="wrapper">
+      <section>
+      <small>16 December 2017</small>
+      <h1 id="material">Material</h1>
+
+<h2 id="class-hierarchy">Class hierarchy</h2>
+
+<ul>
+  <li>The <code class="highlighter-rouge">GenericSet</code> class defines the basic set data structure. It essentially wraps the hash that we use as a storage container, and provides a basic interface to that storage container:
+    <ul>
+      <li>indicator</li>
+      <li>subtract</li>
+      <li>add</li>
+      <li>each</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="getting-started">Getting started</h2>
+
+<p>It’s high time write some code. Let’s start with the bare minimum, and expand the capabilities of our model below. Here is the skeleton of a <code class="highlighter-rouge">Bag</code> class in Ruby:</p>
+
+<p>As announced, we use a hash, initialized in the constructor method, and referenced by the instance variable <code class="highlighter-rouge">@hash</code>, as an internal storage device. The intent is that <code class="highlighter-rouge">@hash[elem]</code> indicates the number of instances of <code class="highlighter-rouge">elem</code> found in our bag (which could be <code class="highlighter-rouge">0</code>, in which case <code class="highlighter-rouge">elem</code> is not to be found in the bag).</p>
+
+<p>Let’s initialize a <code class="highlighter-rouge">Bag</code> object with some elements and see how this works out with what we got so far.</p>
+
+<p>The main step necessary to make this approach amenable to working with sets as well (rather than merely with bags) is to abstract this into a separate method of the <code class="highlighter-rouge">Bag</code> class that the <code class="highlighter-rouge">Set</code> class can override. This is the job of the <code class="highlighter-rouge">indicator</code>.</p>
+
+<p>The intent is that the presence of a particular hash key indicates that the object given by the key is part of the set, and the value for a particular key indicates the count of the object.</p>
+
+<p>For plain sets, this is really all we need to know. For multisets, or bags, as they are also called, their count also matters. The count will be given by the value stored in a hash for a particular key. To see how this works out, lets implement a couple more methods.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9</pre></td><td class="code"><pre><span class="n">enum</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">set</span> <span class="o">=</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
+<span class="n">bag</span> <span class="o">=</span> <span class="no">Bag</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
+
+<span class="n">set</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">elem</span> <span class="p">}</span> <span class="c1"># output: 1 2 3</span>
+<span class="n">bag</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">elem</span> <span class="p">}</span> <span class="c1"># output: 1 2 3 3</span>
+
+<span class="n">set</span><span class="p">.</span><span class="nf">indicator</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 1</span>
+<span class="n">bag</span><span class="p">.</span><span class="nf">indicator</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 2</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>One may justifiably wonder why we have chosen to wrap the hash key reference method <code class="highlighter-rouge">Hash#[]</code> into our own <code class="highlighter-rouge">Bag#indicator</code> method. While redundant at first sight, this is actually the key abstraction needed to make our initial idea of modeling bags and sets polymorphically. Let’s see how.</p>
+
+<h2 id="modeling-sets">Modeling Sets</h2>
+
+<p>To model sets, all we need to add is the following code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Set</span> <span class="o">&lt;</span> <span class="no">Bag</span>
+  <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="k">super</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>This is a a fairly direct implementation of the idea of collapsing the indicator function of a bag to the indicator function of a set.</p>
+
+<h2 id="more-topics">More topics</h2>
+
+<ul>
+  <li>interfacing with Enumerable: <code class="highlighter-rouge">count</code></li>
+  <li>operations with enum (union, intersection etc)</li>
+  <li>predicates with other set (subset, superset, equality)</li>
+  <li>equality and nested sets</li>
+  <li>
+    <p>type-checking the value</p>
+  </li>
+  <li>applications:
+    <ul>
+      <li>multiset: shopping cart, character counter</li>
+      <li>fuzzy set:</li>
+    </ul>
+  </li>
+  <li>interesting operations on sets:
+    <ul>
+      <li>partition</li>
+      <li>powerset</li>
+    </ul>
+  </li>
+  <li>fuzzy sets: for fuzzy sets, union, intersection and complement still apply.</li>
+  <li>however, going from <code class="highlighter-rouge">indicator</code> to <code class="highlighter-rouge">count</code> does not make much sense.</li>
+  <li>in general, how do we enumerate a fuzzy set?</li>
+  <li>what is the subset relation among fuzzy sets?</li>
+</ul>
+
+<h2 id="operations">Operations</h2>
+
+<ul>
+  <li>SUM: for fuzzy sets, this is the “bounded sum” (see here: https://encyclopedia2.thefreedictionary.com/bounded+sum)</li>
+  <li>DIFFERENCE: for fuzzy sets, this is called “bounded difference”. sometimes, this is also called truncated subtraction (https://en.wikipedia.org/wiki/Monus#Natural_numbers)</li>
+</ul>
+
+<h2 id="basicset-class">BasicSet class</h2>
+
+<ul>
+  <li>purpose : provide and abstract away data structure for working with sets: this class could be replaced by a different one, if we chose to use a different kind of collaborator class (instead of a hash)</li>
+</ul>
+
+<h2 id="idea-of-the-class-hierarchy">Idea of the class hierarchy:</h2>
+
+<ul>
+  <li>BasicSet wraps the hash data structure into a custom interface for sets.</li>
+  <li>SetLike</li>
+</ul>
+
+<h2 id="basic-interface-of-a-set">Basic interface of a set</h2>
+
+<ul>
+  <li>:retrieve (key getter) and :update (key setter)</li>
+  <li>:insert and :delete key</li>
+  <li>
+    <p>:valid_value?</p>
+  </li>
+  <li>GenericSet provides :retrieve and :update (and :each)</li>
+  <li>GenericSet provides :valid_value? also, but overridden by child classes</li>
+  <li>The set child class itself provides :insert and :delete</li>
+  <li>
+    <p>SetLike requires :retrieve, :update, and :insert</p>
+  </li>
+  <li>
+    <p>NumericMap also provides the storage device (i.e., a hash)</p>
+  </li>
+  <li>SetLike provides methods for set-typical operations and predicates (which also includes Enumerable):
+    <ul>
+      <li>union</li>
+      <li>intersection</li>
+      <li>difference</li>
+      <li>subset/superset</li>
+      <li>flatten</li>
+      <li>to_s, inspect</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="division-of-labour-between-genericset-and-setlike">Division of labour between <code class="highlighter-rouge">GenericSet</code> and <code class="highlighter-rouge">SetLike</code></h2>
+
+<p><code class="highlighter-rouge">GenericSet</code> contains methods that need direct access to instance variables. These methods directly interact with the internal state of our chosen data structure. <code class="highlighter-rouge">SetLike</code>, on the other hand, only interfaces with the data structure <em>through</em> the methods provided by <code class="highlighter-rouge">GenericSet</code>. It thus respects the guards that the public interface of <code class="highlighter-rouge">GenericSet</code> puts in place. This helps to protect the integrity of a set.</p>
+
+<p>As an example for such a guard, we provide two methods for manipulating the values associated with the keys in our sets: <code class="highlighter-rouge">insert</code> and <code class="highlighter-rouge">remove</code>. Both methods have the side effect of updating the <code class="highlighter-rouge">size</code> attribute of our set stored in the <code class="highlighter-rouge">@size</code> instance variable. We thus would not want other methods to bypass <code class="highlighter-rouge">insert</code> and <code class="highlighter-rouge">remove</code>, thus frustrating our attempt to maintain the invariant <code class="highlighter-rouge">self.size == self.values.sum</code> (i.e., mutating the set does not change the fact that the size of the set is be the sum of the values associated with each key).</p>
+
+<h2 id="why-subclass-from-genericset">Why subclass from <code class="highlighter-rouge">GenericSet</code></h2>
+
+<p>To enforce a kind of typing via <code class="highlighter-rouge">valid_value?</code>. E.g., the union of a multiset with a fuzzy set is not necessarily a multiset. (or is it? maybe it is)</p>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      </section>
+      <header>
+  <small>&nbsp;</small>
+  <a href="http://notes.benrodenhaeuser.io">
+    <h1>Ben Rodenhäuser</h1>
+  </a>
+  <p>Learning to program</p>
+  <hr class="line" />
+  <p>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/16/material/">Material</a><span class="pad"></span><small>16 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/07/06/object-passing/">Object Passing</a><span class="pad"></span><small>06 Jul 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/05/31/negamax/">Negamax</a><span class="pad"></span><small>31 May 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting In Ruby</a><span class="pad"></span><small>15 May 2017</small>
+          </h3>
+      
+  </p>
+  <hr class="line" />
+  <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+</header>
+
+      <!-- <footer>
+  <p><small>Ben Rodenhäuser 2017 | <a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+</footer> -->
+
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>

@@ -34,60 +34,102 @@
       <section>
       <!--  -->
       
-      <small>02 December 2017</small>
-      <h1 id="a-bag-of-sets">A Bag of Sets</h1>
+      <small>18 December 2017</small>
+      <h1 id="a-bunch-of-sets">A Bunch of Sets</h1>
 
-<p><a href="https://pdxwolfy.wordpress.com">Pete</a> mentioned Ruby’s Set library the other day on the Slack channel, and how it internally uses a hash to store the elements of a set. He also pointed out that hashes can be used for representing multisets (or <em>bags</em>, as multisets are also called). This piqued my interest.</p>
+<p>Ruby has a <a href="http://ruby-doc.org/stdlib-2.4.1/libdoc/set/rdoc/Set.html">set class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset">multiset implementation</a> available as a gem. Both uses hashes for internal storage. However, the two libraries do not share any code. This is somewhat regrettable, since—as we will discuss below—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to implement a more generic set class from scratch from which (part of) the functionality provided by these two classes can be derived by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result is a polymorphic approach to modeling various types of sets in Ruby. If you don’t care much for lengthy explanations, head <a href="https://www.github.com">straight to Github</a> to read the code.</p>
 
-<p>More specifically, I thought that it should be possible to have <code class="highlighter-rouge">Set</code> and <code class="highlighter-rouge">Bag</code> classes share a lot, even most of the same code, as an exercise in <a href="http://www.stroustrup.com/glossary.html#Gpolymorphism">polymorphism</a>.</p>
+<h2 id="classical-sets-multisets-and-fuzzy-sets">Classical sets, multisets, and fuzzy sets</h2>
 
-<p>After all, bags and sets have pretty much the same interface:</p>
+<p>Let’s first get a quick overview of the types of collections we are interested in modeling by means of some motivating examples.</p>
+
+<p><strong>Classical Sets.</strong> Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set is a good choice for the job. For instance, the word “learner” could be represented by the set</p>
+
+<script type="math/tex; mode=display">\lbrace a, e, l, r, n \rbrace</script>
+
+<p>Notice that the word “$\text{learn}$” would be represented by the very same set, i.e., $\lbrace a, e, l, r, n \rbrace$. So sets allow us to zoom in on the question of membership: is the letter contained in the word or not? Other salient aspects of words, in particular letter counts, are disregarded.</p>
+
+<p><strong>Multisets.</strong> Suppose now we would like to count how often letters occur in a given word or text, while disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the word “$\text{learner}$” could be represented by the multiset</p>
+
+<script type="math/tex; mode=display">\lbrace a, e, e, l, r, r, n \rbrace</script>
+
+<p>Notice that the word “$\text{learn}$” would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.</p>
+
+<p>A more concise way to represent a multiset is by means of key-value notation. Our multiset representation of the word “learner” would then be written as</p>
+
+<script type="math/tex; mode=display">\lbrace a: 1, e: 2, l: 1, r: 2, n: 1\rbrace</script>
+
+<p>The elements of a multiset are often called <em>keys</em>. The above multiset has five distinct keys ($a$, $e$, $l$, $r$ and $n$). We shall refer to the value associated with a particular key as the <em>score</em> for that key. In the above multiset, the score for the key $e$ is $2$.</p>
+
+<p><strong>Fuzzy sets.</strong> Fuzzy sets also make finer distinctions compared to classical sets. However, they go into a different direction. In a multiset, the score for a particular key indicates multiplicity of membership. In a fuzzy set, we do not allow keys to occur multiple times. Instead, we allow membership  <em>to a degree</em>. This allows us, for example, to model situations where the similarity of various items is at stake.</p>
+
+<p>Consider the words “$\text{learner}$”, “$\text{learn}$”, “$\text{learned}$”, and “$\text{lean}$”. We might wish to capture how similar these words are to the word “$\text{learner}$”. The similarity of “$\text{learner}$” to itself is perfect, since no edit is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word “$\text{learned}$” is very similar to “$\text{learner}$” – substituting the last letter in “$\text{learned}$” will transform it into “$\text{learner}$”. “$\text{learn}$” is also very similar to “$\text{learner}$”, but a little less so – deleting the last two letters from “$\text{learner}$” results in “$\text{learner}$”, requiring two steps rather than one. The word “$\text{lean}$” is again a bit less similar to “$\text{learner}$”, requiring one more deletion step. So to transform each of the words into “learner” requires:</p>
 
 <ul>
-  <li>we can <em>add</em> elements to, or <em>delete</em> elements from a bag, same as from a set,</li>
-  <li>bags can be <em>subsets</em>, or <em>supersets</em> of one another, just as sets,</li>
-  <li>we can take the <em>union</em>, <em>intersection</em>, or <em>difference</em> of two bags, just as we can take the union, intersection or difference of two bags.</li>
+  <li>”$\text{learner}$”: 0 edits</li>
+  <li>”$\text{learned}$”: 1 edit</li>
+  <li>”$\text{learn}$”: 2 edits</li>
+  <li>”$\text{lean}$”: 3 edits</li>
 </ul>
 
-<p>The main difference between the two lies in how they count, so this should be the only point were we need code that is specific to each type of object. This post is an account of how I implemented this idea.</p>
+<p>Suppose now that we settle—pretty arbitrarily but for the sake of exposition—on 3 edits as the treshold from which onwards two words are to be considered perfectly dissimilar or “not similar at all”. Then we can map our edit counts to the 0-1-scale and represent our findings as a fuzzy set which contains “$\text{learner}$” with degree 1.0, “$\text{learned}$” with degree 0.66, “$\text{learn}$” with degree 0.33 and “$\text{lean}$” with degree 0.0, or, using key-value notation:</p>
 
-<h2 id="sets-and-bags">Sets and bags</h2>
+<script type="math/tex; mode=display">\lbrace\text{learner}: 1.0, \text{learned}: 0.66, \text{learn}: 0.33, \text{lean}: 0.0\rbrace</script>
 
-<p>Sets are unordered collections for which element count does not matter. So</p>
+<p>In this fuzzy set, the degree of each element is to be interpreted as the degree of similarity to our target word “learner”.</p>
+
+<h2 id="the-setmap-class-and-its-children">The <code class="highlighter-rouge">SetMap</code> class and its children</h2>
+
+<p>Let us now begin to develop the main ingredients for a Ruby model of sets, a model that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these types via inheritance.</p>
+
+<p><strong>Hash tables.</strong> What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets seem to consist of key-value pairs, while classical sets consist of a bunch of keys only. However, this is merely a matter of representation. In fact, it is rather common to represent a (classical) set by means of a <em>characteristic function</em>, which maps the members of the set to $1$, while all other objects from a given domain to $0$. So we can extend the key-value representation from above to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.</p>
+
+<p>It now requires only a tiny step to conclude that the membership information for a particular set (be it a fuzzy set, a classical set, or a multiset) may be stored in a hash table, such as</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>or</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Of course, we would not want to directly expose such a hash to the user of our set class. The user need not even be aware that we are using a hash to store her set. The hash instance that stores the set keys and their scores will thus be a collaborator object to our set. The <code class="highlighter-rouge">initialize</code> method of our <code class="highlighter-rouge">SetMap</code> class sets the stage for this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
+  <span class="kp">include</span> <span class="no">SetLike</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@hash</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="vi">@size</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The size of a set is defined as the sum of the scores of its keys. We decide to maintain an instance variable <code class="highlighter-rouge">@size</code> that tracks the size, in the interest of being able to look up the size of our set in constant time. We will talk about the <code class="highlighter-rouge">SetLike</code> module included in the <code class="highlighter-rouge">SetMap</code> class in the next section.</p>
+
+<p><strong>Valid scores.</strong> What distinguishes the set types we have seen from each other? It is primarily the notion of a valid score:</p>
 
 <ul>
-  <li>$\lbrace a, b, c\rbrace$ and $\lbrace a, c, b\rbrace$ represent the same set (since order does not matter),</li>
-  <li>$\lbrace a, b, c\rbrace$ and $\lbrace a, b, c, c\rbrace$ represent the same set (since element count does not matter).</li>
+  <li>A classical set either contains or does not a particular key, so the only valid scores are $0$ and $1$.</li>
+  <li>A multiset contains a given key $n$ times, where $n$ is a non-negative number.</li>
+  <li>A fuzzy set scores a given key to a degree in the real interval from $0$ to $1$.</li>
 </ul>
 
-<!-- A first smal digression is in order here. Notice that the preceding examples suggest that $\lbrace a, b, c, c\rbrace$ is a perfectly legal set, which is, however, set-theoretically equivalent to the more canonical representation $\lbrace a, b, c\rbrace$. This is not the only perspective one can take on the matter. There is another view according to which "the same element shall not be allowed to appear more than once" in a set. According to that view, $\lbrace a, b, c, c\rbrace$ would not even be a set! However, for our purposes, it is more natural to take the liberal stance of allowing sets with repeated occurences of elements like $\lbrace a, c, b\rbrace$ while identifying them $\lbrace a, c, b\rbrace$. One reason why this is more natural is that it is pretty much how our implementation of sets will turn out to work. -->
-
-<p>For bags, on the other hand, element count does matter. That is,</p>
-
-<ul>
-  <li>$\lbrace a, b, c\rbrace$ and $\lbrace a, c, b\rbrace$ represent the same bag, since order (still) does not matter,</li>
-  <li>but $\lbrace a, b, c\rbrace$ and $\lbrace a, b, c, c\rbrace$ <em>do not</em> represent the same bag.</li>
-</ul>
-
-<p>The number of times an element occurs in a bag is called the <em>multiplicity</em> of that element, and the size of the bag is the sum of the multiplicity of its elements.</p>
-
-<h2 id="characteristic-functions-and-multiplicity-functions">Characteristic functions and multiplicity functions</h2>
-
-<p>Sets whose elements are drawn from a given domain (i.e., another set) can be represented by what is called a <em>characteristic function</em>, which specifies for each element of the domain whether it is an element of the set in question.</p>
-
-<p>Suppose that our domain is the characters in the Roman alphabet. Then we can represent the set $\lbrace a, b, c\rbrace$ by means of the function that maps the characters $a$, $b$ and $c$ to $1$ (indicating that they are elements of the set), while mapping all other characters to $0$ (indicating that they are not elements of the set). So sets can be defined as maps from a given universe of objects to the set $\lbrace 0, 1\rbrace$.</p>
-
-<p>This approach can be generalized to bags. Instead of mapping elements to either one of $0$ or $1$, we map them to their element count in the bag. This means that the bag $\lbrace a, b, c, c\rbrace$ would be defined by the function that maps $a$ and $b$ to $1$, $c$ to $2$, and all other characters in the Roman alphabet to $0$.</p>
-
-<p>Such a function is called a multiplicity function.</p>
-
-<p>This perspective on the matter is useful for our purposes for two reasons. First, a characteristic function (be it for a set or a bag) can be neatly captured by a hash table, which is just what we are after. Second, viewing sets and bags through the lens of characteristic functions paves the way towards implementing operations on both types of objects in a uniform way.</p>
-
-<p>As an example, consider the union operation. For two sets given by their characteristic function.</p>
-
-<h2 id="setting-up-the-bag-and-set-classes">Setting up the Bag and Set classes</h2>
-
-<p>Let’s start with the basic setup of our <code class="highlighter-rouge">Bag</code> and <code class="highlighter-rouge">Set</code> classes. We will expand the capabilities of both classes as we go along.</p>
+<p>In each case, there is a range of particular values. We model this by means of a bunch of class methods and class instance variables:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -107,46 +149,366 @@
 16
 17
 18
-19
-20
-21
-22
-23
-24
-25
-26
-27</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Bag</span>
-  <span class="kp">include</span> <span class="no">Enumerable</span>
+19</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="k">def</span> <span class="nf">score_type</span>
+      <span class="vi">@score_type</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@score_type not initialized'</span><span class="p">)</span>
+    <span class="k">end</span>
 
-  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">enum</span> <span class="o">=</span> <span class="p">[])</span>
-    <span class="vi">@hash</span> <span class="o">=</span> <span class="no">Hash</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">merge</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
-  <span class="k">end</span>
+    <span class="k">def</span> <span class="nf">min_score</span>
+      <span class="vi">@min_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@min_score not initialized'</span><span class="p">)</span>
+    <span class="k">end</span>
 
-  <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
-    <span class="vi">@hash</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
-  <span class="k">end</span>
+    <span class="k">def</span> <span class="nf">max_score</span>
+      <span class="vi">@max_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@max_score not initialized'</span><span class="p">)</span>
+    <span class="k">end</span>
 
-  <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">elem</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
-    <span class="n">elem</span> <span class="p">?</span> <span class="n">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">:</span> <span class="n">size</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">each</span>
-    <span class="k">return</span> <span class="n">to_enum</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:each</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">block_given?</span>
-    <span class="vi">@hash</span><span class="p">.</span><span class="nf">each_key</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="n">count</span><span class="p">(</span><span class="n">elem</span><span class="p">).</span><span class="nf">times</span> <span class="p">{</span> <span class="k">yield</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="k">class</span> <span class="nc">Set</span> <span class="o">&lt;</span> <span class="no">Bag</span>
-  <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
-    <span class="vi">@hash</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span>
+    <span class="k">def</span> <span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+      <span class="p">(</span><span class="n">min_score</span><span class="p">.</span><span class="nf">.</span><span class="n">max_score</span><span class="p">).</span><span class="nf">cover?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">val</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="n">score_type</span><span class="p">)</span>
+    <span class="k">end</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<p>As announced, we use a hash, referenced by the instance variable <code class="highlighter-rouge">@hash</code>, as an internal storage device for <code class="highlighter-rouge">Bag</code> objects. The intent is that <code class="highlighter-rouge">@hash[elem] == 0</code> indicates that a given <code class="highlighter-rouge">elem</code> is <em>not</em> a member of our collection, while <code class="highlighter-rouge">@hash[elem] &gt; 0</code> indicates that <code class="highlighter-rouge">elem</code> <em>is</em> a member of our collection.</p>
+<p>The <code class="highlighter-rouge">class &lt;&lt; self ... end</code> block in the above snippet indicates that the methods defined in the block are class methods. The first three are getters (on the level of the class object) for the class instance variables <code class="highlighter-rouge">@score_type</code> (the kind of object we may use as a score for a key), <code class="highlighter-rouge">@min_value</code> (the smallest value that may be used as a score), and <code class="highlighter-rouge">@max_value</code> (the largest value that maye be used as a score). The fourth method uses these getters and describes in the form of a predicate what constitutes a valid score.</p>
+
+<p>As the second disjunct of each getter methods above tells us loud and clear, we are missing something so far: our class instance variables have not been initialized so far, and there is so far no obvious way to do so.</p>
+
+<p><strong>Target classes.</strong> Initializing those class instance variables is precisely the job description of our target classes. <code class="highlighter-rouge">SetMap</code> is meant to be subclassed, with each subclass defining a particular set type by specifying the range of legal scores via <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>. Here is the code for classical sets:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">ClassicalSet</span> <span class="o">&lt;</span> <span class="no">SetMap</span>
+  <span class="vi">@score_type</span> <span class="o">=</span> <span class="no">Integer</span>
+  <span class="vi">@min_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="vi">@max_score</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>In other words, the only valid scores for the keys of classical sets are the integers <code class="highlighter-rouge">0</code> and <code class="highlighter-rouge">1</code>. For fuzzy sets, we write:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">FuzzySet</span> <span class="o">&lt;</span> <span class="no">SetMap</span>
+  <span class="vi">@score_type</span> <span class="o">=</span> <span class="no">Numeric</span>
+  <span class="vi">@min_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="vi">@max_score</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Any instance of <code class="highlighter-rouge">Numeric</code> in the interval betwwen 0 and 1 is a valid score for a fuzzy set key. Finally, for multisets:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">MultiSet</span> <span class="o">&lt;</span> <span class="no">SetMap</span>
+  <span class="vi">@score_type</span> <span class="o">=</span> <span class="no">Integer</span>
+  <span class="vi">@min_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="vi">@max_score</span> <span class="o">=</span> <span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The <code class="highlighter-rouge">Float::INFINITY</code> constant has the property that <code class="highlighter-rouge">x &lt; Float::INFINITY</code> for any numeric <code class="highlighter-rouge">x</code>. Setting <code class="highlighter-rouge">@max_score</code> to <code class="highlighter-rouge">Float::INFINITY</code> is thus a way of saying that, for multisets, there <em>is no</em> maximal score: any non-negative integer is allowed.</p>
+
+<p>And this is really all there is to it! Specializing the capabilities of <code class="highlighter-rouge">SetMap</code> to a particular target class boils down to providing appropriate values for a bunch of class instance variables. Of course, we have not demonstrated how the interface for <code class="highlighter-rouge">SetMap</code> actually looks like. But from now on, we will write methods that work equally well for all three scenarios under consideration: classical sets, fuzzy sets, and multisets.</p>
+
+<p><strong>Key insertion.</strong> The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the <code class="highlighter-rouge">SetMap#insert</code> method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+  <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+  <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">max_score</span><span class="p">].</span><span class="nf">min</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@size</span> <span class="o">+</span> <span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_score</span><span class="p">)).</span><span class="nf">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The basic idea of <code class="highlighter-rouge">insert</code> is to increment the score of <code class="highlighter-rouge">key</code> by <code class="highlighter-rouge">val</code>. As per line 2 of the snippet, this will work only if <code class="highlighter-rouge">val</code> is a valid score according to the implementation of <code class="highlighter-rouge">valid_score?</code> (which in turn depends on the values of the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>). If that is the case, we use what is called a <em>bounded sum</em> to add <code class="highlighter-rouge">val</code> to <code class="highlighter-rouge">self[key]</code>, capping off the sum at the value of <code class="highlighter-rouge">@max_score</code> (line 4). We also need to keep track of the size of out set, which happens in line 5. Here, we also keep track of rounding errors that might occur for types of sets that allow floating point numbers as scores.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</pre></td><td class="code"><pre><span class="n">fuzzy_set</span> <span class="o">=</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">fuzzy_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fuzzy_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">fuzzy_set</span> <span class="c1">#=&gt; #&lt;FuzzySet: {"a": 0.8}&gt;</span>
+
+<span class="n">multi_set</span> <span class="o">=</span> <span class="no">MultiSet</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">multi_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="n">multi_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">multi_set</span> <span class="c1">#=&gt; #&lt;MultiSet: {"a": 3}&gt;</span>
+
+<span class="n">classical_set</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">classical_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="n">classical_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="n">classical_set</span> <span class="c1">#=&gt; #&lt;ClassicalSet: {"a": 1}&gt;</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>These are the desired results (assuming a—standard—<code class="highlighter-rouge">inspect</code> method which we have not shown). Notice that the score range we have specified for classical sets ensures that inserting the same key twice has the same effect as inserting it once.</p>
+
+<p><strong>Key retrieval.</strong>  Next, consider <code class="highlighter-rouge">SetMap#retrieve</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+  <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">?</span> <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">:</span> <span class="mi">0</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="p">[]</span> <span class="n">retrieve</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+<p>The <code class="highlighter-rouge">retrieve</code> method (which we alias as <code class="highlighter-rouge">[]</code>) wraps the element reference method of our internal hash. If the hash does not contain a certain key, <code class="highlighter-rouge">@hash[key]</code> will return <code class="highlighter-rouge">nil</code>. In that case, <code class="highlighter-rouge">retrieve(key)</code> (or, equivalently as per our alias, <code class="highlighter-rouge">self[key]</code>) will return <code class="highlighter-rouge">0</code>. Alternatively, we could haver set a default value for <code class="highlighter-rouge">@hash</code>, but the current way seems slightly more explicit.</p>
+
+<p><strong>Key removal.</strong> While it would be possible to tweak our approach and express removal of a key as insertion with a negative score, we prefer to keep things simple here:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+  <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+  <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">min_score</span><span class="p">].</span><span class="nf">max</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@size</span> <span class="o">-</span> <span class="p">(</span><span class="n">old_score</span> <span class="o">-</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">])).</span><span class="nf">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p><code class="highlighter-rouge">SetMap#remove</code> is perfectly symmetric to the earlier <code class="highlighter-rouge">insert</code> method, using a bounded difference instead of a bounded sum. For our three target classes, this ensures that negative scores cannot occur.</p>
+
+<p><strong>Enumeration.</strong> The below <code class="highlighter-rouge">SetMap#each_pair</code> method enumerates set keys and their associated scores in a straightforward manner. Notice that we only yield key-score pairs for which the score is non-zero, since a key with score <code class="highlighter-rouge">0</code> is not considered to be part of our set.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">each_pair</span>
+  <span class="k">return</span> <span class="n">to_enum</span><span class="p">(</span><span class="ss">:each_pair</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">block_given?</span>
+
+  <span class="vi">@hash</span><span class="p">.</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="o">|</span>
+    <span class="k">yield</span><span class="p">([</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="mi">0</span>
+  <span class="k">end</span>
+
+  <span class="nb">self</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="n">each</span> <span class="n">each_pair</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>As we will see below, <code class="highlighter-rouge">each_pair</code> is the basic building block for all our methods that iterate over sets, which includes pretty much all the interesting operations on sets like <code class="highlighter-rouge">union</code>, and <code class="highlighter-rouge">intersection</code>. Since <code class="highlighter-rouge">each_pair</code> is aliassed as <code class="highlighter-rouge">each</code>, it also allows us to include the <code class="highlighter-rouge">Enumerable</code> module, which any respectable collection class should have access to.</p>
+
+<h2 id="the-setlike-module">The <code class="highlighter-rouge">SetLike</code> module</h2>
+
+<p>The preceding methods serve as a wrapper around the hash table that we use internally to store set keys and their associated scores. We have also implemented a mechanism for specifying what constitutes a valid score for a given type of set. The remaining part of the interface will not interact with the hash directly, but build on top of the machinery put in place so far.</p>
+
+<p><strong>Division of Labor.</strong> To emphasize the distinction between methods that directly access the state of a set (given by <code class="highlighter-rouge">@hash</code> and <code class="highlighter-rouge">@size</code>), and methods that built on top of the latter, we put the remainder of the interface in a module which we call <code class="highlighter-rouge">SetLike</code>. This module provides much of the functionality commonly associated  with sets, and assumes that any class that uses it implements the instance methods <code class="highlighter-rouge">retrieve</code>, <code class="highlighter-rouge">insert</code>, <code class="highlighter-rouge">delete</code>, <code class="highlighter-rouge">each</code> and <code class="highlighter-rouge">size</code> (the latter simply being a getter for the <code class="highlighter-rouge">@size</code> variable) we have discussed so far.</p>
+
+<p>In particular, none of the methods in <code class="highlighter-rouge">SetLike</code> need to know that we are using a hash for internal storage. The internal state of a set is thus encapsulated in <code class="highlighter-rouge">SetMap</code>. As long as we provide the methods listed, we could just as well implement a binary search tree for storing a set.</p>
+
+<p>(TODO: Several advantages:)</p>
+<ul>
+  <li>Encapsulate the methods that directly access the internal state of <code class="highlighter-rouge">GenericSet</code> instances. While nothing forces us to respect this boundary, the division of labor is a useful reminder to stick to this rule. (see below)</li>
+  <li>Anyone who implements the interface of <code class="highlighter-rouge">GenericSet</code> can use <code class="highlighter-rouge">SetLike</code>.</li>
+</ul>
+
+<p><strong>Operations on sets.</strong></p>
+
+<p>(TOOD: <code class="highlighter-rouge">do_with</code>, union, sum)</p>
+
+<p><strong>Set predicates.</strong> A classical set $A$ is a subset of a classical set of $B$ if any element of $A$ is also an element of $B$. This can be expressed in terms of keys and their associated scores by saying that the score for any key in $A$ is less than or equal to the score for that same key in $B$. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the <code class="highlighter-rouge">SetLike#subset?</code> method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">subset?</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="n">other</span><span class="p">.</span><span class="nf">instance_of?</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">)</span>
+
+  <span class="n">all?</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="o">|</span>
+    <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="o">&lt;=</span> <span class="n">subset?</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Following the pattern established by the <code class="highlighter-rouge">do_with</code> method discussed above, however, it makes sense to extract the “key comparison” functionality to a separate <code class="highlighter-rouge">compare_with?</code> method that takes a block (you may want to check out the code of the <a href="https://github.com/maraigue/multiset">multiset gem</a>—the gem author does exactly this).</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">keys</span>
+  <span class="n">each</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:first</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">compare_with?</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="n">other</span><span class="p">.</span><span class="nf">instance_of?</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="n">keys</span> <span class="o">|</span> <span class="n">other</span><span class="p">.</span><span class="nf">keys</span><span class="p">).</span><span class="nf">all?</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="o">|</span>
+    <span class="k">yield</span><span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>According to line 2 above, the keys of a set object are given by the first component of each key-value pair. <code class="highlighter-rouge">SetLike#compare_with?</code> then iterates over the keys of both <code class="highlighter-rouge">self</code> and <code class="highlighter-rouge">other</code>, and yields the corresponding values to the block. This allows us to implement <code class="highlighter-rouge">subset?</code> as follows:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">subset?</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="n">compare_with?</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">|</span>
+    <span class="n">s</span> <span class="o">&lt;=</span> <span class="n">o</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="o">&lt;=</span> <span class="n">subset?</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Definitions for the other common set predicates (<code class="highlighter-rouge">proper_subset?</code>, <code class="highlighter-rouge">superset?</code> and <code class="highlighter-rouge">proper_superset?</code>) are similar, so we omit them here.</p>
+
+<p><strong>Equivalence.</strong> When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply do:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">equivalent?</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="n">compare_with?</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">|</span>
+    <span class="n">s</span> <span class="o">==</span> <span class="n">o</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="o">==</span> <span class="n">equivalent?</span>
+<span class="k">alias</span> <span class="nb">eql?</span> <span class="n">equivalent?</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Notice that we have aliassed the <code class="highlighter-rouge">equivalent?</code> method both as <code class="highlighter-rouge">==</code> and <code class="highlighter-rouge">eql?</code>. This brings us to our final topic for today:</p>
+
+<p><strong>Nested sets.</strong> Unless overridden, the <code class="highlighter-rouge">Object#eql?</code> method considers two objects to be same if they are identical. In the current context, overriding <code class="highlighter-rouge">Object#eql?</code> is critical, because <code class="highlighter-rouge">eql?</code> is the method that Ruby uses when accessing hash keys. Lets leave the context of our <code class="highlighter-rouge">SetLike</code> module for a moment, and consider this line of Ruby code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">some_hash</span><span class="p">[</span><span class="n">some_obj</span><span class="p">]</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>When executing this line, Ruby will check if there is a key <code class="highlighter-rouge">key</code> to be found in <code class="highlighter-rouge">some_hash</code> with the property that <code class="highlighter-rouge">some_obj.eql?(key)</code>. If so, the value for <code class="highlighter-rouge">key</code> will be returned.</p>
+
+<p>For our purposes, this is crucial because we would like to be able to model nested sets, i.e., sets that have sets among their keys. Consider:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="n">set1</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">set2</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="n">set1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="n">set3</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="n">set1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="n">set2</span> <span class="o">==</span> <span class="n">set3</span> <span class="c1">#=&gt; ?</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The <code class="highlighter-rouge">ClassicalSet.[]</code> method, which we have not encountered so far, initializes a new instance of <code class="highlighter-rouge">ClassicalSet</code> and feeds the arguments provided as keys into the set (associating them with the score <code class="highlighter-rouge">1</code>).</p>
+
+<p>Now the question is whether <code class="highlighter-rouge">set2</code> and <code class="highlighter-rouge">set3</code> are the same set. It seems that the answer should be yes, because, after all, they <em>contain the same elements</em>. If we do not override <code class="highlighter-rouge">eql?</code>, however, <code class="highlighter-rouge">set2</code> and <code class="highlighter-rouge">set3</code> will not come out equivalent, because <code class="highlighter-rouge">set2</code> and <code class="highlighter-rouge">set3</code> do not reference the same object, hence are not the same according to <code class="highlighter-rouge">Object#eql?</code>. And since we are using a hash internally, this matters, because <code class="highlighter-rouge">self[set1] == other[set1]</code> will fail. However, <code class="highlighter-rouge">SetLike#eql?</code>, as defined above, will do the job. Continuing in this vein, and as mentioned in the Ruby documentation for the Hash class, we also need to override the <code class="highlighter-rouge">Object#hash</code> method to ensure that two set objects that are <code class="highlighter-rouge">eql?</code> also have the same return value when <code class="highlighter-rouge">hash</code> is invoked.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">hash</span>
+  <span class="n">each</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:hash</span><span class="p">).</span><span class="nf">sum</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Here, we simply each key-value pair (a two-element array) to its <code class="highlighter-rouge">hash</code> return value, trusting that <code class="highlighter-rouge">Array#hash</code> is implemented in a meaningful way.</p>
+
+<p><strong>Coda.</strong> This has been a long post. I hope I have not exhausted your patience by discussing too many technicalities. Coming up with a first working implementation of the types of sets discussed here was pretty straightforward. However, arriving at a way to structure and modularize my code that I found convincing myself required me to go back to the drawing board several times. If you have a chance to <a href="http://www.github.com">check out my code</a>, your feedback would be greatly appreciated.</p>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
+      <small>16 December 2017</small>
+      <h1 id="material">Material</h1>
+
+<h2 id="class-hierarchy">Class hierarchy</h2>
+
+<ul>
+  <li>The <code class="highlighter-rouge">GenericSet</code> class defines the basic set data structure. It essentially wraps the hash that we use as a storage container, and provides a basic interface to that storage container:
+    <ul>
+      <li>indicator</li>
+      <li>subtract</li>
+      <li>add</li>
+      <li>each</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="getting-started">Getting started</h2>
+
+<p>It’s high time write some code. Let’s start with the bare minimum, and expand the capabilities of our model below. Here is the skeleton of a <code class="highlighter-rouge">Bag</code> class in Ruby:</p>
+
+<p>As announced, we use a hash, initialized in the constructor method, and referenced by the instance variable <code class="highlighter-rouge">@hash</code>, as an internal storage device. The intent is that <code class="highlighter-rouge">@hash[elem]</code> indicates the number of instances of <code class="highlighter-rouge">elem</code> found in our bag (which could be <code class="highlighter-rouge">0</code>, in which case <code class="highlighter-rouge">elem</code> is not to be found in the bag).</p>
+
+<p>Let’s initialize a <code class="highlighter-rouge">Bag</code> object with some elements and see how this works out with what we got so far.</p>
+
+<p>The main step necessary to make this approach amenable to working with sets as well (rather than merely with bags) is to abstract this into a separate method of the <code class="highlighter-rouge">Bag</code> class that the <code class="highlighter-rouge">Set</code> class can override. This is the job of the <code class="highlighter-rouge">indicator</code>.</p>
 
 <p>The intent is that the presence of a particular hash key indicates that the object given by the key is part of the set, and the value for a particular key indicates the count of the object.</p>
 
@@ -167,27 +529,119 @@
 <span class="n">set</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">elem</span> <span class="p">}</span> <span class="c1"># output: 1 2 3</span>
 <span class="n">bag</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">elem</span> <span class="p">}</span> <span class="c1"># output: 1 2 3 3</span>
 
-<span class="n">set</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 1</span>
-<span class="n">bag</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 2</span>
+<span class="n">set</span><span class="p">.</span><span class="nf">indicator</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 1</span>
+<span class="n">bag</span><span class="p">.</span><span class="nf">indicator</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#=&gt; 2</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<h2 id="topics-for-discussion">Topics for discussion</h2>
+<p>One may justifiably wonder why we have chosen to wrap the hash key reference method <code class="highlighter-rouge">Hash#[]</code> into our own <code class="highlighter-rouge">Bag#indicator</code> method. While redundant at first sight, this is actually the key abstraction needed to make our initial idea of modeling bags and sets polymorphically. Let’s see how.</p>
+
+<h2 id="modeling-sets">Modeling Sets</h2>
+
+<p>To model sets, all we need to add is the following code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Set</span> <span class="o">&lt;</span> <span class="no">Bag</span>
+  <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="k">super</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>This is a a fairly direct implementation of the idea of collapsing the indicator function of a bag to the indicator function of a set.</p>
+
+<h2 id="more-topics">More topics</h2>
 
 <ul>
-  <li>definition of <code class="highlighter-rouge">count</code> in terms of <code class="highlighter-rouge">indicator</code></li>
-  <li>illustrate the consequences: <code class="highlighter-rouge">each</code></li>
-  <li>set interface: like multiset, but don’t care about values in internal hash –
-override <code class="highlighter-rouge">count</code> method</li>
-  <li>interface difference: each: yield without repetitions</li>
-  <li>use of eql? and hash methods</li>
-  <li>set equality can be defined in terms of subset relation</li>
+  <li>interfacing with Enumerable: <code class="highlighter-rouge">count</code></li>
+  <li>operations with enum (union, intersection etc)</li>
+  <li>predicates with other set (subset, superset, equality)</li>
+  <li>equality and nested sets</li>
+  <li>
+    <p>type-checking the value</p>
+  </li>
+  <li>applications:
+    <ul>
+      <li>multiset: shopping cart, character counter</li>
+      <li>fuzzy set:</li>
+    </ul>
+  </li>
+  <li>interesting operations on sets:
+    <ul>
+      <li>partition</li>
+      <li>powerset</li>
+    </ul>
+  </li>
+  <li>fuzzy sets: for fuzzy sets, union, intersection and complement still apply.</li>
+  <li>however, going from <code class="highlighter-rouge">indicator</code> to <code class="highlighter-rouge">count</code> does not make much sense.</li>
+  <li>in general, how do we enumerate a fuzzy set?</li>
+  <li>what is the subset relation among fuzzy sets?</li>
 </ul>
 
-<p>Maybe build both classes (bag and set) as we go?</p>
+<h2 id="operations">Operations</h2>
 
-<p>… For recapitulation, this is the code we have so far:</p>
+<ul>
+  <li>SUM: for fuzzy sets, this is the “bounded sum” (see here: https://encyclopedia2.thefreedictionary.com/bounded+sum)</li>
+  <li>DIFFERENCE: for fuzzy sets, this is called “bounded difference”. sometimes, this is also called truncated subtraction (https://en.wikipedia.org/wiki/Monus#Natural_numbers)</li>
+</ul>
+
+<h2 id="basicset-class">BasicSet class</h2>
+
+<ul>
+  <li>purpose : provide and abstract away data structure for working with sets: this class could be replaced by a different one, if we chose to use a different kind of collaborator class (instead of a hash)</li>
+</ul>
+
+<h2 id="idea-of-the-class-hierarchy">Idea of the class hierarchy:</h2>
+
+<ul>
+  <li>BasicSet wraps the hash data structure into a custom interface for sets.</li>
+  <li>SetLike</li>
+</ul>
+
+<h2 id="basic-interface-of-a-set">Basic interface of a set</h2>
+
+<ul>
+  <li>:retrieve (key getter) and :update (key setter)</li>
+  <li>:insert and :delete key</li>
+  <li>
+    <p>:valid_value?</p>
+  </li>
+  <li>GenericSet provides :retrieve and :update (and :each)</li>
+  <li>GenericSet provides :valid_value? also, but overridden by child classes</li>
+  <li>The set child class itself provides :insert and :delete</li>
+  <li>
+    <p>SetLike requires :retrieve, :update, and :insert</p>
+  </li>
+  <li>
+    <p>NumericMap also provides the storage device (i.e., a hash)</p>
+  </li>
+  <li>SetLike provides methods for set-typical operations and predicates (which also includes Enumerable):
+    <ul>
+      <li>union</li>
+      <li>intersection</li>
+      <li>difference</li>
+      <li>subset/superset</li>
+      <li>flatten</li>
+      <li>to_s, inspect</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="division-of-labour-between-genericset-and-setlike">Division of labour between <code class="highlighter-rouge">GenericSet</code> and <code class="highlighter-rouge">SetLike</code></h2>
+
+<p><code class="highlighter-rouge">GenericSet</code> contains methods that need direct access to instance variables. These methods directly interact with the internal state of our chosen data structure. <code class="highlighter-rouge">SetLike</code>, on the other hand, only interfaces with the data structure <em>through</em> the methods provided by <code class="highlighter-rouge">GenericSet</code>. It thus respects the guards that the public interface of <code class="highlighter-rouge">GenericSet</code> puts in place. This helps to protect the integrity of a set.</p>
+
+<p>As an example for such a guard, we provide two methods for manipulating the values associated with the keys in our sets: <code class="highlighter-rouge">insert</code> and <code class="highlighter-rouge">remove</code>. Both methods have the side effect of updating the <code class="highlighter-rouge">size</code> attribute of our set stored in the <code class="highlighter-rouge">@size</code> instance variable. We thus would not want other methods to bypass <code class="highlighter-rouge">insert</code> and <code class="highlighter-rouge">remove</code>, thus frustrating our attempt to maintain the invariant <code class="highlighter-rouge">self.size == self.values.sum</code> (i.e., mutating the set does not change the fact that the size of the set is be the sum of the values associated with each key).</p>
+
+<h2 id="why-subclass-from-genericset">Why subclass from <code class="highlighter-rouge">GenericSet</code></h2>
+
+<p>To enforce a kind of typing via <code class="highlighter-rouge">valid_value?</code>. E.g., the union of a multiset with a fuzzy set is not necessarily a multiset. (or is it? maybe it is)</p>
 
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       
@@ -684,7 +1138,12 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
       
 
           <h3>
-            <a class="post-link" href="/2017/12/02/a-bag-of-sets/">A Bag Of Sets</a><span class="pad"></span><small>02 Dec 2017</small>
+            <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/16/material/">Material</a><span class="pad"></span><small>16 Dec 2017</small>
           </h3>
       
 
