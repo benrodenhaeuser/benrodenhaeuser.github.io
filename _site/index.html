@@ -35,44 +35,281 @@
       <!--  -->
       
       <small>18 December 2017</small>
+      <h1 id="tic-tac-toe-with-negamax">Tic Tac Toe with Negamax</h1>
+
+<hr />
+
+<p>Comment, December 2017:</p>
+
+<p>This is actually an example of a tree-recursive process.</p>
+
+<p>It should be possible to do this in various ways:</p>
+<ul>
+  <li>brute force</li>
+  <li>with memoization</li>
+  <li>with alpha/beta pruning</li>
+  <li>with dynamic programming (bottom-up)</li>
+</ul>
+
+<p>In fact, all but the last ones I have done already.</p>
+
+<hr />
+
+<p>The first version of the Tic Tac Toe negamax algorithm that I implemented was painfully slow. It took more than 30 seconds to return a move for the initial position of a standard 3x3 game. So I had a strong incentive to try and understand the algorithm better. Beginning programmers are typically advised not to spend time worrying about performance, but here, we are not talking about micro-optimization – we are talking about an algorithm implementation that makes a game unplayable.</p>
+
+<p>In this post, I will discuss the baseline negamax algorithm for solving Tic Tac Toe, and a few improvements to this algorithm – both more generic ones (that could be applied, more or less directly, to any strictly competitive games) and more specific ones (that exploit certain properties of <em>this</em> game, Tic Tac Toe).</p>
+
+<!-- ## Tic Tac Toe
+
+We will represent a 3x3 Tic Tac Toe position as a nine-element array that we can access by index, with indices ranging from 0 to 8. Using the common player markers, and a blank space for squares that have not been chosen by either of the players yet. So the following board position ...
+
+... will be represented by this array:
+
+```ruby
+['X', 'O', ' ', 'X', ' ', ' ', ' ', ' ', ' ']
+```
+
+Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe for us. -->
+
+<h2 id="brute-force-negamax">Brute force Negamax</h2>
+
+<p>Here is an implementation of the Negamax algorithm for Tic Tac Toe in Ruby:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">terminal?</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">available_moves</span><span class="p">(</span><span class="n">state</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">move</span><span class="o">|</span>
+      <span class="n">make</span><span class="p">(</span><span class="n">move</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+      <span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
+      <span class="n">unmake</span><span class="p">(</span><span class="n">move</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+      <span class="n">value_for_move</span>
+    <span class="k">end</span><span class="p">.</span><span class="nf">max</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The method returns the value of a game state <code class="highlighter-rouge">state</code> for the player <code class="highlighter-rouge">player</code>, assumed to be the player who moves next. This value is the highest payoff that <code class="highlighter-rouge">player</code> can be guaranteed to achieve with optimal play, and it is denoted  with the variable <code class="highlighter-rouge">best_value</code>.</p>
+
+<p>For terminal states, the value of <code class="highlighter-rouge">state</code> for <code class="highlighter-rouge">player</code> is given by the Tic Tac Toe payoff function — that’s the first branch of the conditional:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>For non-terminal states, <code class="highlighter-rouge">player</code> has to evaluate all available choices. Suppose she is at the moment looking at one particular move <code class="highlighter-rouge">move</code>. She makes the move (that’s the line <code class="highlighter-rouge">make(move, player, state)</code>, which updates <code class="highlighter-rouge">state</code> as a side-effect), and evaluates the resulting position. She uses our <code class="highlighter-rouge">nega_max</code> method to do this. Assume that the method tells her that the best her opponent can do in the successor state (referenced by <code class="highlighter-rouge">state</code> at this point) is $n$. So what can <code class="highlighter-rouge">player</code> herself achieve by choosing <code class="highlighter-rouge">move</code>? It’s $-n$. Here is why:</p>
+
+<ul>
+  <li>If <code class="highlighter-rouge">opponent(player)</code> can guarantee a win, then opponent will get $1$, so <code class="highlighter-rouge">player</code> gets $-1$ if she chooses <code class="highlighter-rouge">move</code>.</li>
+  <li>If <code class="highlighter-rouge">opponent(player)</code> can only guarantee a tie, opponent will get $0$, so <code class="highlighter-rouge">player</code> gets $-0$, which is $0$.</li>
+  <li>If <code class="highlighter-rouge">opponent(player)</code> is bound to lose, opponent will get $-1$, so <code class="highlighter-rouge">player</code> gets $-(-1)$, which is $1$.</li>
+</ul>
+
+<p>So the best <code class="highlighter-rouge">player</code> can guarantee to achieve when choosing <code class="highlighter-rouge">move</code> is indeed $-n$. This explains the crucial line of the method containing the recursive call:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Notice that this only works because Tic Tac Toe is <em>zero-sum</em>, i.e., one player’s loss is another player’s gain: the payoffs of both players always add up to 0.</p>
+
+<p>Return to <code class="highlighter-rouge">player</code>, who is deliberating which move to take. She proceeds in the manner described, evaluating <em>all</em> her moves. In this way, <code class="highlighter-rouge">player</code> obtains a list of values, one for each move (that list is the return value of the <code class="highlighter-rouge">map</code> invocation). The maximal value from this list is the best she can guarantee, so this is what we return.</p>
+
+<h2 id="the-best-move">The best move</h2>
+
+<h2 id="algorithms">Algorithms</h2>
+
+<ul>
+  <li>brute force negamax</li>
+  <li>negamax with transposition table</li>
+  <li>negamax with symmetry table
+    <ul>
+      <li>consider: instead of solving all of the eight subtrees of the initial game node, we have to solve just three.</li>
+    </ul>
+  </li>
+  <li>negamax with symmetry lookup</li>
+  <li>alpha-beta pruning</li>
+  <li>negamax with shortcuts</li>
+</ul>
+
+<p>these fall onto a spectrum from “more generic” to “more game-specific”</p>
+<ul>
+  <li>negamax and negamax with alpha-beta pruning are generic algorithms that work pretty much for every game.</li>
+  <li>transposition tables are useful whenever there are several ways to reach the same position.</li>
+  <li>symmetry is useful if there are … symmetries!</li>
+  <li>the shortcut method makes use of the fact that tic tac toe is solved. so why not use the fact that the best we can guarantee is a tie?</li>
+</ul>
+
+<h2 id="results">Results</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"> </th>
+      <th style="text-align: right">time</th>
+      <th style="text-align: right">calls</th>
+      <th style="text-align: right">table size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">brute force</td>
+      <td style="text-align: right">5.781872</td>
+      <td style="text-align: right">549,946</td>
+      <td style="text-align: right">-</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">transposition table</td>
+      <td style="text-align: right">0.105050</td>
+      <td style="text-align: right">16,168</td>
+      <td style="text-align: right">5,477</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">symmetry table</td>
+      <td style="text-align: right">0.048830</td>
+      <td style="text-align: right">2,271</td>
+      <td style="text-align: right">5,477</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">symmetry lookup</td>
+      <td style="text-align: right">0.058844</td>
+      <td style="text-align: right">2,271</td>
+      <td style="text-align: right">764</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">alpha-beta</td>
+      <td style="text-align: right">0.193677</td>
+      <td style="text-align: right">18,297</td>
+      <td style="text-align: right">-</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>549,946 is the size of the 3x3 ttt game tree (i.e., the number of nodes)</li>
+  <li>5477 is the number of distinct board positions minus the initial state</li>
+  <li>
+    <p>764 is the number of board positions up to symmetry minus the initial state</p>
+  </li>
+  <li>
+    <p>In the transposition table case, around 6,000 calls are calls that result (as a side-effect) in values being stored to the lookup table, whereas around 10,000 calls return a looked-up value.</p>
+  </li>
+  <li>In the symmetry table case, the table is built “much faster”, because whenever we save to the table, we save eight values instead of merely one.</li>
+</ul>
+
+<h3 id="time">time</h3>
+
+<ul>
+  <li>
+    <p>with a symmetry table, we can realize a hundred fold speed increase.</p>
+  </li>
+  <li>memoizing values is a dramatic improvement over brute force negamax</li>
+  <li>exploiting symmetries allows us reduce computation time by half</li>
+  <li>saving symmetric values as we compute them seems slightly faster than computing symmetries during lookup</li>
+  <li>the memoization approaches are quite a bit faster than alpha-beta-search on a 3x3 board</li>
+  <li>(it looks like alpa-beta scales a lot better, viz the results for a 4x4 board)</li>
+</ul>
+
+<h3 id="calls">calls</h3>
+
+<ul>
+  <li>brute force: the number of method calls is a lot higher than the number of distinct positions, because many positions are computed several times.</li>
+  <li>transposition table: with this algorithm, the number of calls is still higher than the number of positions, because it may happen that our negamax method is called for some state, even if that state has been evaluated already and stored … but we still need to retrieve it!</li>
+  <li>symmetry table: now the number of calls is lower than the size of the table. this looks certainly odd at first sight. but the thing is that with every function call, we write up to eight new values to the table.</li>
+</ul>
+
+<h3 id="method-calls-in-relation-to-time">method calls in relation to time</h3>
+<ul>
+  <li>the number of method calls does not correlate neatly with computation time spent.</li>
+  <li>compare brute force and transposition table: 549946/16168 is about 34, so the evaluation function is called 34 times less when we use the transposition table vs brute force. the speed gain, on the other hand, is around 57-fold. Why is that?</li>
+  <li>
+    <p>When going from a transposition to a symmetry table, there is a 7-fold decrease in function calls, but the computation time is only halved. Filling in the table entries comes with an extra cost that partially offsets avoiding negamax calls. That seems to be the plausible explanation.</p>
+  </li>
+  <li><strong>What does the number of method calls actually correspond to?</strong> In brute force negamax, it is simply the number of nodes in the complete game tree (see https://books.google.com/books?id=1xHPDAAAQBAJ&amp;pg=PA151&amp;lpg=PA151&amp;dq=size+of+tic+tac+toe+game+tree&amp;source=bl&amp;ots=J3Tp09kbbL&amp;sig=DJoyUjGx2XGMm-gvMg-QW5bQ8sI&amp;hl=de&amp;sa=X&amp;ved=0ahUKEwivzpGyjpHUAhVG0WMKHVRqD704ChDoAQhXMAc#v=onepage&amp;q=size%20of%20tic%20tac%20toe%20game%20tree&amp;f=false)</li>
+</ul>
+
+<h3 id="table-size">table size</h3>
+
+<ul>
+  <li>transposition table: there are 5478 distinct positions in 3x3 tic tac toe (see http://www.mathrec.org/old/2002jan/solutions.html). Since we do not store a value for the initial state in the table, our table has 5477 entries.</li>
+  <li>symmetry lookup: since we only store a “representative” of each equivalence class, this is a smaller table. there are 765 distinct ttt positions modulo symmetries (see http://www.mathrec.org/old/2002jan/solutions.html), and since we don’t store the initial state, our table has 764 entries.</li>
+</ul>
+
+<h3 id="why-is-the-number-of-method-calls-smaller-than-the-number-of-distinct-ttt-positions-when-we-use-a-symmetry-table">Why is the number of method calls smaller than the number of distinct ttt positions when we use a symmetry table?</h3>
+
+<p>This might come as a surprise, because shouldn’t we have to visit every distinct node at least once? well, no, actually! The reason we don’t have to do this is that there are certain positions we never even have to evaluate, because they are descendants of nodes that are symmetric to nodes we have evaluated (if that makes sense).</p>
+
+<h3 id="shortcut">shortcut</h3>
+
+<ul>
+  <li>
+    <p>suppose we already know that the best we can guarantee is a tie. then we could stop looking for a win (we know we cannot find a guaranteed win path), but instead look for a tie path. this is the idea behind the two “shortcut” algorithms I looked at: one adds the shortcut to the brute force algorithm, the second adds the shortcut to the transposition table. The second one (transposition with shortcut) is the fastest algorithms I considered.</p>
+  </li>
+  <li>
+    <p>there is a pitfall here, however. if we are playing against a less than perfect opponent, than we might miss a chance to score a win if we take the shortcut!</p>
+  </li>
+</ul>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
+      <small>18 December 2017</small>
       <h1 id="a-bunch-of-sets">A Bunch of Sets</h1>
 
-<p>Ruby has a <a href="http://ruby-doc.org/stdlib-2.4.1/libdoc/set/rdoc/Set.html">set class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset">multiset implementation</a> available as a gem. Both uses hashes for internal storage. However, the two libraries do not share any code. This is somewhat regrettable, since—as we will discuss below—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to implement a more generic set class from scratch from which (part of) the functionality provided by these two classes can be derived by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result is a polymorphic approach to modeling various types of sets in Ruby. If you don’t care much for lengthy explanations, head <a href="https://www.github.com">straight to Github</a> to read the code.</p>
+<p>Ruby comes with a <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset/blob/master/lib/multiset.rb"><code class="highlighter-rouge">Multiset</code> class</a> available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of this post—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don’t care much for lengthy explanations, head <a href="https://github.com/benrodenhaeuser/sets">straight to Github</a> to have a look at the code.</p>
 
 <h2 id="classical-sets-multisets-and-fuzzy-sets">Classical sets, multisets, and fuzzy sets</h2>
 
-<p>Let’s first get a quick overview of the types of collections we are interested in modeling by means of some motivating examples.</p>
+<p>Let’s first get an overview of the types of collections we are interested in by means of some quick examples.</p>
 
-<p><strong>Classical Sets.</strong> Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set is a good choice for the job. For instance, the word “learner” could be represented by the set</p>
+<p><strong>Classical Sets.</strong> Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word “$\text{learner}$” could be represented by the set</p>
 
-<script type="math/tex; mode=display">\lbrace a, e, l, r, n \rbrace</script>
+<script type="math/tex; mode=display">\lbrace a, e, l, r, n \rbrace.</script>
 
-<p>Notice that the word “$\text{learn}$” would be represented by the very same set, i.e., $\lbrace a, e, l, r, n \rbrace$. So sets allow us to zoom in on the question of membership: is the letter contained in the word or not? Other salient aspects of words, in particular letter counts, are disregarded.</p>
+<p>Incidentally, the word “$\text{learn}$” corresponds to the same classical set, as it contains the same letters. The word “$\text{land}$”, on the other hand, corresponds to the set</p>
 
-<p><strong>Multisets.</strong> Suppose now we would like to count how often letters occur in a given word or text, while disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the word “$\text{learner}$” could be represented by the multiset</p>
+<script type="math/tex; mode=display">\lbrace a, l, n, d \rbrace.</script>
+
+<p>Taking the intersection of the two sets, which collects the elements occuring in both of them, we obtain the set $\lbrace a, l, n\rbrace$, which captures the overlap of the two words in terms of letters contained—a crude measure of what they have in common. So sets allow us to zoom in on questions of membership, while disregarding other aspects of particular entities we wish to study.</p>
+
+<p><strong>Multisets.</strong> Suppose now we would like to count <em>how often</em> letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word “$\text{learner}$” corresponds to the multiset</p>
 
 <script type="math/tex; mode=display">\lbrace a, e, e, l, r, r, n \rbrace</script>
 
 <p>Notice that the word “$\text{learn}$” would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.</p>
 
-<p>A more concise way to represent a multiset is by means of key-value notation. Our multiset representation of the word “learner” would then be written as</p>
+<p>A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word “$\text{learner}$” would be written as</p>
 
 <script type="math/tex; mode=display">\lbrace a: 1, e: 2, l: 1, r: 2, n: 1\rbrace</script>
 
-<p>The elements of a multiset are often called <em>keys</em>. The above multiset has five distinct keys ($a$, $e$, $l$, $r$ and $n$). We shall refer to the value associated with a particular key as the <em>score</em> for that key. In the above multiset, the score for the key $e$ is $2$.</p>
+<p>In a programming context, the elements of a set (be it a classical set or a multiset) are often called <em>keys</em>. The above multiset has five distinct keys: $a$, $e$, $l$, $r$ and $n$. In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the <em>score</em> for that key. The score for the key $e$ in the above multiset, for example, is $2$.</p>
 
-<p><strong>Fuzzy sets.</strong> Fuzzy sets also make finer distinctions compared to classical sets. However, they go into a different direction. In a multiset, the score for a particular key indicates multiplicity of membership. In a fuzzy set, we do not allow keys to occur multiple times. Instead, we allow membership  <em>to a degree</em>. This allows us, for example, to model situations where the similarity of various items is at stake.</p>
+<p><strong>Fuzzy sets.</strong> Fuzzy sets also make finer distinctions compared to classical sets. However, they generalize classical sets in a different direction. As we just saw, in a multiset, the score for a particular key represents <em>multiplicity</em> of membership (how many times does the key occur in the set?). In a fuzzy set, the score indicates <em>degree of membership</em>. So besides an element being “fully contained” in the set or “not contained”, it may also be “partially contained” in the set, so to speak.</p>
 
-<p>Consider the words “$\text{learner}$”, “$\text{learn}$”, “$\text{learned}$”, and “$\text{lean}$”. We might wish to capture how similar these words are to the word “$\text{learner}$”. The similarity of “$\text{learner}$” to itself is perfect, since no edit is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word “$\text{learned}$” is very similar to “$\text{learner}$” – substituting the last letter in “$\text{learned}$” will transform it into “$\text{learner}$”. “$\text{learn}$” is also very similar to “$\text{learner}$”, but a little less so – deleting the last two letters from “$\text{learner}$” results in “$\text{learner}$”, requiring two steps rather than one. The word “$\text{lean}$” is again a bit less similar to “$\text{learner}$”, requiring one more deletion step. So to transform each of the words into “learner” requires:</p>
+<p>To see how this can be useful, take this example: consider the words “$\text{learner}$”, “$\text{learn}$”, “$\text{learned}$”, and “$\text{lean}$”. We might wish to capture how similar each of these words is to some other word, let’s say the word “$\text{learner}$” again. The similarity of “$\text{learner}$” to itself is perfect, since no edit (letter change) is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word “$\text{learned}$” is very similar to “$\text{learner}$” – substituting the last letter will transform the former into the latter. “$\text{learn}$” is also very similar to “$\text{learner}$”, but a little less so – deleting the last two letters from “$\text{learner}$” results in “$\text{learner}$”, requiring two steps rather than one. The word “$\text{lean}$” is again a bit less similar to “$\text{learner}$”, requiring one additional deletion. So to transform each of the words given into “$\text{learner}$” requires:</p>
 
 <ul>
-  <li>”$\text{learner}$”: 0 edits</li>
-  <li>”$\text{learned}$”: 1 edit</li>
-  <li>”$\text{learn}$”: 2 edits</li>
-  <li>”$\text{lean}$”: 3 edits</li>
+  <li>”$\text{learner}$”: $0$ edits</li>
+  <li>”$\text{learned}$”: $1$ edit</li>
+  <li>”$\text{learn}$”: $2$ edits</li>
+  <li>”$\text{lean}$”: $3$ edits</li>
 </ul>
 
-<p>Suppose now that we settle—pretty arbitrarily but for the sake of exposition—on 3 edits as the treshold from which onwards two words are to be considered perfectly dissimilar or “not similar at all”. Then we can map our edit counts to the 0-1-scale and represent our findings as a fuzzy set which contains “$\text{learner}$” with degree 1.0, “$\text{learned}$” with degree 0.66, “$\text{learn}$” with degree 0.33 and “$\text{lean}$” with degree 0.0, or, using key-value notation:</p>
+<p>For the sake of exposition, let us settle on $3$ as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or “not similar at all”. Then we can map our edit counts to a scale from $0$ to $1$, and represent our findings as a fuzzy set which scores the key “$\text{learner}$” with $1.0$, “$\text{learned}$” with $0.66$, “$\text{learn}$” with $0.33$ and “$\text{lean}$” with $0.0$, or, using key-value notation:</p>
 
 <script type="math/tex; mode=display">\lbrace\text{learner}: 1.0, \text{learned}: 0.66, \text{learn}: 0.33, \text{lean}: 0.0\rbrace</script>
 
@@ -80,11 +317,11 @@
 
 <h2 id="the-setmap-class-and-its-children">The <code class="highlighter-rouge">SetMap</code> class and its children</h2>
 
-<p>Let us now begin to develop the main ingredients for a Ruby model of sets, a model that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these types via inheritance.</p>
+<p>Equipped with some basic understanding of our problem domain, let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.</p>
 
-<p><strong>Hash tables.</strong> What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets seem to consist of key-value pairs, while classical sets consist of a bunch of keys only. However, this is merely a matter of representation. In fact, it is rather common to represent a (classical) set by means of a <em>characteristic function</em>, which maps the members of the set to $1$, while all other objects from a given domain to $0$. So we can extend the key-value representation from above to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.</p>
+<p><strong>Hash tables.</strong> What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to $1$, while all other objects from a given domain are mapped to $0$. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.</p>
 
-<p>It now requires only a tiny step to conclude that the membership information for a particular set (be it a fuzzy set, a classical set, or a multiset) may be stored in a hash table, such as</p>
+<p>From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table, such as</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">1</span> <span class="p">}</span>
 </pre></td></tr></tbody></table>
@@ -98,7 +335,14 @@
 </div>
 </div>
 
-<p>Of course, we would not want to directly expose such a hash to the user of our set class. The user need not even be aware that we are using a hash to store her set. The hash instance that stores the set keys and their scores will thus be a collaborator object to our set. The <code class="highlighter-rouge">initialize</code> method of our <code class="highlighter-rouge">SetMap</code> class sets the stage for this:</p>
+<p>or</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">6</span> <span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Hash tables will form the basis of our representation of sets. Of course, we would not want to directly expose such a table to the user of our set class. The user need not even be aware that we are using a hash table to store her set. Rather, the hash instance that stores the set keys and their associated scores will be a collaborator object to our set object. The <code class="highlighter-rouge">initialize</code> method of our <code class="highlighter-rouge">SetMap</code> class sets the stage for this:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -108,7 +352,7 @@
 6
 7
 8</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
-  <span class="kp">include</span> <span class="no">SetLike</span>
+  <span class="kp">attr_reader</span> <span class="ss">:size</span>
 
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@hash</span> <span class="o">=</span> <span class="p">{}</span>
@@ -119,17 +363,17 @@
 </div>
 </div>
 
-<p>The size of a set is defined as the sum of the scores of its keys. We decide to maintain an instance variable <code class="highlighter-rouge">@size</code> that tracks the size, in the interest of being able to look up the size of our set in constant time. We will talk about the <code class="highlighter-rouge">SetLike</code> module included in the <code class="highlighter-rouge">SetMap</code> class in the next section.</p>
+<p>We decide to maintain an instance variable <code class="highlighter-rouge">@size</code> (with accompanying getter method <code class="highlighter-rouge">size</code>), in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion.</p>
 
-<p><strong>Valid scores.</strong> What distinguishes the set types we have seen from each other? It is primarily the notion of a valid score:</p>
+<p><strong>Valid scores.</strong> What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
 
 <ul>
-  <li>A classical set either contains or does not a particular key, so the only valid scores are $0$ and $1$.</li>
-  <li>A multiset contains a given key $n$ times, where $n$ is a non-negative number.</li>
-  <li>A fuzzy set scores a given key to a degree in the real interval from $0$ to $1$.</li>
+  <li>A classical set either contains or does not contain a particular key, so the only valid scores are $0$ and $1$.</li>
+  <li>A multiset may contain a given key $n$ times, where $n$ is a non-negative integer.</li>
+  <li>A fuzzy set scores a given key to a degree in the unit interval from $0$ to $1$.</li>
 </ul>
 
-<p>In each case, there is a range of particular values. We model this by means of a bunch of class methods and class instance variables:</p>
+<p>So in each case, we have to be able to express a range of possible values. We set up a bunch of class methods and class instance variables for this purpose:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -147,36 +391,32 @@
 14
 15
 16
-17
-18
-19</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
-  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
-    <span class="k">def</span> <span class="nf">score_type</span>
-      <span class="vi">@score_type</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@score_type not initialized'</span><span class="p">)</span>
-    <span class="k">end</span>
+17</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">score_type</span>
+    <span class="vi">@score_type</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@score_type not initialized'</span><span class="p">)</span>
+  <span class="k">end</span>
 
-    <span class="k">def</span> <span class="nf">min_score</span>
-      <span class="vi">@min_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@min_score not initialized'</span><span class="p">)</span>
-    <span class="k">end</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">min_score</span>
+    <span class="vi">@min_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@min_score not initialized'</span><span class="p">)</span>
+  <span class="k">end</span>
 
-    <span class="k">def</span> <span class="nf">max_score</span>
-      <span class="vi">@max_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@max_score not initialized'</span><span class="p">)</span>
-    <span class="k">end</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">max_score</span>
+    <span class="vi">@max_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@max_score not initialized'</span><span class="p">)</span>
+  <span class="k">end</span>
 
-    <span class="k">def</span> <span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-      <span class="p">(</span><span class="n">min_score</span><span class="p">.</span><span class="nf">.</span><span class="n">max_score</span><span class="p">).</span><span class="nf">cover?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">val</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="n">score_type</span><span class="p">)</span>
-    <span class="k">end</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">val</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="n">score_type</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">min_score</span><span class="p">.</span><span class="nf">.</span><span class="n">max_score</span><span class="p">).</span><span class="nf">cover?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<p>The <code class="highlighter-rouge">class &lt;&lt; self ... end</code> block in the above snippet indicates that the methods defined in the block are class methods. The first three are getters (on the level of the class object) for the class instance variables <code class="highlighter-rouge">@score_type</code> (the kind of object we may use as a score for a key), <code class="highlighter-rouge">@min_value</code> (the smallest value that may be used as a score), and <code class="highlighter-rouge">@max_value</code> (the largest value that maye be used as a score). The fourth method uses these getters and describes in the form of a predicate what constitutes a valid score.</p>
+<p>The first three class methods defined above are getters (on the level of the class object) for the class instance variables <code class="highlighter-rouge">@score_type</code> (the kind of object we may use as a score for a key), <code class="highlighter-rouge">@min_score</code> (the smallest value that may be used as a score), and <code class="highlighter-rouge">@max_score</code> (the largest value that maye be used as a score). The fourth method uses these getters and describes what constitutes a valid score as a predicate.</p>
 
-<p>As the second disjunct of each getter methods above tells us loud and clear, we are missing something so far: our class instance variables have not been initialized so far, and there is so far no obvious way to do so.</p>
+<p>As the second disjunct of each of the above getter methods tells us loud and clear, we are missing something so far: our class instance variables have not been set to any value! Initializing those class instance variables is precisely the job description of our target classes.</p>
 
-<p><strong>Target classes.</strong> Initializing those class instance variables is precisely the job description of our target classes. <code class="highlighter-rouge">SetMap</code> is meant to be subclassed, with each subclass defining a particular set type by specifying the range of legal scores via <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>. Here is the code for classical sets:</p>
+<p><strong>Target classes.</strong> <code class="highlighter-rouge">SetMap</code> is meant to be subclassed, with each subclass defining a particular set type by specifying a range of legal scores via the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>. Here is the code for classical sets:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -206,7 +446,7 @@
 </div>
 </div>
 
-<p>Any instance of <code class="highlighter-rouge">Numeric</code> in the interval betwwen 0 and 1 is a valid score for a fuzzy set key. Finally, for multisets:</p>
+<p>So any <code class="highlighter-rouge">Numeric</code> instance in the closed interval $[0, 1]$ is a valid score for a fuzzy set key (we choose <code class="highlighter-rouge">Numeric</code> so as to allow both floats and integers). Finally, for multisets:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -221,9 +461,11 @@
 </div>
 </div>
 
-<p>The <code class="highlighter-rouge">Float::INFINITY</code> constant has the property that <code class="highlighter-rouge">x &lt; Float::INFINITY</code> for any numeric <code class="highlighter-rouge">x</code>. Setting <code class="highlighter-rouge">@max_score</code> to <code class="highlighter-rouge">Float::INFINITY</code> is thus a way of saying that, for multisets, there <em>is no</em> maximal score: any non-negative integer is allowed.</p>
+<p>The <code class="highlighter-rouge">Float::INFINITY</code> constant has the property that <code class="highlighter-rouge">x &lt; Float::INFINITY</code> for any numeric <code class="highlighter-rouge">x</code>. Setting <code class="highlighter-rouge">@max_score</code> to <code class="highlighter-rouge">Float::INFINITY</code> is thus a way of saying that, for multisets, there is no maximal score: any non-negative integer is allowed.</p>
 
-<p>And this is really all there is to it! Specializing the capabilities of <code class="highlighter-rouge">SetMap</code> to a particular target class boils down to providing appropriate values for a bunch of class instance variables. Of course, we have not demonstrated how the interface for <code class="highlighter-rouge">SetMap</code> actually looks like. But from now on, we will write methods that work equally well for all three scenarios under consideration: classical sets, fuzzy sets, and multisets.</p>
+<p>And this is really all there is to it! Specializing the capabilities of <code class="highlighter-rouge">SetMap</code> to a particular target class boils down to providing appropriate values for a bunch of class instance variables.</p>
+
+<p>Of course, we have not yet demonstrated what the interface for <code class="highlighter-rouge">SetMap</code> actually looks like. But from now on, we will write methods that work equally well for all three set types under consideration: classical sets, fuzzy sets, and multisets.</p>
 
 <p><strong>Key insertion.</strong> The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the <code class="highlighter-rouge">SetMap#insert</code> method:</p>
 
@@ -242,7 +484,9 @@
 </div>
 </div>
 
-<p>The basic idea of <code class="highlighter-rouge">insert</code> is to increment the score of <code class="highlighter-rouge">key</code> by <code class="highlighter-rouge">val</code>. As per line 2 of the snippet, this will work only if <code class="highlighter-rouge">val</code> is a valid score according to the implementation of <code class="highlighter-rouge">valid_score?</code> (which in turn depends on the values of the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>). If that is the case, we use what is called a <em>bounded sum</em> to add <code class="highlighter-rouge">val</code> to <code class="highlighter-rouge">self[key]</code>, capping off the sum at the value of <code class="highlighter-rouge">@max_score</code> (line 4). We also need to keep track of the size of out set, which happens in line 5. Here, we also keep track of rounding errors that might occur for types of sets that allow floating point numbers as scores.</p>
+<p>The general idea of this method is to increment the score of <code class="highlighter-rouge">key</code> by <code class="highlighter-rouge">val</code>. As per line 2 of the snippet, this will work only if <code class="highlighter-rouge">val</code> is a valid score according to the implementation of <code class="highlighter-rouge">valid_score?</code> (which in turn depends on the values of the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>). If that is the case, we use what is called a <em>bounded sum</em> to add <code class="highlighter-rouge">val</code> to <code class="highlighter-rouge">self[key]</code>, capping off the sum at <code class="highlighter-rouge">@max_score</code> (line 4).</p>
+
+<p>Let’s try this out using our target classes:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -275,7 +519,9 @@
 </div>
 </div>
 
-<p>These are the desired results (assuming a—standard—<code class="highlighter-rouge">inspect</code> method which we have not shown). Notice that the score range we have specified for classical sets ensures that inserting the same key twice has the same effect as inserting it once.</p>
+<p>These are the desired results (assuming a—standard—<code class="highlighter-rouge">inspect</code> method which we have not shown). Notice that the score range we have specified for classical sets in tandem with the bounded sum ensures that inserting the same key twice has the same effect as inserting it once: the sum of <code class="highlighter-rouge">1</code> and <code class="highlighter-rouge">1</code> bounded by <code class="highlighter-rouge">1</code> is again <code class="highlighter-rouge">1</code>.</p>
+
+<p>Returning to the earlier snippet, we also need to keep track of the size of our set (line 5). Here, we also neutralize rounding errors that might occur for types of sets that allow <a href="http://floating-point-gui.de">floating point numbers</a> as scores.</p>
 
 <p><strong>Key retrieval.</strong>  Next, consider <code class="highlighter-rouge">SetMap#retrieve</code>:</p>
 
@@ -290,6 +536,8 @@
 </div>
 </div>
 <p>The <code class="highlighter-rouge">retrieve</code> method (which we alias as <code class="highlighter-rouge">[]</code>) wraps the element reference method of our internal hash. If the hash does not contain a certain key, <code class="highlighter-rouge">@hash[key]</code> will return <code class="highlighter-rouge">nil</code>. In that case, <code class="highlighter-rouge">retrieve(key)</code> (or, equivalently as per our alias, <code class="highlighter-rouge">self[key]</code>) will return <code class="highlighter-rouge">0</code>. Alternatively, we could haver set a default value for <code class="highlighter-rouge">@hash</code>, but the current way seems slightly more explicit.</p>
+
+<p>Observe that key retrieval is fast: accessing a hash key takes constant time on average (<a href="https://lemire.me/blog/2009/08/18/do-hash-tables-work-in-constant-time/">disregarding some fine-print</a>), i.e., as the number of keys in a hash increases, the average time necessary to recover the value for a key does not increase. This is one of the main reasons why using hash tables to model sets is an attractive choice.</p>
 
 <p><strong>Key removal.</strong> While it would be possible to tweak our approach and express removal of a key as insertion with a negative score, we prefer to keep things simple here:</p>
 
@@ -310,7 +558,7 @@
 
 <p><code class="highlighter-rouge">SetMap#remove</code> is perfectly symmetric to the earlier <code class="highlighter-rouge">insert</code> method, using a bounded difference instead of a bounded sum. For our three target classes, this ensures that negative scores cannot occur.</p>
 
-<p><strong>Enumeration.</strong> The below <code class="highlighter-rouge">SetMap#each_pair</code> method enumerates set keys and their associated scores in a straightforward manner. Notice that we only yield key-score pairs for which the score is non-zero, since a key with score <code class="highlighter-rouge">0</code> is not considered to be part of our set.</p>
+<p><strong>Enumeration.</strong> The below <code class="highlighter-rouge">SetMap#each_pair</code> method enumerates set keys and their associated scores in a straightforward manner, piggybacking on <code class="highlighter-rouge">Hash#each_pair</code>. Notice that we only yield key-value pairs for which the value is non-zero, since a key scored with value <code class="highlighter-rouge">0</code> is not considered part of our set.</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -335,25 +583,166 @@
 </div>
 </div>
 
-<p>As we will see below, <code class="highlighter-rouge">each_pair</code> is the basic building block for all our methods that iterate over sets, which includes pretty much all the interesting operations on sets like <code class="highlighter-rouge">union</code>, and <code class="highlighter-rouge">intersection</code>. Since <code class="highlighter-rouge">each_pair</code> is aliassed as <code class="highlighter-rouge">each</code>, it also allows us to include the <code class="highlighter-rouge">Enumerable</code> module, which any respectable collection class should have access to.</p>
+<p>As we will see below, <code class="highlighter-rouge">each_pair</code> forms the basis for all our methods that iterate over sets. This includes pretty much all the interesting operations on sets—<code class="highlighter-rouge">union</code>, <code class="highlighter-rouge">intersection</code>, and the like. Since <code class="highlighter-rouge">each_pair</code> is aliassed as <code class="highlighter-rouge">each</code>, it also allows us to include the <code class="highlighter-rouge">Enumerable</code> module, which any respectable Ruby collection class should have access to.</p>
 
 <h2 id="the-setlike-module">The <code class="highlighter-rouge">SetLike</code> module</h2>
 
-<p>The preceding methods serve as a wrapper around the hash table that we use internally to store set keys and their associated scores. We have also implemented a mechanism for specifying what constitutes a valid score for a given type of set. The remaining part of the interface will not interact with the hash directly, but build on top of the machinery put in place so far.</p>
+<p>The preceding methods, and the <code class="highlighter-rouge">SetMap</code> class that defines these methods, serve as a wrapper around our hash table. We have also implemented a mechanism for specifying what constitutes a valid score for a given type of set. And we have provided our three target classes that inherit from <code class="highlighter-rouge">SetMap</code>. The basics of our model are thus in place.</p>
 
-<p><strong>Division of Labor.</strong> To emphasize the distinction between methods that directly access the state of a set (given by <code class="highlighter-rouge">@hash</code> and <code class="highlighter-rouge">@size</code>), and methods that built on top of the latter, we put the remainder of the interface in a module which we call <code class="highlighter-rouge">SetLike</code>. This module provides much of the functionality commonly associated  with sets, and assumes that any class that uses it implements the instance methods <code class="highlighter-rouge">retrieve</code>, <code class="highlighter-rouge">insert</code>, <code class="highlighter-rouge">delete</code>, <code class="highlighter-rouge">each</code> and <code class="highlighter-rouge">size</code> (the latter simply being a getter for the <code class="highlighter-rouge">@size</code> variable) we have discussed so far.</p>
+<p>What remains to be implemented is all the interesting operations on sets! The remaining part of the interface will, however, not interact with the internally used hash table directly, but only through the interface developed so far.</p>
 
-<p>In particular, none of the methods in <code class="highlighter-rouge">SetLike</code> need to know that we are using a hash for internal storage. The internal state of a set is thus encapsulated in <code class="highlighter-rouge">SetMap</code>. As long as we provide the methods listed, we could just as well implement a binary search tree for storing a set.</p>
+<p>For the purpose of implementing those additional operations, we open a new module <code class="highlighter-rouge">SetLike</code>, which we include in <code class="highlighter-rouge">SetMap</code>.</p>
 
-<p>(TODO: Several advantages:)</p>
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{matrix}
+ && \text{SetLike} & \\
+&& \large\uparrow  \\
+&& \text{SetMap} \\
+&\large\nearrow & \large\uparrow & \large\nwarrow \\
+\text{ClassicalSet} & & \text{MultiSet}&  & \text{FuzzySet}\\
+\end{matrix} %]]></script>
+
+<p>Since our target classes <code class="highlighter-rouge">ClassicalSet</code>, <code class="highlighter-rouge">FuzzySet</code> and <code class="highlighter-rouge">MultiSet</code> inherit from <code class="highlighter-rouge">SetMap</code>, as shown in the above diagram, they will also be able to access the functionality provided by <code class="highlighter-rouge">SetLike</code>.</p>
+
+<p><strong>Division of Labor.</strong> The division of labor we adopt here takes a cue from the place the <code class="highlighter-rouge">Enumerable</code> module occupies in Ruby’s design. <code class="highlighter-rouge">Enumerable</code> provides a number of useful methods for working with collections to any class that chooses to include it. In doing so, <code class="highlighter-rouge">Enumerable</code> assumes that the class implements an <code class="highlighter-rouge">each</code> method, which forms the basis for all the methods <code class="highlighter-rouge">Enumerable</code> defines. Beyond this, however, <code class="highlighter-rouge">Enumerable</code> does not (need to) know anything about the class using it. Here, we do something very similar:</p>
+
 <ul>
-  <li>Encapsulate the methods that directly access the internal state of <code class="highlighter-rouge">GenericSet</code> instances. While nothing forces us to respect this boundary, the division of labor is a useful reminder to stick to this rule. (see below)</li>
-  <li>Anyone who implements the interface of <code class="highlighter-rouge">GenericSet</code> can use <code class="highlighter-rouge">SetLike</code>.</li>
+  <li><code class="highlighter-rouge">SetLike</code> provides most of the functionality commonly associated with sets.</li>
+  <li><code class="highlighter-rouge">SetLike</code> assumes that any class that uses it implements the instance methods <code class="highlighter-rouge">retrieve</code>, <code class="highlighter-rouge">insert</code>, <code class="highlighter-rouge">delete</code>, <code class="highlighter-rouge">each</code> and <code class="highlighter-rouge">size</code>.</li>
+  <li><code class="highlighter-rouge">SetLike</code> does not make any further assumptions about the internals of the class using it.</li>
 </ul>
 
-<p><strong>Operations on sets.</strong></p>
+<p>In particular, none of the methods in <code class="highlighter-rouge">SetLike</code> need to know that we are using a hash for internal storage. This draws a distinction between methods that do need to know that we have chosen to represent sets with hash tables (they go in the <code class="highlighter-rouge">SetMap</code> class), and methods that don’t need to know this (they go in the <code class="highlighter-rouge">SetLike</code> module), and thus encapsulates the internal state of a set in <code class="highlighter-rouge">SetMap</code>. As long as we keep the public interface of <code class="highlighter-rouge">SetMap</code> stable, we could just as well reimplement all its methods using a binary search tree instead of a hash for storing a set, say: <code class="highlighter-rouge">SetLike</code> will not care.</p>
 
-<p>(TOOD: <code class="highlighter-rouge">do_with</code>, union, sum)</p>
+<p><strong>Operations on sets.</strong> We would like to implement the usual operations on sets, like <code class="highlighter-rouge">union</code>, <code class="highlighter-rouge">intersection</code>, and <code class="highlighter-rouge">difference</code>. Since they all follow essentially the same pattern, we focus on just one of them, <code class="highlighter-rouge">union!</code> (the  destructive version of <code class="highlighter-rouge">union</code>).</p>
+
+<p>Following the example established by Ruby’s <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a>, we first implement a helper method <code class="highlighter-rouge">SetLike#do_with</code> that yields to a block:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">do_with</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="k">unless</span> <span class="n">other</span><span class="p">.</span><span class="nf">instance_of?</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="no">SetError</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="si">}</span><span class="s2"> instance needed"</span>
+  <span class="k">end</span>
+
+  <span class="k">return</span> <span class="n">other</span><span class="p">.</span><span class="nf">each</span> <span class="k">unless</span> <span class="nb">block_given?</span>
+  <span class="n">other</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="o">|</span> <span class="k">yield</span><span class="p">([</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span> <span class="p">}</span>
+<span class="k">end</span>
+<span class="kp">private</span> <span class="ss">:do_with</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>This methods takes care of the type-checking for us. We would not, e.g., want to subtract a fuzzy set from a classical set, as the result will not in general be a classical set. The above guard clause ensures that the operations we will define are only carried out for two objects that belong to the same target class. Beyond this, <code class="highlighter-rouge">do_with</code> simply yields the key-value pairs of the set passed to it as an argument. Using <code class="highlighter-rouge">do_with</code>, we implement <code class="highlighter-rouge">union!</code> as follows:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">union!</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="n">do_with</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="o">|</span>
+    <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]].</span><span class="nf">max</span>
+  <span class="k">end</span>
+  <span class="nb">self</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The union of a given set with another one is defined by maximizing scores for given keys across the two sets. This is how the union is usually defined, and it yields the expected results.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8</pre></td><td class="code"><pre><span class="c1"># SetMap::from_hash(hsh) creates a new set instance and populates it</span>
+<span class="c1"># with the key-value pairs from the given hash `hsh`</span>
+
+<span class="n">multi_set1</span> <span class="o">=</span> <span class="no">MultiSet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">multi_set2</span> <span class="o">=</span> <span class="no">MultiSet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">multi_set1</span><span class="p">.</span><span class="nf">union!</span><span class="p">(</span><span class="n">multi_set2</span><span class="p">)</span>
+
+<span class="n">multi_set1</span> <span class="o">==</span> <span class="no">MultiSet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># true</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p><code class="highlighter-rouge">union!</code> implements a notion of “combining what is contained in two given sets”. There is a similar, yet slightly different notion which is interesting from the perspective of our polymorphic approach: the <em>sum</em> of two sets. So let’s briefly digress:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">sum!</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="n">do_with</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="o">|</span> <span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="p">}</span>
+  <span class="nb">self</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Rather than maximizing scores, as <code class="highlighter-rouge">union!</code> did, <code class="highlighter-rouge">sum!</code> adds the scores given by the other set to the scores of the receiver. For classical sets, <code class="highlighter-rouge">sum!</code> and <code class="highlighter-rouge">union!</code> amount to the very same thing:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="c1"># SetMap::[](*list) creates a new set instance and turns the</span>
+<span class="c1"># members of `list` into keys of the new instance.</span>
+
+<span class="n">set1</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">set2</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="n">set3</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">set4</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="n">set1</span><span class="p">.</span><span class="nf">union!</span><span class="p">(</span><span class="n">set2</span><span class="p">)</span> <span class="o">==</span> <span class="n">set3</span><span class="p">.</span><span class="nf">sum!</span><span class="p">(</span><span class="n">set4</span><span class="p">)</span> <span class="c1"># true</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>This is why Ruby’s own <code class="highlighter-rouge">Set</code> class simply defines <code class="highlighter-rouge">+</code> (the sum operator) to be an alias of <code class="highlighter-rouge">|</code> (the union operator). However, for other types of sets, sum and union are not always the same. This is because taking the maximum of two scores is not generally the same as summing up those two scores! For example:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre></td><td class="code"><pre><span class="n">set1</span> <span class="o">=</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">set2</span> <span class="o">=</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">set3</span> <span class="o">=</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">set4</span> <span class="o">=</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">set1</span><span class="p">.</span><span class="nf">sum!</span><span class="p">(</span><span class="n">set2</span><span class="p">)</span>
+<span class="n">set3</span><span class="p">.</span><span class="nf">union!</span><span class="p">(</span><span class="n">set4</span><span class="p">)</span>
+
+<span class="n">set1</span> <span class="o">==</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">7</span><span class="p">)</span> <span class="c1"># true</span>
+<span class="n">set3</span> <span class="o">==</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="mi">2</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">4</span><span class="p">)</span> <span class="c1"># true</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Our model captures all of this correctly.</p>
 
 <p><strong>Set predicates.</strong> A classical set $A$ is a subset of a classical set of $B$ if any element of $A$ is also an element of $B$. This can be expressed in terms of keys and their associated scores by saying that the score for any key in $A$ is less than or equal to the score for that same key in $B$. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the <code class="highlighter-rouge">SetLike#subset?</code> method:</p>
 
@@ -376,7 +765,7 @@
 </div>
 </div>
 
-<p>Following the pattern established by the <code class="highlighter-rouge">do_with</code> method discussed above, however, it makes sense to extract the “key comparison” functionality to a separate <code class="highlighter-rouge">compare_with?</code> method that takes a block (you may want to check out the code of the <a href="https://github.com/maraigue/multiset">multiset gem</a>—the gem author does exactly this).</p>
+<p>Following the pattern established by the <code class="highlighter-rouge">do_with</code> method discussed above, however, it makes sense to extract the “key comparison” functionality to a separate <code class="highlighter-rouge">compare_with?</code> method that takes a block (you may want to check out the <a href="https://github.com/maraigue/multiset/blob/master/lib/multiset.rb">code of the multiset gem</a>—the gem author does exactly this).</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -422,7 +811,7 @@
 
 <p>Definitions for the other common set predicates (<code class="highlighter-rouge">proper_subset?</code>, <code class="highlighter-rouge">superset?</code> and <code class="highlighter-rouge">proper_superset?</code>) are similar, so we omit them here.</p>
 
-<p><strong>Equivalence.</strong> When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply do:</p>
+<p><strong>Equivalence.</strong> When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply write the following code:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -441,9 +830,9 @@
 </div>
 </div>
 
-<p>Notice that we have aliassed the <code class="highlighter-rouge">equivalent?</code> method both as <code class="highlighter-rouge">==</code> and <code class="highlighter-rouge">eql?</code>. This brings us to our final topic for today:</p>
+<p>Notice that we have aliassed the <code class="highlighter-rouge">equivalent?</code> method both as <code class="highlighter-rouge">==</code> and <code class="highlighter-rouge">eql?</code>. We have already taken the <code class="highlighter-rouge">==</code> method for granted in some earlier snippets. Now what about <code class="highlighter-rouge">eql?</code>? This brings us to our final topic for today:</p>
 
-<p><strong>Nested sets.</strong> Unless overridden, the <code class="highlighter-rouge">Object#eql?</code> method considers two objects to be same if they are identical. In the current context, overriding <code class="highlighter-rouge">Object#eql?</code> is critical, because <code class="highlighter-rouge">eql?</code> is the method that Ruby uses when accessing hash keys. Lets leave the context of our <code class="highlighter-rouge">SetLike</code> module for a moment, and consider this line of Ruby code:</p>
+<p><strong>Nested sets.</strong> Unless overridden, the <code class="highlighter-rouge">Object#eql?</code> method considers two objects to be the same if they are identical (i.e., are stored at the same location in memory). In the current context, overriding <code class="highlighter-rouge">Object#eql?</code> is critical, because <code class="highlighter-rouge">eql?</code> is the method that Ruby uses when accessing hash keys. Let’s leave the context of our <code class="highlighter-rouge">SetLike</code> module for a moment, and consider this line of Ruby code:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">some_hash</span><span class="p">[</span><span class="n">some_obj</span><span class="p">]</span>
 </pre></td></tr></tbody></table>
@@ -452,22 +841,32 @@
 
 <p>When executing this line, Ruby will check if there is a key <code class="highlighter-rouge">key</code> to be found in <code class="highlighter-rouge">some_hash</code> with the property that <code class="highlighter-rouge">some_obj.eql?(key)</code>. If so, the value for <code class="highlighter-rouge">key</code> will be returned.</p>
 
-<p>For our purposes, this is crucial because we would like to be able to model nested sets, i.e., sets that have sets among their keys. Consider:</p>
+<p>For our purposes, this process of looking up keys in a hash is crucial because (1) we are using hashes for storing set membership information, and (2) we would like to be able to model <em>nested</em> sets, which are sets that have sets among their keys. Consider:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
 3
-4</pre></td><td class="code"><pre><span class="n">set1</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-<span class="n">set2</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="n">set1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+4
+5
+6
+7
+8
+9</pre></td><td class="code"><pre><span class="c1"># SetMap::[](*list) creates a new set instance and turns the</span>
+<span class="c1"># members of `list` into keys of the new instance.</span>
+
+<span class="n">set1</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">set2</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="n">set3</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="n">set1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
-<span class="n">set2</span> <span class="o">==</span> <span class="n">set3</span> <span class="c1">#=&gt; ?</span>
+<span class="n">set4</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">[</span><span class="n">set2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="n">set3</span> <span class="o">==</span> <span class="n">set4</span> <span class="c1">#=&gt; ?</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<p>The <code class="highlighter-rouge">ClassicalSet.[]</code> method, which we have not encountered so far, initializes a new instance of <code class="highlighter-rouge">ClassicalSet</code> and feeds the arguments provided as keys into the set (associating them with the score <code class="highlighter-rouge">1</code>).</p>
+<p>Now the question is whether <code class="highlighter-rouge">set3</code> and <code class="highlighter-rouge">set4</code> are the same set. It seems that the answer should be yes, because, after all, they <em>contain the same elements</em>. Assume, however, for a moment that we had not overridden <code class="highlighter-rouge">eql?</code>. Then <code class="highlighter-rouge">set3</code> and <code class="highlighter-rouge">set4</code> do <em>not</em> come out the same in the sense of <code class="highlighter-rouge">==</code> because <code class="highlighter-rouge">set1</code> and <code class="highlighter-rouge">set2</code> do not reference the same object, which implies that <code class="highlighter-rouge">set3[set1] == set4[set1]</code> will return false, for the simple reason that <code class="highlighter-rouge">set1</code> is not considered a key in the set <code class="highlighter-rouge">other</code>, since it is not the case that <code class="highlighter-rouge">set2.eql?(set1)</code>. So overriding <code class="highlighter-rouge">eql?</code>, like we did above, is indeed critical.</p>
 
-<p>Now the question is whether <code class="highlighter-rouge">set2</code> and <code class="highlighter-rouge">set3</code> are the same set. It seems that the answer should be yes, because, after all, they <em>contain the same elements</em>. If we do not override <code class="highlighter-rouge">eql?</code>, however, <code class="highlighter-rouge">set2</code> and <code class="highlighter-rouge">set3</code> will not come out equivalent, because <code class="highlighter-rouge">set2</code> and <code class="highlighter-rouge">set3</code> do not reference the same object, hence are not the same according to <code class="highlighter-rouge">Object#eql?</code>. And since we are using a hash internally, this matters, because <code class="highlighter-rouge">self[set1] == other[set1]</code> will fail. However, <code class="highlighter-rouge">SetLike#eql?</code>, as defined above, will do the job. Continuing in this vein, and as mentioned in the Ruby documentation for the Hash class, we also need to override the <code class="highlighter-rouge">Object#hash</code> method to ensure that two set objects that are <code class="highlighter-rouge">eql?</code> also have the same return value when <code class="highlighter-rouge">hash</code> is invoked.</p>
+<p><strong>The <code class="highlighter-rouge">hash</code> method</strong> As a final aside: For our set comparisons to work, we also need to override the <code class="highlighter-rouge">Object#hash</code> method so as to ensure that two set objects that are <code class="highlighter-rouge">eql?</code> have the same return value when <code class="highlighter-rouge">hash</code> is called on them. This can be achieved, e.g., like this:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -478,9 +877,11 @@
 </div>
 </div>
 
-<p>Here, we simply each key-value pair (a two-element array) to its <code class="highlighter-rouge">hash</code> return value, trusting that <code class="highlighter-rouge">Array#hash</code> is implemented in a meaningful way.</p>
+<p>Here, we simply map each key-value pair (a two-element array) yielded by <code class="highlighter-rouge">each</code> to its <code class="highlighter-rouge">hash</code> value and sum up the result, trusting that <code class="highlighter-rouge">Array#hash</code> is implemented in a meaningful way. And this indeed ensures that <code class="highlighter-rouge">eql?</code> sets have the same <code class="highlighter-rouge">hash</code> return value.</p>
 
-<p><strong>Coda.</strong> This has been a long post. I hope I have not exhausted your patience by discussing too many technicalities. Coming up with a first working implementation of the types of sets discussed here was pretty straightforward. However, arriving at a way to structure and modularize my code that I found convincing myself required me to go back to the drawing board several times. If you have a chance to <a href="http://www.github.com">check out my code</a>, your feedback would be greatly appreciated.</p>
+<p><strong>Coda.</strong> What has been achieved? As mentioned at the beginning of the post, the set functionality that we have discussed is either readily available as part of Ruby’s Standard Library (for classical sets), or via an easily accesible Ruby gem (for multisets). However, the code presented here presents a <em>uniform</em> perspective on classical sets and multisets. While I have written <code class="highlighter-rouge">SetMap</code> and its child classes as an exercise for myself, I consider this uniformity an advantage over the pre-existing implementation. We have also seen how easily the approach generalizes to further use cases by considering fuzzy sets.</p>
+
+<p>This has been a long post. I hope I have not overstretched the limits of your patience. While coming up with a first working implementation of the types of sets discussed here was pretty straightforward, arriving at a way to structure and modularize my code that I found convincing myself required me to go back to the drawing board several times. If you have a chance to <a href="https://github.com/benrodenhaeuser/sets">check out my code</a>, your feedback would be greatly appreciated.</p>
 
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       
@@ -768,221 +1169,6 @@
 
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       
-      <small>31 May 2017</small>
-      <h1 id="tic-tac-toe-with-negamax">Tic Tac Toe with Negamax</h1>
-
-<p>The first version of the Tic Tac Toe negamax algorithm that I implemented was painfully slow. It took more than 30 seconds to return a move for the initial position of a standard 3x3 game. So I had a strong incentive to try and understand the algorithm better. Beginning programmers are typically advised not to spend time worrying about performance, but here, we are not talking about micro-optimization – we are talking about an algorithm implementation that makes a game unplayable.</p>
-
-<p>In this post, I will discuss the baseline negamax algorithm for solving Tic Tac Toe, and a few improvements to this algorithm – both more generic ones (that could be applied, more or less directly, to any strictly competitive games) and more specific ones (that exploit certain properties of <em>this</em> game, Tic Tac Toe).</p>
-
-<!-- ## Tic Tac Toe
-
-We will represent a 3x3 Tic Tac Toe position as a nine-element array that we can access by index, with indices ranging from 0 to 8. Using the common player markers, and a blank space for squares that have not been chosen by either of the players yet. So the following board position ...
-
-... will be represented by this array:
-
-```ruby
-['X', 'O', ' ', 'X', ' ', ' ', ' ', ' ', ' ']
-```
-
-Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe for us. -->
-
-<h2 id="brute-force-negamax">Brute force Negamax</h2>
-
-<p>Here is an implementation of the Negamax algorithm for Tic Tac Toe in Ruby:</p>
-
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">terminal?</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-    <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-  <span class="k">else</span>
-    <span class="n">available_moves</span><span class="p">(</span><span class="n">state</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">move</span><span class="o">|</span>
-      <span class="n">make</span><span class="p">(</span><span class="n">move</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-      <span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
-      <span class="n">unmake</span><span class="p">(</span><span class="n">move</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-      <span class="n">value_for_move</span>
-    <span class="k">end</span><span class="p">.</span><span class="nf">max</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</pre></td></tr></tbody></table>
-</div>
-</div>
-
-<p>The method returns the value of a game state <code class="highlighter-rouge">state</code> for the player <code class="highlighter-rouge">player</code>, assumed to be the player who moves next. This value is the highest payoff that <code class="highlighter-rouge">player</code> can be guaranteed to achieve with optimal play, and it is denoted  with the variable <code class="highlighter-rouge">best_value</code>.</p>
-
-<p>For terminal states, the value of <code class="highlighter-rouge">state</code> for <code class="highlighter-rouge">player</code> is given by the Tic Tac Toe payoff function — that’s the first branch of the conditional:</p>
-
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-</pre></td></tr></tbody></table>
-</div>
-</div>
-
-<p>For non-terminal states, <code class="highlighter-rouge">player</code> has to evaluate all available choices. Suppose she is at the moment looking at one particular move <code class="highlighter-rouge">move</code>. She makes the move (that’s the line <code class="highlighter-rouge">make(move, player, state)</code>, which updates <code class="highlighter-rouge">state</code> as a side-effect), and evaluates the resulting position. She uses our <code class="highlighter-rouge">nega_max</code> method to do this. Assume that the method tells her that the best her opponent can do in the successor state (referenced by <code class="highlighter-rouge">state</code> at this point) is $n$. So what can <code class="highlighter-rouge">player</code> herself achieve by choosing <code class="highlighter-rouge">move</code>? It’s $-n$. Here is why:</p>
-
-<ul>
-  <li>If <code class="highlighter-rouge">opponent(player)</code> can guarantee a win, then opponent will get $1$, so <code class="highlighter-rouge">player</code> gets $-1$ if she chooses <code class="highlighter-rouge">move</code>.</li>
-  <li>If <code class="highlighter-rouge">opponent(player)</code> can only guarantee a tie, opponent will get $0$, so <code class="highlighter-rouge">player</code> gets $-0$, which is $0$.</li>
-  <li>If <code class="highlighter-rouge">opponent(player)</code> is bound to lose, opponent will get $-1$, so <code class="highlighter-rouge">player</code> gets $-(-1)$, which is $1$.</li>
-</ul>
-
-<p>So the best <code class="highlighter-rouge">player</code> can guarantee to achieve when choosing <code class="highlighter-rouge">move</code> is indeed $-n$. This explains the crucial line of the method containing the recursive call:</p>
-
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
-</pre></td></tr></tbody></table>
-</div>
-</div>
-
-<p>Notice that this only works because Tic Tac Toe is <em>zero-sum</em>, i.e., one player’s loss is another player’s gain: the payoffs of both players always add up to 0.</p>
-
-<p>Return to <code class="highlighter-rouge">player</code>, who is deliberating which move to take. She proceeds in the manner described, evaluating <em>all</em> her moves. In this way, <code class="highlighter-rouge">player</code> obtains a list of values, one for each move (that list is the return value of the <code class="highlighter-rouge">map</code> invocation). The maximal value from this list is the best she can guarantee, so this is what we return.</p>
-
-<h2 id="the-best-move">The best move</h2>
-
-<h2 id="algorithms">Algorithms</h2>
-
-<ul>
-  <li>brute force negamax</li>
-  <li>negamax with transposition table</li>
-  <li>negamax with symmetry table
-    <ul>
-      <li>consider: instead of solving all of the eight subtrees of the initial game node, we have to solve just three.</li>
-    </ul>
-  </li>
-  <li>negamax with symmetry lookup</li>
-  <li>alpha-beta pruning</li>
-  <li>negamax with shortcuts</li>
-</ul>
-
-<p>these fall onto a spectrum from “more generic” to “more game-specific”</p>
-<ul>
-  <li>negamax and negamax with alpha-beta pruning are generic algorithms that work pretty much for every game.</li>
-  <li>transposition tables are useful whenever there are several ways to reach the same position.</li>
-  <li>symmetry is useful if there are … symmetries!</li>
-  <li>the shortcut method makes use of the fact that tic tac toe is solved. so why not use the fact that the best we can guarantee is a tie?</li>
-</ul>
-
-<h2 id="results">Results</h2>
-
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: left"> </th>
-      <th style="text-align: right">time</th>
-      <th style="text-align: right">calls</th>
-      <th style="text-align: right">table size</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left">brute force</td>
-      <td style="text-align: right">5.781872</td>
-      <td style="text-align: right">549,946</td>
-      <td style="text-align: right">-</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">transposition table</td>
-      <td style="text-align: right">0.105050</td>
-      <td style="text-align: right">16,168</td>
-      <td style="text-align: right">5,477</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">symmetry table</td>
-      <td style="text-align: right">0.048830</td>
-      <td style="text-align: right">2,271</td>
-      <td style="text-align: right">5,477</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">symmetry lookup</td>
-      <td style="text-align: right">0.058844</td>
-      <td style="text-align: right">2,271</td>
-      <td style="text-align: right">764</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">alpha-beta</td>
-      <td style="text-align: right">0.193677</td>
-      <td style="text-align: right">18,297</td>
-      <td style="text-align: right">-</td>
-    </tr>
-  </tbody>
-</table>
-
-<ul>
-  <li>549,946 is the size of the 3x3 ttt game tree (i.e., the number of nodes)</li>
-  <li>5477 is the number of distinct board positions minus the initial state</li>
-  <li>
-    <p>764 is the number of board positions up to symmetry minus the initial state</p>
-  </li>
-  <li>
-    <p>In the transposition table case, around 6,000 calls are calls that result (as a side-effect) in values being stored to the lookup table, whereas around 10,000 calls return a looked-up value.</p>
-  </li>
-  <li>In the symmetry table case, the table is built “much faster”, because whenever we save to the table, we save eight values instead of merely one.</li>
-</ul>
-
-<h3 id="time">time</h3>
-
-<ul>
-  <li>
-    <p>with a symmetry table, we can realize a hundred fold speed increase.</p>
-  </li>
-  <li>memoizing values is a dramatic improvement over brute force negamax</li>
-  <li>exploiting symmetries allows us reduce computation time by half</li>
-  <li>saving symmetric values as we compute them seems slightly faster than computing symmetries during lookup</li>
-  <li>the memoization approaches are quite a bit faster than alpha-beta-search on a 3x3 board</li>
-  <li>(it looks like alpa-beta scales a lot better, viz the results for a 4x4 board)</li>
-</ul>
-
-<h3 id="calls">calls</h3>
-
-<ul>
-  <li>brute force: the number of method calls is a lot higher than the number of distinct positions, because many positions are computed several times.</li>
-  <li>transposition table: with this algorithm, the number of calls is still higher than the number of positions, because it may happen that our negamax method is called for some state, even if that state has been evaluated already and stored … but we still need to retrieve it!</li>
-  <li>symmetry table: now the number of calls is lower than the size of the table. this looks certainly odd at first sight. but the thing is that with every function call, we write up to eight new values to the table.</li>
-</ul>
-
-<h3 id="method-calls-in-relation-to-time">method calls in relation to time</h3>
-<ul>
-  <li>the number of method calls does not correlate neatly with computation time spent.</li>
-  <li>compare brute force and transposition table: 549946/16168 is about 34, so the evaluation function is called 34 times less when we use the transposition table vs brute force. the speed gain, on the other hand, is around 57-fold. Why is that?</li>
-  <li>
-    <p>When going from a transposition to a symmetry table, there is a 7-fold decrease in function calls, but the computation time is only halved. Filling in the table entries comes with an extra cost that partially offsets avoiding negamax calls. That seems to be the plausible explanation.</p>
-  </li>
-  <li><strong>What does the number of method calls actually correspond to?</strong> In brute force negamax, it is simply the number of nodes in the complete game tree (see https://books.google.com/books?id=1xHPDAAAQBAJ&amp;pg=PA151&amp;lpg=PA151&amp;dq=size+of+tic+tac+toe+game+tree&amp;source=bl&amp;ots=J3Tp09kbbL&amp;sig=DJoyUjGx2XGMm-gvMg-QW5bQ8sI&amp;hl=de&amp;sa=X&amp;ved=0ahUKEwivzpGyjpHUAhVG0WMKHVRqD704ChDoAQhXMAc#v=onepage&amp;q=size%20of%20tic%20tac%20toe%20game%20tree&amp;f=false)</li>
-</ul>
-
-<h3 id="table-size">table size</h3>
-
-<ul>
-  <li>transposition table: there are 5478 distinct positions in 3x3 tic tac toe (see http://www.mathrec.org/old/2002jan/solutions.html). Since we do not store a value for the initial state in the table, our table has 5477 entries.</li>
-  <li>symmetry lookup: since we only store a “representative” of each equivalence class, this is a smaller table. there are 765 distinct ttt positions modulo symmetries (see http://www.mathrec.org/old/2002jan/solutions.html), and since we don’t store the initial state, our table has 764 entries.</li>
-</ul>
-
-<h3 id="why-is-the-number-of-method-calls-smaller-than-the-number-of-distinct-ttt-positions-when-we-use-a-symmetry-table">Why is the number of method calls smaller than the number of distinct ttt positions when we use a symmetry table?</h3>
-
-<p>This might come as a surprise, because shouldn’t we have to visit every distinct node at least once? well, no, actually! The reason we don’t have to do this is that there are certain positions we never even have to evaluate, because they are descendants of nodes that are symmetric to nodes we have evaluated (if that makes sense).</p>
-
-<h3 id="shortcut">shortcut</h3>
-
-<ul>
-  <li>
-    <p>suppose we already know that the best we can guarantee is a tie. then we could stop looking for a win (we know we cannot find a guaranteed win path), but instead look for a tie path. this is the idea behind the two “shortcut” algorithms I looked at: one adds the shortcut to the brute force algorithm, the second adds the shortcut to the transposition table. The second one (transposition with shortcut) is the fastest algorithms I considered.</p>
-  </li>
-  <li>
-    <p>there is a pitfall here, however. if we are playing against a less than perfect opponent, than we might miss a chance to score a win if we take the shortcut!</p>
-  </li>
-</ul>
-
-      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
-      
       <small>15 May 2017</small>
       <h1 id="sorting-in-ruby">Sorting in Ruby</h1>
 
@@ -1138,6 +1324,11 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
       
 
           <h3>
+            <a class="post-link" href="/2017/12/18/negamax/">Negamax</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
             <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
           </h3>
       
@@ -1154,11 +1345,6 @@ Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe
 
           <h3>
             <a class="post-link" href="/2017/07/06/object-passing/">Object Passing</a><span class="pad"></span><small>06 Jul 2017</small>
-          </h3>
-      
-
-          <h3>
-            <a class="post-link" href="/2017/05/31/negamax/">Negamax</a><span class="pad"></span><small>31 May 2017</small>
           </h3>
       
 

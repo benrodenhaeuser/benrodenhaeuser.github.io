@@ -1,5 +1,23 @@
 # Tic Tac Toe with Negamax
 
+----
+
+Comment, December 2017:
+
+This is actually an example of a tree-recursive process.
+
+It should be possible to do this in various ways:
+- brute force
+- with memoization
+- with alpha/beta pruning
+- with dynamic programming (bottom-up)
+
+In fact, all but the last ones I have done already.
+
+
+----
+
+
 The first version of the Tic Tac Toe negamax algorithm that I implemented was painfully slow. It took more than 30 seconds to return a move for the initial position of a standard 3x3 game. So I had a strong incentive to try and understand the algorithm better. Beginning programmers are typically advised not to spend time worrying about performance, but here, we are not talking about micro-optimization – we are talking about an algorithm implementation that makes a game unplayable.
 
 In this post, I will discuss the baseline negamax algorithm for solving Tic Tac Toe, and a few improvements to this algorithm – both more generic ones (that could be applied, more or less directly, to any strictly competitive games) and more specific ones (that exploit certain properties of *this* game, Tic Tac Toe).
