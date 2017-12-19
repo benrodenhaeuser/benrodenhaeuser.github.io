@@ -42,7 +42,7 @@ code, pre { font-family: 'Roboto Mono', monospace; color: #333; }
 
 pre { padding: 8px 15px; background: #f8f8f8; border-radius: 0px; border: 1px solid #e5e5e5; overflow-x: auto; font-size: 14px; }
 
-table { width: 100%; border-collapse: collapse; }
+table { border-collapse: collapse; }
 
 th, td { text-align: left; padding: 5px 10px; }
 
