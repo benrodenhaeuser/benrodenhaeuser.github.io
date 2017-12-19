@@ -254,6 +254,10 @@ footer {
 
 // styling code blocks with line numbers
 
+.highlight {
+  // max-width: 200px;
+}
+
 pre.highlight {
   width: 100%;
   padding: 0;
@@ -327,6 +331,15 @@ pre.highlight {
 
   pre, code {
     word-wrap:normal;
+    // overflow: scroll;
+    max-width: 60vw;
+    // width: 100%;  // DONT DO THIS
+  }
+
+  table {
+    width: 100%;
+    max-width: 100%;
+    // overflow: scroll;
   }
 }
 

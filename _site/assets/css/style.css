@@ -96,7 +96,8 @@ pre.highlight { width: 100%; padding: 0; margin: 0; background-color: white; bor
 @media print, screen and (max-width: 720px) { body { word-wrap: break-word; }
   header { padding: 0; }
   header ul, header p.view { position: static; }
-  pre, code { word-wrap: normal; } }
+  pre, code { word-wrap: normal; max-width: 60vw; }
+  table { width: 100%; max-width: 100%; } }
 @media print, screen and (max-width: 480px) { body { padding: 15px; }
   header ul { width: 99%; }
   header li, header ul li + li + li { width: 33%; } }
