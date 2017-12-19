@@ -100,6 +100,5 @@ pre.highlight { width: 100%; padding: 0; margin: 0; background-color: white; bor
   table { width: 100%; max-width: 100%; } }
 @media print, screen and (max-width: 480px) { body { padding: 15px; }
   header ul { width: 99%; }
-  header li, header ul li + li + li { width: 33%; }
-  pre { font-size: 1em; } }
+  header li, header ul li + li + li { width: 33%; } }
 @media print { body { padding: 0.4in; font-size: 12pt; color: #444; } }
