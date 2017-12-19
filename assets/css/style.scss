@@ -333,8 +333,12 @@ pre.highlight {
     word-wrap:normal;
     // overflow: scroll;
     max-width: 60vw;
-    font-size: 0.6em;
+    // font-size: 0.5em;
     // width: 100%;  // DONT DO THIS
+  }
+
+  pre {
+    font-size: 0.6em;
   }
 
   table {
