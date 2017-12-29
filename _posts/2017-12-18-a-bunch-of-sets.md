@@ -71,8 +71,6 @@ Hash tables will form the basis of our representation of sets. Of course, we wou
 
 ```ruby
 class SetMap
-  attr_reader :size
-
   def initialize
     @hash = {}
     @size = 0
@@ -80,7 +78,7 @@ class SetMap
 end
 ```
 
-We decide to maintain an instance variable `@size` (with accompanying getter method `size`), in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that `@size` will always store this value in an up-to-date fashion.
+Besides the `@hash` instance variable, we also decide to maintain an instance variable `@size`, in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that `@size` will always store this value in an up-to-date fashion. We also make available a getter method `size` that returns the current value of `@size`, omitted here.
 
 **Valid scores.** What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:
 
@@ -157,7 +155,7 @@ def insert(key, val = 1)
   raise(SetError, 'Illegal value') unless self.class.valid_score?(val)
   old_score = self[key]
   @hash[key] = [self[key] + val, self.class.max_score].min
-  @size = (@size + (self[key] - old_score)).round(2)
+  @size = @size + (self[key] - old_score)
   self
 end
 ```
@@ -206,7 +204,7 @@ def remove(key, val = 1)
   raise(SetError, 'Illegal value') unless self.class.valid_score?(val)
   old_score = self[key]
   @hash[key] = [self[key] - val, self.class.min_score].max
-  @size = (@size - (old_score - self[key])).round(2)
+  @size = @size - (old_score - self[key])
   self
 end
 ```
