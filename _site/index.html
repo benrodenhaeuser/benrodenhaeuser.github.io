@@ -41,6 +41,951 @@
       <section>
       <!--  -->
       
+      <small>05 March 2018</small>
+      <h1 id="understanding-sinatra">Understanding Sinatra</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>We are going to develop our toy version in a number of iterations, starting small. This is more or less how I built it, too, even though the process was less orderly than this blog post may make it appear.</p>
+
+<h2 id="01-hello-frankie">0.1. Hello Frankie</h2>
+
+<p>At its core, Sinatra is (1) a mechanism for storing routes, and (2) a mechanism for handling requests based on the routes stored. So this is where we start.</p>
+
+<p>Storing a Route</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+      <span class="kp">new</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">routes</span>
+      <span class="vi">@routes</span> <span class="o">||=</span> <span class="p">[]</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="n">route</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="n">route</span><span class="p">(</span><span class="s1">'POST'</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">route</span><span class="p">(</span><span class="n">verb</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+      <span class="n">routes</span> <span class="o">&lt;&lt;</span> <span class="p">{</span>
+        <span class="ss">verb:  </span><span class="n">verb</span><span class="p">,</span>
+        <span class="ss">path:  </span><span class="n">path</span><span class="p">,</span>
+        <span class="ss">block: </span><span class="n">block</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Responding to a Request</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="vi">@request</span>  <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="vi">@verb</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">request_method</span>
+    <span class="vi">@path</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">path_info</span>
+
+    <span class="vi">@response</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="ss">status:  </span><span class="mi">200</span><span class="p">,</span>
+      <span class="ss">headers: </span><span class="n">headers</span><span class="p">,</span>
+      <span class="ss">body:    </span><span class="p">[]</span>
+    <span class="p">}</span>
+
+    <span class="n">route!</span>
+
+    <span class="vi">@response</span><span class="p">.</span><span class="nf">values</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">params</span>
+    <span class="vi">@request</span><span class="p">.</span><span class="nf">params</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+    <span class="vi">@response</span><span class="p">[</span><span class="ss">:status</span><span class="p">]</span> <span class="o">=</span> <span class="n">code</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">headers</span>
+    <span class="vi">@headers</span> <span class="o">||=</span> <span class="p">{</span> <span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/html'</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="vi">@response</span><span class="p">[</span><span class="ss">:body</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">string</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">route!</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="no">Application</span><span class="p">.</span><span class="nf">routes</span>
+                       <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
+                       <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:path</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@path</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">status</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="k">unless</span> <span class="n">match</span>
+
+    <span class="n">body</span> <span class="n">match</span><span class="p">[</span><span class="ss">:block</span><span class="p">].</span><span class="nf">call</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<h2 id="02-frankie-goes-top-level">0.2. Frankie goes top level</h2>
+
+<p>New module <code class="highlighter-rouge">Frankie::Delegator</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="k">module</span> <span class="nn">Delegator</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">delegate</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
+    <span class="n">define_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span> <span class="k">do</span> <span class="o">|*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="o">|</span>
+      <span class="no">Application</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">delegate</span><span class="p">(</span><span class="ss">:get</span><span class="p">)</span>
+  <span class="n">delegate</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Change the <code class="highlighter-rouge">Application#route!</code> method to use <code class="highlighter-rouge">instance_eval</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">route!</span>
+  <span class="n">match</span> <span class="o">=</span> <span class="no">Application</span><span class="p">.</span><span class="nf">routes</span>
+                     <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
+                     <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:path</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@path</span> <span class="p">}</span>
+  <span class="k">return</span> <span class="n">status</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="k">unless</span> <span class="n">match</span>
+
+  <span class="n">body</span> <span class="nb">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">match</span><span class="p">[</span><span class="ss">:block</span><span class="p">])</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>We also need (at the top level):</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="kp">extend</span> <span class="no">Frankie</span><span class="o">::</span><span class="no">Delegator</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>And a <code class="highlighter-rouge">Templates</code> module:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre></td><td class="code"><pre><span class="k">module</span> <span class="nn">Templates</span>
+  <span class="k">def</span> <span class="nf">path_to_template</span><span class="p">(</span><span class="n">app_root</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
+    <span class="n">template_dir</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">expand_path</span><span class="p">(</span><span class="s1">'../views'</span><span class="p">,</span> <span class="n">app_root</span><span class="p">)</span>
+    <span class="s2">"</span><span class="si">#{</span><span class="n">template_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">template</span><span class="si">}</span><span class="s2">.erb"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">erb</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">binding</span>
+    <span class="n">app_root</span> <span class="o">=</span> <span class="n">caller_locations</span><span class="p">.</span><span class="nf">first</span><span class="p">.</span><span class="nf">absolute_path</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">path_to_template</span><span class="p">(</span><span class="n">app_root</span><span class="p">,</span> <span class="n">template</span><span class="p">))</span>
+    <span class="no">ERB</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">content</span><span class="p">).</span><span class="nf">result</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<h2 id="03-frankie-recognizes-patterns">0.3. Frankie recognizes patterns</h2>
+
+<p>Change the <code class="highlighter-rouge">route</code> class method, and add <code class="highlighter-rouge">compile</code> class method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="k">def</span> <span class="nf">route</span><span class="p">(</span><span class="n">verb</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+      <span class="n">pattern</span><span class="p">,</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">compile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+      <span class="n">routes</span> <span class="o">&lt;&lt;</span> <span class="p">{</span>
+        <span class="ss">verb:     </span><span class="n">verb</span><span class="p">,</span>
+        <span class="ss">pattern:  </span><span class="n">pattern</span><span class="p">,</span>
+        <span class="ss">keys:     </span><span class="n">keys</span><span class="p">,</span>
+        <span class="ss">block:    </span><span class="n">block</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+      <span class="n">segments</span> <span class="o">=</span> <span class="n">path</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+
+      <span class="n">segments</span><span class="p">.</span><span class="nf">map!</span> <span class="k">do</span> <span class="o">|</span><span class="n">segment</span><span class="o">|</span>
+        <span class="k">if</span> <span class="n">segment</span><span class="p">.</span><span class="nf">start_with?</span><span class="p">(</span><span class="s1">':'</span><span class="p">)</span>
+          <span class="n">keys</span> <span class="o">&lt;&lt;</span> <span class="n">segment</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+          <span class="s2">"([^</span><span class="se">\/</span><span class="s2">]+)"</span>
+        <span class="k">else</span>
+          <span class="n">segment</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">pattern</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">compile</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">A</span><span class="si">#{</span><span class="n">segments</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">z"</span><span class="p">)</span>
+      <span class="p">[</span><span class="n">pattern</span><span class="p">,</span> <span class="n">keys</span><span class="p">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Change the <code class="highlighter-rouge">route!</code> instance method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">def</span> <span class="nf">route!</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="no">Application</span><span class="p">.</span><span class="nf">routes</span>
+                       <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
+                       <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">status</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="k">unless</span> <span class="n">match</span>
+
+    <span class="c1"># CHANGE in 0.3: process captured groups</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">).</span><span class="nf">captures</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="ss">:keys</span><span class="p">].</span><span class="nf">zip</span><span class="p">(</span><span class="n">values</span><span class="p">).</span><span class="nf">to_h</span><span class="p">)</span>
+    <span class="n">body</span><span class="p">(</span><span class="nb">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">match</span><span class="p">[</span><span class="ss">:block</span><span class="p">]))</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<h2 id="04-frankie-plays-catch">0.4. Frankie plays catch</h2>
+
+<p>The <code class="highlighter-rouge">Application#call</code> method used to invoke the <code class="highlighter-rouge">Application#route!</code> method. It now reads <code class="highlighter-rouge">catch(:halt) { dispatch! }</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="c1"># CHANGE: changed method in 0.4:</span>
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="vi">@request</span>  <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="vi">@verb</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">request_method</span>
+    <span class="vi">@path</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">path_info</span>
+
+    <span class="vi">@response</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="ss">status:  </span><span class="mi">200</span><span class="p">,</span>
+      <span class="ss">headers: </span><span class="n">headers</span><span class="p">,</span>
+      <span class="ss">body:    </span><span class="p">[]</span>
+    <span class="p">}</span>
+
+    <span class="c1"># CHANGE: changed line in 0.4:</span>
+    <span class="kp">catch</span><span class="p">(</span><span class="ss">:halt</span><span class="p">)</span> <span class="p">{</span> <span class="n">dispatch!</span> <span class="p">}</span>
+
+    <span class="vi">@response</span><span class="p">.</span><span class="nf">values</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Define <code class="highlighter-rouge">dispatch!</code>, change <code class="highlighter-rouge">route!</code>, define <code class="highlighter-rouge">not_found</code> and <code class="highlighter-rouge">redirect</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="c1"># CHANGE: new method in 0.4</span>
+  <span class="k">def</span> <span class="nf">dispatch!</span>
+    <span class="n">route!</span>
+    <span class="n">not_found</span>
+  <span class="k">end</span>
+
+  <span class="c1"># CHANGE in 0.4: handle not_found separately, use throw:</span>
+  <span class="k">def</span> <span class="nf">route!</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="no">Application</span><span class="p">.</span><span class="nf">routes</span>
+                       <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
+                       <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="n">match</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">).</span><span class="nf">captures</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="ss">:keys</span><span class="p">].</span><span class="nf">zip</span><span class="p">(</span><span class="n">values</span><span class="p">).</span><span class="nf">to_h</span><span class="p">)</span>
+    <span class="n">body</span><span class="p">(</span><span class="nb">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">match</span><span class="p">[</span><span class="ss">:block</span><span class="p">]))</span>
+    <span class="c1"># CHANGE in 0.4: new line</span>
+    <span class="kp">throw</span> <span class="ss">:halt</span>
+  <span class="k">end</span>
+
+  <span class="c1"># CHANGE: new method in 0.4</span>
+  <span class="k">def</span> <span class="nf">not_found</span>
+    <span class="n">status</span> <span class="mi">404</span>
+    <span class="n">body</span> <span class="s2">"&lt;h1&gt;404 Not Found&lt;/h1"</span>
+    <span class="kp">throw</span> <span class="ss">:halt</span>
+  <span class="k">end</span>
+
+  <span class="c1"># CHANGE: new method in 0.4</span>
+  <span class="k">def</span> <span class="nf">redirect</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+    <span class="n">status</span> <span class="p">(</span><span class="vi">@verb</span> <span class="o">==</span> <span class="s1">'GET'</span> <span class="p">?</span> <span class="mi">302</span> <span class="p">:</span> <span class="mi">303</span><span class="p">)</span>
+    <span class="n">headers</span><span class="p">[</span><span class="s1">'Location'</span><span class="p">]</span> <span class="o">=</span> <span class="n">uri</span>
+    <span class="kp">throw</span> <span class="ss">:halt</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<h2 id="05-frankie-likes-cookies">0.5. Frankie likes cookies</h2>
+
+<p>Setting up middleware</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="c1"># CHANGE: changed method</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+      <span class="n">prototype</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="c1"># CHANGE: new method</span>
+    <span class="k">def</span> <span class="nf">prototype</span>
+      <span class="vi">@prototype</span> <span class="o">||=</span> <span class="kp">new</span>
+    <span class="k">end</span>
+
+    <span class="c1"># CHANGE: new alias</span>
+    <span class="k">alias</span> <span class="kp">new</span><span class="o">!</span> <span class="kp">new</span>
+
+    <span class="c1"># CHANGE: new/overridden method</span>
+    <span class="k">def</span> <span class="nf">new</span>
+      <span class="n">instance</span> <span class="o">=</span> <span class="kp">new</span><span class="o">!</span>
+      <span class="n">build</span><span class="p">(</span><span class="n">instance</span><span class="p">).</span><span class="nf">to_app</span>
+    <span class="k">end</span>
+
+    <span class="c1"># CHANGE: new method</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+      <span class="n">builder</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Builder</span><span class="p">.</span><span class="nf">new</span>
+
+      <span class="k">if</span> <span class="vi">@middleware</span>
+        <span class="vi">@middleware</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">middleware</span><span class="p">,</span> <span class="n">args</span><span class="o">|</span>
+          <span class="n">builder</span><span class="p">.</span><span class="nf">use</span><span class="p">(</span><span class="n">middleware</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">builder</span><span class="p">.</span><span class="nf">run</span> <span class="n">app</span>
+      <span class="n">builder</span>
+    <span class="k">end</span>
+
+    <span class="c1"># CHANGE: new method</span>
+    <span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="n">middleware</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="p">(</span><span class="vi">@middleware</span> <span class="o">||=</span> <span class="p">[])</span> <span class="o">&lt;&lt;</span> <span class="p">[</span><span class="n">middleware</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Rename <code class="highlighter-rouge">call</code> method to <code class="highlighter-rouge">call!</code>, introduce new <code class="highlighter-rouge">call</code> method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="c1"># CHANGE: new method</span>
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="nb">dup</span><span class="p">.</span><span class="nf">call!</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="c1"># CHANGE: this method used to be called `call`.</span>
+  <span class="c1"># It is otherwise unchanged.</span>
+  <span class="k">def</span> <span class="nf">call!</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="vi">@request</span>  <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="vi">@verb</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">request_method</span>
+    <span class="vi">@path</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">path_info</span>
+
+    <span class="vi">@response</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="ss">status:  </span><span class="mi">200</span><span class="p">,</span>
+      <span class="ss">headers: </span><span class="n">headers</span><span class="p">,</span>
+      <span class="ss">body:    </span><span class="p">[]</span>
+    <span class="p">}</span>
+
+    <span class="kp">catch</span><span class="p">(</span><span class="ss">:halt</span><span class="p">)</span> <span class="p">{</span> <span class="n">dispatch!</span> <span class="p">}</span>
+
+    <span class="vi">@response</span><span class="p">.</span><span class="nf">values</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>We also add a <code class="highlighter-rouge">session</code> method for accessing the session:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="c1"># CHANGE: new method</span>
+  <span class="k">def</span> <span class="nf">session</span>
+    <span class="vi">@request</span><span class="p">.</span><span class="nf">session</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<h2 id="06-frankie-returns">0.6. Frankie returns</h2>
+
+<p>For flexible return values, we need to introduce one additional level of indirection. Within the <code class="highlighter-rouge">call!</code> method, we invoke <code class="highlighter-rouge">invoke</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="k">def</span> <span class="nf">call!</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+      <span class="vi">@request</span>  <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+      <span class="vi">@verb</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">request_method</span>
+      <span class="vi">@path</span>     <span class="o">=</span> <span class="vi">@request</span><span class="p">.</span><span class="nf">path_info</span>
+
+      <span class="vi">@response</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="ss">status:  </span><span class="mi">200</span><span class="p">,</span>
+        <span class="ss">headers: </span><span class="n">headers</span><span class="p">,</span>
+        <span class="ss">body:    </span><span class="p">[]</span>
+      <span class="p">}</span>
+
+      <span class="c1"># CHANGE: we use invoke now</span>
+      <span class="n">invoke</span> <span class="p">{</span> <span class="n">dispatch!</span> <span class="p">}</span>
+
+      <span class="vi">@response</span><span class="p">.</span><span class="nf">values</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p><code class="highlighter-rouge">invoke</code> is defined as follows:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">Application</span>
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="k">def</span> <span class="nf">invoke</span>
+      <span class="n">caught</span> <span class="o">=</span> <span class="kp">catch</span><span class="p">(</span><span class="ss">:halt</span><span class="p">)</span> <span class="p">{</span> <span class="k">yield</span> <span class="p">}</span>
+      <span class="k">return</span> <span class="k">unless</span> <span class="n">caught</span>
+
+      <span class="k">case</span> <span class="n">caught</span>
+      <span class="k">when</span> <span class="no">Integer</span> <span class="k">then</span> <span class="n">status</span> <span class="n">caught</span>
+      <span class="k">when</span> <span class="no">String</span> <span class="k">then</span> <span class="n">body</span> <span class="n">caught</span>
+      <span class="k">else</span>
+        <span class="n">body</span><span class="p">(</span><span class="o">*</span><span class="n">caught</span><span class="p">.</span><span class="nf">pop</span><span class="p">)</span>
+        <span class="n">status</span> <span class="n">caught</span><span class="p">.</span><span class="nf">shift</span>
+        <span class="n">headers</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="o">*</span><span class="n">caught</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
+      <small>18 December 2017</small>
+      <h1 id="tic-tac-toe-with-negamax">Tic Tac Toe with Negamax</h1>
+
+<hr />
+
+<p>Comment, December 2017:</p>
+
+<p>This is actually an example of a tree-recursive process.</p>
+
+<p>It should be possible to do this in various ways:</p>
+<ul>
+  <li>brute force</li>
+  <li>with memoization</li>
+  <li>with alpha/beta pruning</li>
+  <li>with dynamic programming (bottom-up)</li>
+</ul>
+
+<p>In fact, all but the last ones I have done already.</p>
+
+<hr />
+
+<p>The first version of the Tic Tac Toe negamax algorithm that I implemented was painfully slow. It took more than 30 seconds to return a move for the initial position of a standard 3x3 game. So I had a strong incentive to try and understand the algorithm better. Beginning programmers are typically advised not to spend time worrying about performance, but here, we are not talking about micro-optimization – we are talking about an algorithm implementation that makes a game unplayable.</p>
+
+<p>In this post, I will discuss the baseline negamax algorithm for solving Tic Tac Toe, and a few improvements to this algorithm – both more generic ones (that could be applied, more or less directly, to any strictly competitive games) and more specific ones (that exploit certain properties of <em>this</em> game, Tic Tac Toe).</p>
+
+<!-- ## Tic Tac Toe
+
+We will represent a 3x3 Tic Tac Toe position as a nine-element array that we can access by index, with indices ranging from 0 to 8. Using the common player markers, and a blank space for squares that have not been chosen by either of the players yet. So the following board position ...
+
+... will be represented by this array:
+
+```ruby
+['X', 'O', ' ', 'X', ' ', ' ', ' ', ' ', ' ']
+```
+
+Let's now agree on a bag of Ruby methods that implement the rules of Tic Tac Toe for us. -->
+
+<h2 id="brute-force-negamax">Brute force Negamax</h2>
+
+<p>Here is an implementation of the Negamax algorithm for Tic Tac Toe in Ruby:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">nega_max</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">terminal?</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">available_moves</span><span class="p">(</span><span class="n">state</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">move</span><span class="o">|</span>
+      <span class="n">make</span><span class="p">(</span><span class="n">move</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+      <span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
+      <span class="n">unmake</span><span class="p">(</span><span class="n">move</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+      <span class="n">value_for_move</span>
+    <span class="k">end</span><span class="p">.</span><span class="nf">max</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The method returns the value of a game state <code class="highlighter-rouge">state</code> for the player <code class="highlighter-rouge">player</code>, assumed to be the player who moves next. This value is the highest payoff that <code class="highlighter-rouge">player</code> can be guaranteed to achieve with optimal play, and it is denoted  with the variable <code class="highlighter-rouge">best_value</code>.</p>
+
+<p>For terminal states, the value of <code class="highlighter-rouge">state</code> for <code class="highlighter-rouge">player</code> is given by the Tic Tac Toe payoff function — that’s the first branch of the conditional:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">best_value</span> <span class="o">=</span> <span class="n">payoff</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>For non-terminal states, <code class="highlighter-rouge">player</code> has to evaluate all available choices. Suppose she is at the moment looking at one particular move <code class="highlighter-rouge">move</code>. She makes the move (that’s the line <code class="highlighter-rouge">make(move, player, state)</code>, which updates <code class="highlighter-rouge">state</code> as a side-effect), and evaluates the resulting position. She uses our <code class="highlighter-rouge">nega_max</code> method to do this. Assume that the method tells her that the best her opponent can do in the successor state (referenced by <code class="highlighter-rouge">state</code> at this point) is $n$. So what can <code class="highlighter-rouge">player</code> herself achieve by choosing <code class="highlighter-rouge">move</code>? It’s $-n$. Here is why:</p>
+
+<ul>
+  <li>If <code class="highlighter-rouge">opponent(player)</code> can guarantee a win, then opponent will get $1$, so <code class="highlighter-rouge">player</code> gets $-1$ if she chooses <code class="highlighter-rouge">move</code>.</li>
+  <li>If <code class="highlighter-rouge">opponent(player)</code> can only guarantee a tie, opponent will get $0$, so <code class="highlighter-rouge">player</code> gets $-0$, which is $0$.</li>
+  <li>If <code class="highlighter-rouge">opponent(player)</code> is bound to lose, opponent will get $-1$, so <code class="highlighter-rouge">player</code> gets $-(-1)$, which is $1$.</li>
+</ul>
+
+<p>So the best <code class="highlighter-rouge">player</code> can guarantee to achieve when choosing <code class="highlighter-rouge">move</code> is indeed $-n$. This explains the crucial line of the method containing the recursive call:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">value_for_move</span> <span class="o">=</span> <span class="o">-</span><span class="n">nega_max</span><span class="p">(</span><span class="n">opponent</span><span class="p">(</span><span class="n">player</span><span class="p">),</span> <span class="n">state</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Notice that this only works because Tic Tac Toe is <em>zero-sum</em>, i.e., one player’s loss is another player’s gain: the payoffs of both players always add up to 0.</p>
+
+<p>Return to <code class="highlighter-rouge">player</code>, who is deliberating which move to take. She proceeds in the manner described, evaluating <em>all</em> her moves. In this way, <code class="highlighter-rouge">player</code> obtains a list of values, one for each move (that list is the return value of the <code class="highlighter-rouge">map</code> invocation). The maximal value from this list is the best she can guarantee, so this is what we return.</p>
+
+<h2 id="the-best-move">The best move</h2>
+
+<h2 id="algorithms">Algorithms</h2>
+
+<ul>
+  <li>brute force negamax</li>
+  <li>negamax with transposition table</li>
+  <li>negamax with symmetry table
+    <ul>
+      <li>consider: instead of solving all of the eight subtrees of the initial game node, we have to solve just three.</li>
+    </ul>
+  </li>
+  <li>negamax with symmetry lookup</li>
+  <li>alpha-beta pruning</li>
+  <li>negamax with shortcuts</li>
+</ul>
+
+<p>these fall onto a spectrum from “more generic” to “more game-specific”</p>
+<ul>
+  <li>negamax and negamax with alpha-beta pruning are generic algorithms that work pretty much for every game.</li>
+  <li>transposition tables are useful whenever there are several ways to reach the same position.</li>
+  <li>symmetry is useful if there are … symmetries!</li>
+  <li>the shortcut method makes use of the fact that tic tac toe is solved. so why not use the fact that the best we can guarantee is a tie?</li>
+</ul>
+
+<h2 id="results">Results</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"> </th>
+      <th style="text-align: right">time</th>
+      <th style="text-align: right">calls</th>
+      <th style="text-align: right">table size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">brute force</td>
+      <td style="text-align: right">5.781872</td>
+      <td style="text-align: right">549,946</td>
+      <td style="text-align: right">-</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">transposition table</td>
+      <td style="text-align: right">0.105050</td>
+      <td style="text-align: right">16,168</td>
+      <td style="text-align: right">5,477</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">symmetry table</td>
+      <td style="text-align: right">0.048830</td>
+      <td style="text-align: right">2,271</td>
+      <td style="text-align: right">5,477</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">symmetry lookup</td>
+      <td style="text-align: right">0.058844</td>
+      <td style="text-align: right">2,271</td>
+      <td style="text-align: right">764</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">alpha-beta</td>
+      <td style="text-align: right">0.193677</td>
+      <td style="text-align: right">18,297</td>
+      <td style="text-align: right">-</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>549,946 is the size of the 3x3 ttt game tree (i.e., the number of nodes)</li>
+  <li>5477 is the number of distinct board positions minus the initial state</li>
+  <li>
+    <p>764 is the number of board positions up to symmetry minus the initial state</p>
+  </li>
+  <li>
+    <p>In the transposition table case, around 6,000 calls are calls that result (as a side-effect) in values being stored to the lookup table, whereas around 10,000 calls return a looked-up value.</p>
+  </li>
+  <li>In the symmetry table case, the table is built “much faster”, because whenever we save to the table, we save eight values instead of merely one.</li>
+</ul>
+
+<h3 id="time">time</h3>
+
+<ul>
+  <li>
+    <p>with a symmetry table, we can realize a hundred fold speed increase.</p>
+  </li>
+  <li>memoizing values is a dramatic improvement over brute force negamax</li>
+  <li>exploiting symmetries allows us reduce computation time by half</li>
+  <li>saving symmetric values as we compute them seems slightly faster than computing symmetries during lookup</li>
+  <li>the memoization approaches are quite a bit faster than alpha-beta-search on a 3x3 board</li>
+  <li>(it looks like alpa-beta scales a lot better, viz the results for a 4x4 board)</li>
+</ul>
+
+<h3 id="calls">calls</h3>
+
+<ul>
+  <li>brute force: the number of method calls is a lot higher than the number of distinct positions, because many positions are computed several times.</li>
+  <li>transposition table: with this algorithm, the number of calls is still higher than the number of positions, because it may happen that our negamax method is called for some state, even if that state has been evaluated already and stored … but we still need to retrieve it!</li>
+  <li>symmetry table: now the number of calls is lower than the size of the table. this looks certainly odd at first sight. but the thing is that with every function call, we write up to eight new values to the table.</li>
+</ul>
+
+<h3 id="method-calls-in-relation-to-time">method calls in relation to time</h3>
+<ul>
+  <li>the number of method calls does not correlate neatly with computation time spent.</li>
+  <li>compare brute force and transposition table: 549946/16168 is about 34, so the evaluation function is called 34 times less when we use the transposition table vs brute force. the speed gain, on the other hand, is around 57-fold. Why is that?</li>
+  <li>
+    <p>When going from a transposition to a symmetry table, there is a 7-fold decrease in function calls, but the computation time is only halved. Filling in the table entries comes with an extra cost that partially offsets avoiding negamax calls. That seems to be the plausible explanation.</p>
+  </li>
+  <li><strong>What does the number of method calls actually correspond to?</strong> In brute force negamax, it is simply the number of nodes in the complete game tree (see https://books.google.com/books?id=1xHPDAAAQBAJ&amp;pg=PA151&amp;lpg=PA151&amp;dq=size+of+tic+tac+toe+game+tree&amp;source=bl&amp;ots=J3Tp09kbbL&amp;sig=DJoyUjGx2XGMm-gvMg-QW5bQ8sI&amp;hl=de&amp;sa=X&amp;ved=0ahUKEwivzpGyjpHUAhVG0WMKHVRqD704ChDoAQhXMAc#v=onepage&amp;q=size%20of%20tic%20tac%20toe%20game%20tree&amp;f=false)</li>
+</ul>
+
+<h3 id="table-size">table size</h3>
+
+<ul>
+  <li>transposition table: there are 5478 distinct positions in 3x3 tic tac toe (see http://www.mathrec.org/old/2002jan/solutions.html). Since we do not store a value for the initial state in the table, our table has 5477 entries.</li>
+  <li>symmetry lookup: since we only store a “representative” of each equivalence class, this is a smaller table. there are 765 distinct ttt positions modulo symmetries (see http://www.mathrec.org/old/2002jan/solutions.html), and since we don’t store the initial state, our table has 764 entries.</li>
+</ul>
+
+<h3 id="why-is-the-number-of-method-calls-smaller-than-the-number-of-distinct-ttt-positions-when-we-use-a-symmetry-table">Why is the number of method calls smaller than the number of distinct ttt positions when we use a symmetry table?</h3>
+
+<p>This might come as a surprise, because shouldn’t we have to visit every distinct node at least once? well, no, actually! The reason we don’t have to do this is that there are certain positions we never even have to evaluate, because they are descendants of nodes that are symmetric to nodes we have evaluated (if that makes sense).</p>
+
+<h3 id="shortcut">shortcut</h3>
+
+<ul>
+  <li>
+    <p>suppose we already know that the best we can guarantee is a tie. then we could stop looking for a win (we know we cannot find a guaranteed win path), but instead look for a tie path. this is the idea behind the two “shortcut” algorithms I looked at: one adds the shortcut to the brute force algorithm, the second adds the shortcut to the transposition table. The second one (transposition with shortcut) is the fastest algorithms I considered.</p>
+  </li>
+  <li>
+    <p>there is a pitfall here, however. if we are playing against a less than perfect opponent, than we might miss a chance to score a win if we take the shortcut!</p>
+  </li>
+</ul>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
       <small>18 December 2017</small>
       <h1 id="a-bunch-of-sets">A Bunch of Sets</h1>
 
@@ -123,11 +1068,7 @@
 3
 4
 5
-6
-7
-8</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
-  <span class="kp">attr_reader</span> <span class="ss">:size</span>
-
+6</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@hash</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="vi">@size</span> <span class="o">=</span> <span class="mi">0</span>
@@ -137,7 +1078,7 @@
 </div>
 </div>
 
-<p>We decide to maintain an instance variable <code class="highlighter-rouge">@size</code> (with accompanying getter method <code class="highlighter-rouge">size</code>), in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion.</p>
+<p>Besides the <code class="highlighter-rouge">@hash</code> instance variable, we also decide to maintain an instance variable <code class="highlighter-rouge">@size</code>, in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion. We also make available a getter method <code class="highlighter-rouge">size</code> that returns the current value of <code class="highlighter-rouge">@size</code>, omitted here.</p>
 
 <p><strong>Valid scores.</strong> What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
 
@@ -253,7 +1194,7 @@
   <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
   <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
   <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">max_score</span><span class="p">].</span><span class="nf">min</span>
-  <span class="vi">@size</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@size</span> <span class="o">+</span> <span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_score</span><span class="p">)).</span><span class="nf">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="vi">@size</span> <span class="o">+</span> <span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_score</span><span class="p">)</span>
   <span class="nb">self</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
@@ -327,7 +1268,7 @@
   <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
   <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
   <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">min_score</span><span class="p">].</span><span class="nf">max</span>
-  <span class="vi">@size</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@size</span> <span class="o">-</span> <span class="p">(</span><span class="n">old_score</span> <span class="o">-</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">])).</span><span class="nf">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="vi">@size</span> <span class="o">-</span> <span class="p">(</span><span class="n">old_score</span> <span class="o">-</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
   <span class="nb">self</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
@@ -663,6 +1604,40 @@
 
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       
+      <small>28 October 2017</small>
+      <h1 id="on-subproblems">On Subproblems</h1>
+
+<h2 id="subroutines">Subroutines</h2>
+
+<p>Breaking down a problem into smaller pieces necessary to solve it.</p>
+
+<p>Big problems as collections of small problems.</p>
+
+<p>Subroutines!</p>
+
+<h2 id="subinstances">Subinstances</h2>
+
+<ul>
+  <li>Non-overlapping subproblems:
+    <ul>
+      <li>Mergesort</li>
+    </ul>
+  </li>
+  <li>Overlapping subproblems:
+    <ul>
+      <li>Fibonacci</li>
+      <li>TicTacToe</li>
+      <li>Dynamic Programming</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="objects">Objects</h2>
+
+<p>=&gt; Objects break down a problem into “responsibilities”.</p>
+
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+      
       <small>06 July 2017</small>
       <h1 id="object-passing-in-ruby">Object Passing in Ruby</h1>
 
@@ -907,7 +1882,22 @@
       
 
           <h3>
+            <a class="post-link" href="/2018/03/05/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>05 Mar 2018</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/18/negamax/">Negamax</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
             <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
           </h3>
       
 

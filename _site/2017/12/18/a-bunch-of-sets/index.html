@@ -121,11 +121,7 @@
 3
 4
 5
-6
-7
-8</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
-  <span class="kp">attr_reader</span> <span class="ss">:size</span>
-
+6</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@hash</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="vi">@size</span> <span class="o">=</span> <span class="mi">0</span>
@@ -135,7 +131,7 @@
 </div>
 </div>
 
-<p>We decide to maintain an instance variable <code class="highlighter-rouge">@size</code> (with accompanying getter method <code class="highlighter-rouge">size</code>), in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion.</p>
+<p>Besides the <code class="highlighter-rouge">@hash</code> instance variable, we also decide to maintain an instance variable <code class="highlighter-rouge">@size</code>, in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion. We also make available a getter method <code class="highlighter-rouge">size</code> that returns the current value of <code class="highlighter-rouge">@size</code>, omitted here.</p>
 
 <p><strong>Valid scores.</strong> What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
 
@@ -251,7 +247,7 @@
   <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
   <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
   <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">max_score</span><span class="p">].</span><span class="nf">min</span>
-  <span class="vi">@size</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@size</span> <span class="o">+</span> <span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_score</span><span class="p">)).</span><span class="nf">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="vi">@size</span> <span class="o">+</span> <span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_score</span><span class="p">)</span>
   <span class="nb">self</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
@@ -325,7 +321,7 @@
   <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
   <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
   <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">min_score</span><span class="p">].</span><span class="nf">max</span>
-  <span class="vi">@size</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@size</span> <span class="o">-</span> <span class="p">(</span><span class="n">old_score</span> <span class="o">-</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">])).</span><span class="nf">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="vi">@size</span> <span class="o">-</span> <span class="p">(</span><span class="n">old_score</span> <span class="o">-</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
   <span class="nb">self</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
@@ -672,7 +668,22 @@
       
 
           <h3>
+            <a class="post-link" href="/2018/03/05/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>05 Mar 2018</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/12/18/negamax/">Negamax</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
             <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+          </h3>
+      
+
+          <h3>
+            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
           </h3>
       
 
