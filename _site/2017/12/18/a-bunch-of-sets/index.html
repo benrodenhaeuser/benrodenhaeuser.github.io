@@ -3,9 +3,9 @@
   <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <title>Ben Rodenhäuser</title>
+  <title>Ben Rodenhäuser | Notes on programming.</title>
 
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans|Anton|Roboto+Mono" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/style.css?v=">
   <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -40,15 +40,21 @@
     <div class="wrapper">
       <section>
       <small>18 December 2017</small>
-      <h1 id="a-bunch-of-sets">A Bunch of Sets</h1>
+      <h1 class="title">A Bunch of Sets</h1>
+      <div class="description">A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.</div>
 
-<p>Ruby comes with a <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset/blob/master/lib/multiset.rb"><code class="highlighter-rouge">Multiset</code> class</a> available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of this post—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don’t care much for lengthy explanations, head <a href="https://github.com/benrodenhaeuser/sets">straight to Github</a> to have a look at the code.</p>
+      <div class="content">
+        <hr class="line" />
+        <div class="content-inner">
+          <p>Ruby comes with a <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset/blob/master/lib/multiset.rb"><code class="highlighter-rouge">Multiset</code> class</a> available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of this post—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don’t care much for lengthy explanations, head <a href="https://github.com/benrodenhaeuser/sets">straight to Github</a> to have a look at the code.</p>
 
 <h2 id="classical-sets-multisets-and-fuzzy-sets">Classical sets, multisets, and fuzzy sets</h2>
 
 <p>Let’s first get an overview of the types of collections we are interested in by means of some quick examples.</p>
 
-<p><strong>Classical Sets.</strong> Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word “$\text{learner}$” could be represented by the set</p>
+<h3 id="classical-sets">Classical Sets</h3>
+
+<p>Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word “$\text{learner}$” could be represented by the set</p>
 
 <script type="math/tex; mode=display">\lbrace a, e, l, r, n \rbrace.</script>
 
@@ -58,7 +64,9 @@
 
 <p>Taking the intersection of the two sets, which collects the elements occuring in both of them, we obtain the set $\lbrace a, l, n\rbrace$, which captures the overlap of the two words in terms of letters contained—a crude measure of what they have in common. So sets allow us to zoom in on questions of membership, while disregarding other aspects of particular entities we wish to study.</p>
 
-<p><strong>Multisets.</strong> Suppose now we would like to count <em>how often</em> letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word “$\text{learner}$” corresponds to the multiset</p>
+<h3 id="multisets">Multisets</h3>
+
+<p>Suppose now we would like to count <em>how often</em> letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word “$\text{learner}$” corresponds to the multiset</p>
 
 <script type="math/tex; mode=display">\lbrace a, e, e, l, r, r, n \rbrace</script>
 
@@ -70,7 +78,9 @@
 
 <p>In a programming context, the elements of a set (be it a classical set or a multiset) are often called <em>keys</em>. The above multiset has five distinct keys: $a$, $e$, $l$, $r$ and $n$. In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the <em>score</em> for that key. The score for the key $e$ in the above multiset, for example, is $2$.</p>
 
-<p><strong>Fuzzy sets.</strong> Fuzzy sets also make finer distinctions compared to classical sets. However, they generalize classical sets in a different direction. As we just saw, in a multiset, the score for a particular key represents <em>multiplicity</em> of membership (how many times does the key occur in the set?). In a fuzzy set, the score indicates <em>degree of membership</em>. So besides an element being “fully contained” in the set or “not contained”, it may also be “partially contained” in the set, so to speak.</p>
+<h3 id="fuzzy-sets">Fuzzy sets</h3>
+
+<p>Fuzzy sets also make finer distinctions compared to classical sets. However, they generalize classical sets in a different direction. As we just saw, in a multiset, the score for a particular key represents <em>multiplicity</em> of membership (how many times does the key occur in the set?). In a fuzzy set, the score indicates <em>degree of membership</em>. So besides an element being “fully contained” in the set or “not contained”, it may also be “partially contained” in the set, so to speak.</p>
 
 <p>To see how this can be useful, take this example: consider the words “$\text{learner}$”, “$\text{learn}$”, “$\text{learned}$”, and “$\text{lean}$”. We might wish to capture how similar each of these words is to some other word, let’s say the word “$\text{learner}$” again. The similarity of “$\text{learner}$” to itself is perfect, since no edit (letter change) is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word “$\text{learned}$” is very similar to “$\text{learner}$” – substituting the last letter will transform the former into the latter. “$\text{learn}$” is also very similar to “$\text{learner}$”, but a little less so – deleting the last two letters from “$\text{learner}$” results in “$\text{learner}$”, requiring two steps rather than one. The word “$\text{lean}$” is again a bit less similar to “$\text{learner}$”, requiring one additional deletion. So to transform each of the words given into “$\text{learner}$” requires:</p>
 
@@ -91,25 +101,17 @@
 
 <p>Equipped with some basic understanding of our problem domain, let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.</p>
 
-<p><strong>Hash tables.</strong> What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to $1$, while all other objects from a given domain are mapped to $0$. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.</p>
+<h3 id="hash-tables">Hash tables</h3>
 
-<p>From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table, such as</p>
+<p>What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to $1$, while all other objects from a given domain are mapped to $0$. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.</p>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">1</span> <span class="p">}</span>
-</pre></td></tr></tbody></table>
-</div>
-</div>
+<p>From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table:</p>
 
-<p>or</p>
-
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="p">}</span>
-</pre></td></tr></tbody></table>
-</div>
-</div>
-
-<p>or</p>
-
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">6</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">1</span> <span class="p">}</span>     <span class="c1"># 'classical set'</span>
+<span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="p">}</span>     <span class="c1"># 'multiset'</span>
+<span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">6</span> <span class="p">}</span> <span class="c1"># 'fuzzy set'</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
@@ -133,7 +135,9 @@
 
 <p>Besides the <code class="highlighter-rouge">@hash</code> instance variable, we also decide to maintain an instance variable <code class="highlighter-rouge">@size</code>, in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion. We also make available a getter method <code class="highlighter-rouge">size</code> that returns the current value of <code class="highlighter-rouge">@size</code>, omitted here.</p>
 
-<p><strong>Valid scores.</strong> What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
+<h3 id="valid-scores">Valid scores</h3>
+
+<p>What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
 
 <ul>
   <li>A classical set either contains or does not contain a particular key, so the only valid scores are $0$ and $1$.</li>
@@ -184,7 +188,9 @@
 
 <p>As the second disjunct of each of the above getter methods tells us loud and clear, we are missing something so far: our class instance variables have not been set to any value! Initializing those class instance variables is precisely the job description of our target classes.</p>
 
-<p><strong>Target classes.</strong> <code class="highlighter-rouge">SetMap</code> is meant to be subclassed, with each subclass defining a particular set type by specifying a range of legal scores via the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>. Here is the code for classical sets:</p>
+<h3 id="target-classes">Target classes</h3>
+
+<p><code class="highlighter-rouge">SetMap</code> is meant to be subclassed, with each subclass defining a particular set type by specifying a range of legal scores via the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>. Here is the code for classical sets:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -235,7 +241,9 @@
 
 <p>Of course, we have not yet demonstrated what the interface for <code class="highlighter-rouge">SetMap</code> actually looks like. But from now on, we will write methods that work equally well for all three set types under consideration: classical sets, fuzzy sets, and multisets.</p>
 
-<p><strong>Key insertion.</strong> The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the <code class="highlighter-rouge">SetMap#insert</code> method:</p>
+<h3 id="key-insertion">Key insertion.</h3>
+
+<p>The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the <code class="highlighter-rouge">SetMap#insert</code> method:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -293,7 +301,9 @@
 
 <p>Returning to the earlier snippet, we also need to keep track of the size of our set (line 5). Here, we also neutralize rounding errors that might occur for types of sets that allow <a href="http://floating-point-gui.de">floating point numbers</a> as scores.</p>
 
-<p><strong>Key retrieval.</strong>  Next, consider <code class="highlighter-rouge">SetMap#retrieve</code>:</p>
+<h3 id="key-retrieval">Key retrieval</h3>
+
+<p>Next, consider <code class="highlighter-rouge">SetMap#retrieve</code>:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -309,7 +319,9 @@
 
 <p>Observe that key retrieval is fast: accessing a hash key takes constant time on average (<a href="https://lemire.me/blog/2009/08/18/do-hash-tables-work-in-constant-time/">disregarding some fine-print</a>), i.e., as the number of keys in a hash increases, the average time necessary to recover the value for a key does not increase. This is one of the main reasons why using hash tables to model sets is an attractive choice.</p>
 
-<p><strong>Key removal.</strong> While it would be possible to tweak our approach and express removal of a key as insertion with a negative score, we prefer to keep things simple here:</p>
+<h3 id="key-removal">Key removal</h3>
+
+<p>While it would be possible to tweak our approach and express removal of a key as insertion with a negative score, we prefer to keep things simple here:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -330,7 +342,9 @@
 
 <p><code class="highlighter-rouge">SetMap#remove</code> is perfectly symmetric to the earlier <code class="highlighter-rouge">insert</code> method, using a bounded difference instead of a bounded sum. For our three target classes, this ensures that negative scores cannot occur.</p>
 
-<p><strong>Enumeration.</strong> The below <code class="highlighter-rouge">SetMap#each_pair</code> method enumerates set keys and their associated scores in a straightforward manner, piggybacking on <code class="highlighter-rouge">Hash#each_pair</code>. Notice that we only yield key-value pairs for which the value is non-zero, since a key scored with value <code class="highlighter-rouge">0</code> is not considered part of our set.</p>
+<h3 id="enumeration">Enumeration</h3>
+
+<p>The below <code class="highlighter-rouge">SetMap#each_pair</code> method enumerates set keys and their associated scores in a straightforward manner, piggybacking on <code class="highlighter-rouge">Hash#each_pair</code>. Notice that we only yield key-value pairs for which the value is non-zero, since a key scored with value <code class="highlighter-rouge">0</code> is not considered part of our set.</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -376,7 +390,9 @@
 
 <p>Since our target classes <code class="highlighter-rouge">ClassicalSet</code>, <code class="highlighter-rouge">FuzzySet</code> and <code class="highlighter-rouge">MultiSet</code> inherit from <code class="highlighter-rouge">SetMap</code>, as shown in the above diagram, they will also be able to access the functionality provided by <code class="highlighter-rouge">SetLike</code>.</p>
 
-<p><strong>Division of Labor.</strong> The division of labor we adopt here takes a cue from the place the <code class="highlighter-rouge">Enumerable</code> module occupies in Ruby’s design. <code class="highlighter-rouge">Enumerable</code> provides a number of useful methods for working with collections to any class that chooses to include it. In doing so, <code class="highlighter-rouge">Enumerable</code> assumes that the class implements an <code class="highlighter-rouge">each</code> method, which forms the basis for all the methods <code class="highlighter-rouge">Enumerable</code> defines. Beyond this, however, <code class="highlighter-rouge">Enumerable</code> does not (need to) know anything about the class using it. Here, we do something very similar:</p>
+<h3 id="division-of-labor">Division of Labor</h3>
+
+<p>The division of labor we adopt here takes a cue from the place the <code class="highlighter-rouge">Enumerable</code> module occupies in Ruby’s design. <code class="highlighter-rouge">Enumerable</code> provides a number of useful methods for working with collections to any class that chooses to include it. In doing so, <code class="highlighter-rouge">Enumerable</code> assumes that the class implements an <code class="highlighter-rouge">each</code> method, which forms the basis for all the methods <code class="highlighter-rouge">Enumerable</code> defines. Beyond this, however, <code class="highlighter-rouge">Enumerable</code> does not (need to) know anything about the class using it. Here, we do something very similar:</p>
 
 <ul>
   <li><code class="highlighter-rouge">SetLike</code> provides most of the functionality commonly associated with sets.</li>
@@ -386,7 +402,9 @@
 
 <p>In particular, none of the methods in <code class="highlighter-rouge">SetLike</code> need to know that we are using a hash for internal storage. This draws a distinction between methods that do need to know that we have chosen to represent sets with hash tables (they go in the <code class="highlighter-rouge">SetMap</code> class), and methods that don’t need to know this (they go in the <code class="highlighter-rouge">SetLike</code> module), and thus encapsulates the internal state of a set in <code class="highlighter-rouge">SetMap</code>. As long as we keep the public interface of <code class="highlighter-rouge">SetMap</code> stable, we could just as well reimplement all its methods using a binary search tree instead of a hash for storing a set, say: <code class="highlighter-rouge">SetLike</code> will not care.</p>
 
-<p><strong>Operations on sets.</strong> We would like to implement the usual operations on sets, like <code class="highlighter-rouge">union</code>, <code class="highlighter-rouge">intersection</code>, and <code class="highlighter-rouge">difference</code>. Since they all follow essentially the same pattern, we focus on just one of them, <code class="highlighter-rouge">union!</code> (the  destructive version of <code class="highlighter-rouge">union</code>).</p>
+<h3 id="operations-on-sets">Operations on sets</h3>
+
+<p>We would like to implement the usual operations on sets, like <code class="highlighter-rouge">union</code>, <code class="highlighter-rouge">intersection</code>, and <code class="highlighter-rouge">difference</code>. Since they all follow essentially the same pattern, we focus on just one of them, <code class="highlighter-rouge">union!</code> (the  destructive version of <code class="highlighter-rouge">union</code>).</p>
 
 <p>Following the example established by Ruby’s <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a>, we first implement a helper method <code class="highlighter-rouge">SetLike#do_with</code> that yields to a block:</p>
 
@@ -516,7 +534,9 @@
 
 <p>Our model captures all of this correctly.</p>
 
-<p><strong>Set predicates.</strong> A classical set $A$ is a subset of a classical set of $B$ if any element of $A$ is also an element of $B$. This can be expressed in terms of keys and their associated scores by saying that the score for any key in $A$ is less than or equal to the score for that same key in $B$. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the <code class="highlighter-rouge">SetLike#subset?</code> method:</p>
+<h3 id="set-predicates">Set predicates</h3>
+
+<p>A classical set $A$ is a subset of a classical set of $B$ if any element of $A$ is also an element of $B$. This can be expressed in terms of keys and their associated scores by saying that the score for any key in $A$ is less than or equal to the score for that same key in $B$. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the <code class="highlighter-rouge">SetLike#subset?</code> method:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -583,7 +603,9 @@
 
 <p>Definitions for the other common set predicates (<code class="highlighter-rouge">proper_subset?</code>, <code class="highlighter-rouge">superset?</code> and <code class="highlighter-rouge">proper_superset?</code>) are similar, so we omit them here.</p>
 
-<p><strong>Equivalence.</strong> When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply write the following code:</p>
+<h3 id="equivalence">Equivalence</h3>
+
+<p>When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply write the following code:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -604,7 +626,9 @@
 
 <p>Notice that we have aliassed the <code class="highlighter-rouge">equivalent?</code> method both as <code class="highlighter-rouge">==</code> and <code class="highlighter-rouge">eql?</code>. We have already taken the <code class="highlighter-rouge">==</code> method for granted in some earlier snippets. Now what about <code class="highlighter-rouge">eql?</code>? This brings us to our final topic for today:</p>
 
-<p><strong>Nested sets.</strong> Unless overridden, the <code class="highlighter-rouge">Object#eql?</code> method considers two objects to be the same if they are identical (i.e., are stored at the same location in memory). In the current context, overriding <code class="highlighter-rouge">Object#eql?</code> is critical, because <code class="highlighter-rouge">eql?</code> is the method that Ruby uses when accessing hash keys. Let’s leave the context of our <code class="highlighter-rouge">SetLike</code> module for a moment, and consider this line of Ruby code:</p>
+<h3 id="nested-sets">Nested sets</h3>
+
+<p>Unless overridden, the <code class="highlighter-rouge">Object#eql?</code> method considers two objects to be the same if they are identical (i.e., are stored at the same location in memory). In the current context, overriding <code class="highlighter-rouge">Object#eql?</code> is critical, because <code class="highlighter-rouge">eql?</code> is the method that Ruby uses when accessing hash keys. Let’s leave the context of our <code class="highlighter-rouge">SetLike</code> module for a moment, and consider this line of Ruby code:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">some_hash</span><span class="p">[</span><span class="n">some_obj</span><span class="p">]</span>
 </pre></td></tr></tbody></table>
@@ -638,7 +662,9 @@
 
 <p>Now the question is whether <code class="highlighter-rouge">set3</code> and <code class="highlighter-rouge">set4</code> are the same set. It seems that the answer should be yes, because, after all, they <em>contain the same elements</em>. Assume, however, for a moment that we had not overridden <code class="highlighter-rouge">eql?</code>. Then <code class="highlighter-rouge">set3</code> and <code class="highlighter-rouge">set4</code> do <em>not</em> come out the same in the sense of <code class="highlighter-rouge">==</code> because <code class="highlighter-rouge">set1</code> and <code class="highlighter-rouge">set2</code> do not reference the same object, which implies that <code class="highlighter-rouge">set3[set1] == set4[set1]</code> will return false, for the simple reason that <code class="highlighter-rouge">set1</code> is not considered a key in the set <code class="highlighter-rouge">other</code>, since it is not the case that <code class="highlighter-rouge">set2.eql?(set1)</code>. So overriding <code class="highlighter-rouge">eql?</code>, like we did above, is indeed critical.</p>
 
-<p><strong>The <code class="highlighter-rouge">hash</code> method</strong> As a final aside: For our set comparisons to work, we also need to override the <code class="highlighter-rouge">Object#hash</code> method so as to ensure that two set objects that are <code class="highlighter-rouge">eql?</code> have the same return value when <code class="highlighter-rouge">hash</code> is called on them. This can be achieved, e.g., like this:</p>
+<h3 id="the-hash-method">The <code class="highlighter-rouge">hash</code> method</h3>
+
+<p>As a final aside: For our set comparisons to work, we also need to override the <code class="highlighter-rouge">Object#hash</code> method so as to ensure that two set objects that are <code class="highlighter-rouge">eql?</code> have the same return value when <code class="highlighter-rouge">hash</code> is called on them. This can be achieved, e.g., like this:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -651,54 +677,77 @@
 
 <p>Here, we simply map each key-value pair (a two-element array) yielded by <code class="highlighter-rouge">each</code> to its <code class="highlighter-rouge">hash</code> value and sum up the result, trusting that <code class="highlighter-rouge">Array#hash</code> is implemented in a meaningful way. And this indeed ensures that <code class="highlighter-rouge">eql?</code> sets have the same <code class="highlighter-rouge">hash</code> return value.</p>
 
-<p><strong>Coda.</strong> What has been achieved? As mentioned at the beginning of the post, the set functionality that we have discussed is either readily available as part of Ruby’s Standard Library (for classical sets), or via an easily accesible Ruby gem (for multisets). However, the code presented here presents a <em>uniform</em> perspective on classical sets and multisets. While I have written <code class="highlighter-rouge">SetMap</code> and its child classes as an exercise for myself, I consider this uniformity an advantage over the pre-existing implementation. We have also seen how easily the approach generalizes to further use cases by considering fuzzy sets.</p>
+<h3 id="coda">Coda</h3>
+
+<p>What has been achieved? As mentioned at the beginning of the post, the set functionality that we have discussed is either readily available as part of Ruby’s Standard Library (for classical sets), or via an easily accesible Ruby gem (for multisets). However, the code presented here presents a <em>uniform</em> perspective on classical sets and multisets. While I have written <code class="highlighter-rouge">SetMap</code> and its child classes as an exercise for myself, I consider this uniformity an advantage over the pre-existing implementation. We have also seen how easily the approach generalizes to further use cases by considering fuzzy sets.</p>
 
 <p>This has been a long post. I hope I have not overstretched the limits of your patience. While coming up with a first working implementation of the types of sets discussed here was pretty straightforward, arriving at a way to structure and modularize my code that I found convincing myself required me to go back to the drawing board several times. If you have a chance to <a href="https://github.com/benrodenhaeuser/sets">check out my code</a>, your feedback would be greatly appreciated.</p>
 
+        </div>
+      </div>
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       </section>
       <header>
   <small>&nbsp;</small>
   <a href="http://notes.benrodenhaeuser.io">
-    <h1>Ben Rodenhäuser</h1>
+    <h1 class="title">
+      Ben Rodenhäuser
+    </h1>
   </a>
-  <p>Learning to program</p>
-  <hr class="line" />
-  <p>
-      
 
-          <h3>
-            <a class="post-link" href="/2018/03/05/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>05 Mar 2018</small>
-          </h3>
-      
+  <div class="description">
+    Notes on programming.
+  </div>
 
-          <h3>
-            <a class="post-link" href="/2017/12/18/negamax/">Negamax</a><span class="pad"></span><small>18 Dec 2017</small>
-          </h3>
-      
+  <div class="content">
+    <hr class="line" />
+    <div class="sidebar-content-inner">
 
-          <h3>
-            <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
-          </h3>
-      
 
-          <h3>
-            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
-          </h3>
-      
+        
 
-          <h3>
-            <a class="post-link" href="/2017/07/06/object-passing/">Object Passing</a><span class="pad"></span><small>06 Jul 2017</small>
-          </h3>
-      
+            <h2 class="sidebar">
+              <a class="post-link" href="/2018/03/07/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>07 Mar 2018</small>
+            </h2>
+            <div class="sidebar-description">
+              Building a toy version of a popular Ruby framework from the ground up.
+            </div>
+        
 
-          <h3>
-            <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting In Ruby</a><span class="pad"></span><small>15 May 2017</small>
-          </h3>
-      
-  </p>
-  <hr class="line" />
-  <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+            <h2 class="sidebar">
+              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+            </h2>
+            <div class="sidebar-description">
+              A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
+            </div>
+        
+
+            <h2 class="sidebar">
+              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="pad"></span><small>06 Jul 2017</small>
+            </h2>
+            <div class="sidebar-description">
+              Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
+            </div>
+        
+
+            <h2 class="sidebar">
+              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="pad"></span><small>15 May 2017</small>
+            </h2>
+            <div class="sidebar-description">
+              Why does Ruby have two sorting methods, rather than one?
+            </div>
+        
+
+    </div>
+    <hr class="line" />
+
+    <div class="external">
+      <a href="http://github.com/benrodenhaeuser">
+        <img class="mark" src="/assets/images/GitHub-Mark-64px.png" />
+      </a>
+    </div>
+    <!-- <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p> -->
+  </div>
 </header>
 
       <!-- <footer>

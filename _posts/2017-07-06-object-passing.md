@@ -1,8 +1,7 @@
-# Object Passing in Ruby
-
-The following is a characterization of the object passing strategy followed by Ruby.
-
-## Pass-by-reference vs pass-by-value
+---
+title: "Passing Objects"
+description: "Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby."
+---
 
 The following characterizations come from [this article](http://javadude.com/articles/passbyvalue.htm) and are quoted verbatim.
 
@@ -60,6 +59,6 @@ In this example, the `mutate` method mutates the object it receives. In a pass-v
 
 As a consequence, the last line of the above code evaluates to `[10]`, not to `[1]` as we would expect on a pass-value-by-value model. *Mutating an object within a method will have an effect on the caller in Ruby.*
 
-### Takeaway
+## Takeaway
 
 Ruby is not a *pass-by-reference* language, it is a *pass-by-value* language. But it is not a *pass-value-by-value* language, it's *pass-reference-by-value*. Reassignment of a variable within a method will never affect the original variable that lives outside the method. On the other hand, mutating an object within a method will affect the original object outside the method, because those two objects are shared.

@@ -4,12 +4,25 @@
   <body>
     <div class="wrapper">
       <section>
-      <!-- {% assign post = site.posts.first %} -->
-      {% for post in site.posts %}
+      {% assign post = site.posts.first %}
+      <small>{{ post.date | date_to_long_string }}</small>
+      <h1 class="title">{{ post.title }}</h1>
+      <div class="description">{{ post.description }}</div>
+
+      <div class="content">
+        <hr class="line" />
+        <div class="content-inner">
+          {{ post.content }}
+        </div>
+      </div>
+      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
+
+      <!-- {% for post in site.posts %}
       <small>{{ post.date | date_to_long_string }}</small>
       {{ post.content }}
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
-      {% endfor %}
+      {% endfor %} -->
+
       </section>
       {% include header.html %}
       {% include footer.html %}

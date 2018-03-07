@@ -1,23 +1,20 @@
-# Understanding Sinatra
+---
+title: "Understanding Sinatra"
+description: "Building a toy version of a popular Ruby framework from the ground up."
+---
 
 
-## Introduction
-
-We are going to develop our toy version in a number of iterations, starting small. This is more or less how I built it, too, even though the process was less orderly than this blog post may make it appear.
+We are going to develop our toy version of Sinatra in a number of iterations, starting "tiny", and building towards "small". This corresponds to how I built Frankie, too, even though this blog post makes the process perhaps appear a little more orderly than it really was.
 
 ## 0.1. Hello Frankie
 
 At its core, Sinatra is (1) a mechanism for storing routes, and (2) a mechanism for handling requests based on the routes stored. So this is where we start.
 
-Storing a Route
+If you investigate the Sinatra source code, you will see that part (1), route storage, is a class task, while part (2), request handling, happens at the instance level. Let's first see how to store routes.
 
 ```ruby
 class Application
   class << self
-    def call(env)
-      new.call(env)
-    end
-
     def routes
       @routes ||= []
     end
@@ -41,10 +38,16 @@ class Application
 end
 ```
 
-Responding to a Request
+Routes are stored in an array which we can access via the `routes` class method. Invoking the `get` and `post` method defined above leads to a route being stored. As you can see by inspecting the `route` method, a route has three components: an HTTP `verb`, a URL `path`, and a block (a Proc object, to be precise). If the `verb` for a given request is `GET`, and its `path` is `'/'`, then you can imagine that the block will determine how to handle that request.
+
+Now, how are requests handled?  
 
 ```ruby
 class Application
+  def self.call(env)
+    new.call(env)
+  end
+
   def call(env)
     @request  = Rack::Request.new(env)
     @verb     = @request.request_method
@@ -106,6 +109,14 @@ module Delegator
 end
 ```
 
+We also need (at the top level):
+
+```ruby
+extend Frankie::Delegator
+```
+
+If we just did this, we could actually already run a 'Hello world' route. However, more work needs to be done. E.g., we want to be able to use the `params` method in our route blocks.
+
 Change the `Application#route!` method to use `instance_eval`:
 
 ```ruby
@@ -117,12 +128,6 @@ def route!
 
   body instance_eval(&match[:block])
 end
-```
-
-We also need (at the top level):
-
-```ruby
-extend Frankie::Delegator
 ```
 
 And a `Templates` module:
@@ -269,6 +274,8 @@ end
 
 Setting up middleware
 
+As an example, we will set up Frankie to use cookie-based session management as provided by `Rack::Session::Cookie` (which is also what Sinatra uses by default).
+
 ```ruby
 class Application
   class << self
@@ -401,3 +408,7 @@ class Application
   end
 end
 ```
+
+### Finishing touches
+
+The code on github includes some additional minor changes.

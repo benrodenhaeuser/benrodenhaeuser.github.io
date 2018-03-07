@@ -4,33 +4,49 @@
 @import "syntax.css";
 
 body {
-  background-color: #fff;
+  background-color: #f8f8f8;
   padding:50px;
-  font: 16px/1.5 'Open Sans', sans-serif;
+  font: 17px/1.5 'PT Sans', sans-serif;
   color:#595959;
   font-weight:400;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  // color:#383838;
-  color: #252525;
-  margin:0 0 20px;
-  font-weight: normal;
+h1 {
+  font-family: 'Anton', serif;
 }
 
 h1 {
-  // color: #FF7F50;
-  font-weight: bold;
-  padding-bottom: 25px;
+  line-height:1.1;
+  color: #303030;
+  margin:0 0 20px;
+  font-weight: normal;
+  font-size: 45px;
+  padding-bottom: 0px;
+  margin-bottom: 10px;
+}
+
+a h1:hover {
+  color: #FF7F50;;
 }
 
 h2 {
-  color: #FF7F50;
-  font-weight: bold;
+  line-height:1.1;
 }
 
-a code {
+h2 {
+  font-size: 22px;
+  margin-top: 45px;
   color: #FF7F50;
+}
+
+h2.sidebar {
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+
+h2.sidebar small {
+  color: #595959;
+  font-weight: normal;
 }
 
 h2 code {
@@ -38,6 +54,62 @@ h2 code {
   font-weight: normal;
 }
 
+// h3 headlines are set inline (inline-block), followed by a '.' character, and
+// the following paragraph. for this to work, we need to display p elements
+// preceded by h3 inline as well
+
+h3 {
+  display: inline-block;
+  margin-bottom: 0px;
+  font-size: 100%;
+  color: #080808;
+}
+
+h3:after {
+  content: ".";
+  padding-right: 2px;
+}
+
+h3+p {
+  display: inline;
+}
+
+a code {
+  color: #FF7F50;
+}
+
+a code:hover {
+  color: #494949;
+}
+
+.external {
+  margin-top: 40px;
+}
+
+img.mark {
+  height: 25px;
+}
+
+.description {
+  font-size: 0.9rem;
+}
+
+.sidebar-description {
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+}
+
+.sidebar-content-inner {
+  margin-top: 20px;
+}
+
+.content {
+  margin-top: 45px;
+}
+
+.content-inner {
+  // margin-top: -20px;
+}
 
 p, ul, ol, pre, dl {
   margin-top: 20px;
@@ -45,28 +117,6 @@ p, ul, ol, pre, dl {
   margin-right: 0;
   margin-bottom: 0;
 }
-
-h1, h2, h3 {
-  line-height:1.1;
-}
-
-h1 {
-  font-size: 29px;
-}
-
-// Want this?
-h2 {
-  font-size: 20px;
-  margin-top: 45px;
-}
-
-// h2 {
-//   color:#393939;
-// }
-//
-// h3, h4, h5, h6 {
-//   color:#494949;
-// }
 
 .pad {
   padding: 5px;
@@ -105,7 +155,7 @@ a small {
 }
 
 .wrapper {
-  width:1100px;
+  width:1150px;
   margin:0 auto;
 }
 
@@ -123,9 +173,14 @@ code, pre {
 
 pre {
   padding:8px 15px;
-  background: #f8f8f8;
+  padding-right: 13px;
+  padding-left: 13px;
+  margin-left: 2px;
+  margin-right: 2px;
+  // background: #fcfcfc;
   border-radius:0px;
-  border:1px solid #e5e5e5;
+  border-top:2px solid #e5e5e5;
+  border-bottom:2px solid #e5e5e5;
   overflow-x: auto;
   font-size: 14px;
 }
@@ -155,11 +210,11 @@ img {
 }
 
 header {
-  width:310px;
+  width:328px;
   float:right;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 10px;
+  // position: absolute;
+  // top: 58px;
+  // left: 900px;
   -webkit-font-smoothing:subpixel-antialiased;
 }
 
@@ -241,7 +296,9 @@ small {
 
 hr.line {
   border:0;
-  border-top: 1px solid #FF7F50;
+  border-top: 2px solid #FF7F50;
+  width: 35px;
+  margin-left: 0px;
 }
 
 footer {
@@ -281,7 +338,7 @@ pre.highlight {
 // background color: #f8f8f8
 // border color: #e5e5e5
 
-@media print, screen and (max-width: 1100px) {
+@media print, screen and (max-width: 1150px) {
 
   div.wrapper {
     width:auto;

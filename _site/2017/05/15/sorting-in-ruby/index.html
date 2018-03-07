@@ -3,9 +3,9 @@
   <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <title>Ben Rodenhäuser</title>
+  <title>Ben Rodenhäuser | Notes on programming.</title>
 
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans|Anton|Roboto+Mono" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/style.css?v=">
   <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -40,11 +40,13 @@
     <div class="wrapper">
       <section>
       <small>15 May 2017</small>
-      <h1 id="sorting-in-ruby">Sorting in Ruby</h1>
+      <h1 class="title">Sorting in Ruby</h1>
+      <div class="description">Why does Ruby have two sorting methods, rather than one?</div>
 
-<p>Ruby has two built-in methods for sorting collections: <code class="highlighter-rouge">sort</code> and <code class="highlighter-rouge">sort_by</code>. Both are contained in the <code class="highlighter-rouge">Enumerable</code> module, which any Ruby class can include as long as it implements a an <code class="highlighter-rouge">each</code> method for iterating over instances of the class. The elements of a collection also need to implement a three-way comparison method <code class="highlighter-rouge">&lt;=&gt;</code> (the “spaceship operator”) if we want to invoke <code class="highlighter-rouge">sort</code> or <code class="highlighter-rouge">sort_by</code> on that collection.</p>
-
-<p>My question for this post is this: why would there be two sort methods rather than just one?</p>
+      <div class="content">
+        <hr class="line" />
+        <div class="content-inner">
+          <p>Ruby has two built-in methods for sorting collections: <code class="highlighter-rouge">sort</code> and <code class="highlighter-rouge">sort_by</code>. Both are contained in the <code class="highlighter-rouge">Enumerable</code> module, which any Ruby class can include as long as it implements a an <code class="highlighter-rouge">each</code> method for iterating over instances of the class. The elements of a collection also need to implement a three-way comparison method <code class="highlighter-rouge">&lt;=&gt;</code> (the “spaceship operator”) if we want to invoke <code class="highlighter-rouge">sort</code> or <code class="highlighter-rouge">sort_by</code> on that collection. My question for this post is this: why would there be two sort methods rather than just one?</p>
 
 <h2 id="exploring-sort_by">Exploring <code class="highlighter-rouge">sort_by</code></h2>
 
@@ -180,50 +182,71 @@
 
 <p><em>Thanks to Pete Hanson from Launch School for valuable information on the topic of this post.</em></p>
 
+        </div>
+      </div>
       <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
       </section>
       <header>
   <small>&nbsp;</small>
   <a href="http://notes.benrodenhaeuser.io">
-    <h1>Ben Rodenhäuser</h1>
+    <h1 class="title">
+      Ben Rodenhäuser
+    </h1>
   </a>
-  <p>Learning to program</p>
-  <hr class="line" />
-  <p>
-      
 
-          <h3>
-            <a class="post-link" href="/2018/03/05/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>05 Mar 2018</small>
-          </h3>
-      
+  <div class="description">
+    Notes on programming.
+  </div>
 
-          <h3>
-            <a class="post-link" href="/2017/12/18/negamax/">Negamax</a><span class="pad"></span><small>18 Dec 2017</small>
-          </h3>
-      
+  <div class="content">
+    <hr class="line" />
+    <div class="sidebar-content-inner">
 
-          <h3>
-            <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch Of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
-          </h3>
-      
 
-          <h3>
-            <a class="post-link" href="/2017/10/28/subproblems/">Subproblems</a><span class="pad"></span><small>28 Oct 2017</small>
-          </h3>
-      
+        
 
-          <h3>
-            <a class="post-link" href="/2017/07/06/object-passing/">Object Passing</a><span class="pad"></span><small>06 Jul 2017</small>
-          </h3>
-      
+            <h2 class="sidebar">
+              <a class="post-link" href="/2018/03/07/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>07 Mar 2018</small>
+            </h2>
+            <div class="sidebar-description">
+              Building a toy version of a popular Ruby framework from the ground up.
+            </div>
+        
 
-          <h3>
-            <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting In Ruby</a><span class="pad"></span><small>15 May 2017</small>
-          </h3>
-      
-  </p>
-  <hr class="line" />
-  <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+            <h2 class="sidebar">
+              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+            </h2>
+            <div class="sidebar-description">
+              A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
+            </div>
+        
+
+            <h2 class="sidebar">
+              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="pad"></span><small>06 Jul 2017</small>
+            </h2>
+            <div class="sidebar-description">
+              Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
+            </div>
+        
+
+            <h2 class="sidebar">
+              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="pad"></span><small>15 May 2017</small>
+            </h2>
+            <div class="sidebar-description">
+              Why does Ruby have two sorting methods, rather than one?
+            </div>
+        
+
+    </div>
+    <hr class="line" />
+
+    <div class="external">
+      <a href="http://github.com/benrodenhaeuser">
+        <img class="mark" src="/assets/images/GitHub-Mark-64px.png" />
+      </a>
+    </div>
+    <!-- <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p> -->
+  </div>
 </header>
 
       <!-- <footer>

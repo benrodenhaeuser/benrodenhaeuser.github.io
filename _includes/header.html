@@ -1,18 +1,38 @@
 <header>
   <small>&nbsp;</small>
   <a href="http://notes.benrodenhaeuser.io">
-    <h1>{{ site.title }}</h1>
+    <h1 class="title">
+      {{ site.title }}
+    </h1>
   </a>
-  <p>{{ site.description }}</p>
-  <hr class="line" />
-  <p>
-      {% for post in site.posts %}
 
-          <h3>
-            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="pad"></span><small>{{ post.date | date_to_string }}</small>
-          </h3>
-      {% endfor %}
-  </p>
-  <hr class="line" />
-  <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+  <div class="description">
+    {{ site.description }}
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+    <div class="sidebar-content-inner">
+
+
+        {% for post in site.posts %}
+
+            <h2 class="sidebar">
+              <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="pad"></span><small>{{ post.date | date_to_string }}</small>
+            </h2>
+            <div class="sidebar-description">
+              {{ post.description }}
+            </div>
+        {% endfor %}
+
+    </div>
+    <hr class="line" />
+
+    <div class="external">
+      <a href="http://github.com/benrodenhaeuser">
+        <img class="mark" src="/assets/images/GitHub-Mark-64px.png" />
+      </a>
+    </div>
+    <!-- <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p> -->
+  </div>
 </header>
