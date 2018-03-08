@@ -4,7 +4,7 @@
 @import "syntax.css";
 
 body {
-  background-color: #fff;
+  background-color: #f8f8f8;
   padding:50px;
   font: 17px/1.5 'PT Sans', sans-serif;
   color:#595959;
@@ -62,7 +62,7 @@ h3 {
   display: inline-block;
   margin-bottom: 0px;
   font-size: 100%;
-  color: #080808;
+  color: #303030;
 }
 
 h3:after {
@@ -319,7 +319,6 @@ pre.highlight {
   width: 100%;
   padding: 0;
   margin: 0;
-  background-color: white;
   border-color: white;
 }
 
