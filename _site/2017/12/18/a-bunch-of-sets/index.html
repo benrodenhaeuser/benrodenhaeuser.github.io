@@ -39,14 +39,24 @@
   <body>
     <div class="wrapper">
       <section>
-      <small>18 December 2017</small>
-      <h1 class="title">A Bunch of Sets</h1>
-      <div class="description">A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.</div>
+  <p>
+    <small>
+      18 December 2017
+    </small>
+  </p>
 
-      <div class="content">
-        <hr class="line" />
-        <div class="content-inner">
-          <p>Ruby comes with a <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset/blob/master/lib/multiset.rb"><code class="highlighter-rouge">Multiset</code> class</a> available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of this post—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don’t care much for lengthy explanations, head <a href="https://github.com/benrodenhaeuser/sets">straight to Github</a> to have a look at the code.</p>
+  <h1 class="title">
+    A Bunch of Sets
+  </h1>
+
+  <div class="description">
+    A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+    <div class="content-inner">
+      <p>Ruby comes with a <a href="https://github.com/ruby/ruby/blob/trunk/lib/set.rb"><code class="highlighter-rouge">Set</code> class</a> as part of its standard library, and there is also a <a href="https://github.com/maraigue/multiset/blob/master/lib/multiset.rb"><code class="highlighter-rouge">Multiset</code> class</a> available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of this post—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don’t care much for lengthy explanations, head <a href="https://github.com/benrodenhaeuser/sets">straight to Github</a> to have a look at the code.</p>
 
 <h2 id="classical-sets-multisets-and-fuzzy-sets">Classical sets, multisets, and fuzzy sets</h2>
 
@@ -683,12 +693,19 @@
 
 <p>This has been a long post. I hope I have not overstretched the limits of your patience. While coming up with a first working implementation of the types of sets discussed here was pretty straightforward, arriving at a way to structure and modularize my code that I found convincing myself required me to go back to the drawing board several times. If you have a chance to <a href="https://github.com/benrodenhaeuser/sets">check out my code</a>, your feedback would be greatly appreciated.</p>
 
-        </div>
-      </div>
-      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
-      </section>
+    </div>
+  </div>
+
+  <p class='terminal'>
+    <small>&nbsp;</small>
+  </p>
+  <hr class="line" />
+</section>
+
       <header>
-  <small>&nbsp;</small>
+  <p>
+    <small>&nbsp;</small>
+  </p>
   <a href="http://notes.benrodenhaeuser.io">
     <h1 class="title">
       Ben Rodenhäuser
@@ -701,44 +718,46 @@
 
   <div class="content">
     <hr class="line" />
+    
     <div class="sidebar-content-inner">
 
 
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2018/03/07/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>07 Mar 2018</small>
+              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>18 Dec 2017</small>
             </h2>
-            <div class="sidebar-description">
-              Building a toy version of a popular Ruby framework from the ground up.
-            </div>
+            <p class="sidebar">
+              <small>
+                A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
+              </small>
+            </p>
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="sidebar-pad"></span><small>06 Jul 2017</small>
             </h2>
-            <div class="sidebar-description">
-              A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
-            </div>
+            <p class="sidebar">
+              <small>
+                Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
+              </small>
+            </p>
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="pad"></span><small>06 Jul 2017</small>
+              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="sidebar-pad"></span><small>15 May 2017</small>
             </h2>
-            <div class="sidebar-description">
-              Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
-            </div>
-        
-
-            <h2 class="sidebar">
-              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="pad"></span><small>15 May 2017</small>
-            </h2>
-            <div class="sidebar-description">
-              Why does Ruby have two sorting methods, rather than one?
-            </div>
+            <p class="sidebar">
+              <small>
+                Why does Ruby have two sorting methods, rather than one?
+              </small>
+            </p>
         
 
     </div>
+    <p class='terminal'>
+      <small>&nbsp;</small>
+    </p>
     <hr class="line" />
 
     <div class="external">

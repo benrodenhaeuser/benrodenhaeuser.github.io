@@ -1,0 +1,27 @@
+<section>
+  <p>
+    <small>
+      {{ page.date | date_to_long_string }}
+    </small>
+  </p>
+
+  <h1 class="title">
+    {{ page.title }}
+  </h1>
+
+  <div class="description">
+    {{ page.description }}
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+    <div class="content-inner">
+      {{ page.content }}
+    </div>
+  </div>
+
+  <p class='terminal'>
+    <small>&nbsp;</small>
+  </p>
+  <hr class="line" />
+</section>

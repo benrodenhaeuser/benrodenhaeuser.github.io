@@ -1,4 +1,22 @@
 @charset "UTF-8";
+ul, ol { list-style: none; }
+
+h1, h2, h3, h4, h5, h6, pre, code { font-size: 1em; }
+
+ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, body, html, p, blockquote, fieldset, input, dl, dt, dd, figure, figcaption { margin: 0; padding: 0; }
+
+a img, :link img, :visited img, fieldset { border: none; }
+
+address { font-style: normal; }
+
+header, section, article, nav, footer, hgroup, details, summary, figure, main { display: block; }
+
+mark { color: inherit; background: transparent; }
+
+abbr { border: none; }
+
+summary::-webkit-details-marker { display: none; }
+
 .highlight .hll { background-color: #ffffcc; }
 
 .highlight .c { color: #999988; font-style: italic; }
@@ -172,25 +190,21 @@
 .highlight .il { color: #999999; }
 
 /* Literal.Number.Integer.Long */
-body { background-color: #fafafa; padding: 50px; font: 18px 'PT Sans', sans-serif; line-height: 30px; color: #595959; font-weight: 400; }
+body { background-color: #fafafa; color: #595959; font-family: 'PT Sans', sans-serif; font-size: 18px; font-weight: normal; line-height: 30px; margin: 60px; }
 
-h1 { font-family: 'Anton', serif; }
-
-h1 { line-height: 1.1; color: #303030; margin: 0 0 20px; font-weight: normal; font-size: 45px; padding-bottom: 0px; margin-bottom: 10px; }
+h1 { color: #303030; font-family: 'Anton', serif; font-weight: normal; font-size: 45px; line-height: 45px; }
 
 a h1:hover { color: #FF7F50; }
 
-h2 { line-height: 1.1; }
+h2 { line-height: 27px; font-size: 27px; font-weight: bold; margin-top: 45px; color: #FF7F50; font-weight: bold; }
 
-h2 { font-size: 22px; margin-top: 45px; color: #FF7F50; }
+h2.sidebar { font-size: 21.6px; line-height: 21.6px; margin-top: 22.2px; }
 
-h2.sidebar { margin-bottom: 10px; margin-top: 0px; }
-
-h2.sidebar small { color: #595959; font-weight: normal; }
+p.sidebar { line-height: 18px; margin-top: 7.5px; }
 
 h2 code { color: #FF7F50; font-weight: normal; }
 
-h3 { display: inline-block; margin-bottom: 0px; font-size: 100%; color: #303030; }
+h3 { display: inline-block; margin-top: 22.2px; line-height: 30px; font-size: 18px; font-weight: bold; color: #303030; }
 
 h3:after { content: "."; padding-right: 2px; }
 
@@ -204,19 +218,15 @@ a code:hover { color: #494949; }
 
 img.mark { height: 25px; }
 
-.description { font-size: 0.9rem; }
-
-.sidebar-description { font-size: 0.8rem; margin-bottom: 20px; line-height: 1.3; }
-
-.sidebar-content-inner { margin-top: 20px; }
+.description { font-size: 15px; line-height: 45px; }
 
 .content { margin-top: 45px; }
 
-p, ul, ol, pre, dl { margin-top: 20px; margin-left: 0; margin-right: 0; margin-bottom: 0; }
+p, ul, ol, pre, dl { margin-top: 22.2px; }
 
-.pad { padding: 5px; }
+p.terminal { margin-top: 0; line-height: 22.2px; }
 
-.triplepad { padding: 15px; }
+.sidebar-pad { padding: 5px; }
 
 a { color: #FF7F50; text-decoration: none; }
 
@@ -226,7 +236,7 @@ ul { list-style-type: none; padding-left: 1.3em; }
 
 ul > li:before { content: "—"; /* em dash here */ position: absolute; margin-left: -1.3em; }
 
-a small { font-size: 11px; color: #777; margin-top: -0.3em; display: block; }
+a small { color: #777; margin-top: -0.3em; display: block; }
 
 .wrapper { width: 1150px; margin: 0 auto; }
 
@@ -250,27 +260,11 @@ img { max-width: 100%; }
 
 header { width: 328px; float: right; -webkit-font-smoothing: subpixel-antialiased; }
 
-header ul { list-style: none; height: 40px; padding: 0; background: #f4f4f4; border-radius: 5px; border: 1px solid #e0e0e0; width: 270px; }
-
-header li { width: 89px; float: left; border-right: 1px solid #e0e0e0; height: 40px; }
-
-header li:first-child a { border-radius: 5px 0 0 5px; }
-
-header li:last-child a { border-radius: 0 5px 5px 0; }
-
-header ul a { line-height: 1; font-size: 11px; color: #676767; display: block; text-align: center; padding-top: 6px; height: 34px; }
-
-header ul a:hover, header ul a:focus { color: #675C5C; }
-
 strong { color: #222; font-weight: 700; }
-
-header ul li + li + li { border-right: none; width: 89px; }
-
-header ul a strong { font-size: 14px; display: block; color: #222; }
 
 section { width: 690px; float: left; padding-bottom: 50px; }
 
-small { font-size: 11px; }
+small { font-size: 12px; line-height: 15px; color: #595959; font-weight: normal; }
 
 hr.line { border: 0; border-top: 2px solid #FF7F50; width: 35px; margin-left: 0px; }
 

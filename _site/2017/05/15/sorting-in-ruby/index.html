@@ -39,14 +39,24 @@
   <body>
     <div class="wrapper">
       <section>
-      <small>15 May 2017</small>
-      <h1 class="title">Sorting in Ruby</h1>
-      <div class="description">Why does Ruby have two sorting methods, rather than one?</div>
+  <p>
+    <small>
+      15 May 2017
+    </small>
+  </p>
 
-      <div class="content">
-        <hr class="line" />
-        <div class="content-inner">
-          <p>Ruby has two built-in methods for sorting collections: <code class="highlighter-rouge">sort</code> and <code class="highlighter-rouge">sort_by</code>. Both are contained in the <code class="highlighter-rouge">Enumerable</code> module, which any Ruby class can include as long as it implements a an <code class="highlighter-rouge">each</code> method for iterating over instances of the class. The elements of a collection also need to implement a three-way comparison method <code class="highlighter-rouge">&lt;=&gt;</code> (the “spaceship operator”) if we want to invoke <code class="highlighter-rouge">sort</code> or <code class="highlighter-rouge">sort_by</code> on that collection. My question for this post is this: why would there be two sort methods rather than just one?</p>
+  <h1 class="title">
+    Sorting in Ruby
+  </h1>
+
+  <div class="description">
+    Why does Ruby have two sorting methods, rather than one?
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+    <div class="content-inner">
+      <p>Ruby has two built-in methods for sorting collections: <code class="highlighter-rouge">sort</code> and <code class="highlighter-rouge">sort_by</code>. Both are contained in the <code class="highlighter-rouge">Enumerable</code> module, which any Ruby class can include as long as it implements a an <code class="highlighter-rouge">each</code> method for iterating over instances of the class. The elements of a collection also need to implement a three-way comparison method <code class="highlighter-rouge">&lt;=&gt;</code> (the “spaceship operator”) if we want to invoke <code class="highlighter-rouge">sort</code> or <code class="highlighter-rouge">sort_by</code> on that collection. My question for this post is this: why would there be two sort methods rather than just one?</p>
 
 <h2 id="exploring-sort_by">Exploring <code class="highlighter-rouge">sort_by</code></h2>
 
@@ -182,12 +192,19 @@
 
 <p><em>Thanks to Pete Hanson from Launch School for valuable information on the topic of this post.</em></p>
 
-        </div>
-      </div>
-      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
-      </section>
+    </div>
+  </div>
+
+  <p class='terminal'>
+    <small>&nbsp;</small>
+  </p>
+  <hr class="line" />
+</section>
+
       <header>
-  <small>&nbsp;</small>
+  <p>
+    <small>&nbsp;</small>
+  </p>
   <a href="http://notes.benrodenhaeuser.io">
     <h1 class="title">
       Ben Rodenhäuser
@@ -200,44 +217,46 @@
 
   <div class="content">
     <hr class="line" />
+    
     <div class="sidebar-content-inner">
 
 
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2018/03/07/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>07 Mar 2018</small>
+              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>18 Dec 2017</small>
             </h2>
-            <div class="sidebar-description">
-              Building a toy version of a popular Ruby framework from the ground up.
-            </div>
+            <p class="sidebar">
+              <small>
+                A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
+              </small>
+            </p>
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="sidebar-pad"></span><small>06 Jul 2017</small>
             </h2>
-            <div class="sidebar-description">
-              A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
-            </div>
+            <p class="sidebar">
+              <small>
+                Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
+              </small>
+            </p>
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="pad"></span><small>06 Jul 2017</small>
+              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="sidebar-pad"></span><small>15 May 2017</small>
             </h2>
-            <div class="sidebar-description">
-              Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
-            </div>
-        
-
-            <h2 class="sidebar">
-              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="pad"></span><small>15 May 2017</small>
-            </h2>
-            <div class="sidebar-description">
-              Why does Ruby have two sorting methods, rather than one?
-            </div>
+            <p class="sidebar">
+              <small>
+                Why does Ruby have two sorting methods, rather than one?
+              </small>
+            </p>
         
 
     </div>
+    <p class='terminal'>
+      <small>&nbsp;</small>
+    </p>
     <hr class="line" />
 
     <div class="external">

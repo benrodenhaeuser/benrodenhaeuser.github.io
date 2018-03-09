@@ -1,5 +1,7 @@
 <header>
-  <small>&nbsp;</small>
+  <p>
+    <small>&nbsp;</small>
+  </p>
   <a href="http://notes.benrodenhaeuser.io">
     <h1 class="title">
       {{ site.title }}
@@ -12,20 +14,26 @@
 
   <div class="content">
     <hr class="line" />
+    
     <div class="sidebar-content-inner">
 
 
         {% for post in site.posts %}
 
             <h2 class="sidebar">
-              <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="pad"></span><small>{{ post.date | date_to_string }}</small>
+              <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="sidebar-pad"></span><small>{{ post.date | date_to_string }}</small>
             </h2>
-            <div class="sidebar-description">
-              {{ post.description }}
-            </div>
+            <p class="sidebar">
+              <small>
+                {{ post.description }}
+              </small>
+            </p>
         {% endfor %}
 
     </div>
+    <p class='terminal'>
+      <small>&nbsp;</small>
+    </p>
     <hr class="line" />
 
     <div class="external">

@@ -39,14 +39,24 @@
   <body>
     <div class="wrapper">
       <section>
-      <small>06 July 2017</small>
-      <h1 class="title">Passing Objects</h1>
-      <div class="description">Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.</div>
+  <p>
+    <small>
+      06 July 2017
+    </small>
+  </p>
 
-      <div class="content">
-        <hr class="line" />
-        <div class="content-inner">
-          <p>The following characterizations come from <a href="http://javadude.com/articles/passbyvalue.htm">this article</a> and are quoted verbatim.</p>
+  <h1 class="title">
+    Passing Objects
+  </h1>
+
+  <div class="description">
+    Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+    <div class="content-inner">
+      <p>The following characterizations come from <a href="http://javadude.com/articles/passbyvalue.htm">this article</a> and are quoted verbatim.</p>
 
 <ul>
   <li><em>Pass-by-value:</em> “The actual parameter (or argument expression) is fully evaluated and the resulting value is <em>copied</em> into a location being used to hold the formal parameter’s value during method/function execution. That location is typically a chunk of memory on the runtime stack for the application (which is how Java handles it), but other languages could choose parameter storage differently.”</li>
@@ -126,12 +136,19 @@
 
 <p>Ruby is not a <em>pass-by-reference</em> language, it is a <em>pass-by-value</em> language. But it is not a <em>pass-value-by-value</em> language, it’s <em>pass-reference-by-value</em>. Reassignment of a variable within a method will never affect the original variable that lives outside the method. On the other hand, mutating an object within a method will affect the original object outside the method, because those two objects are shared.</p>
 
-        </div>
-      </div>
-      <div class="pad"></div><hr class="line" /><div class="triplepad"></div>
-      </section>
+    </div>
+  </div>
+
+  <p class='terminal'>
+    <small>&nbsp;</small>
+  </p>
+  <hr class="line" />
+</section>
+
       <header>
-  <small>&nbsp;</small>
+  <p>
+    <small>&nbsp;</small>
+  </p>
   <a href="http://notes.benrodenhaeuser.io">
     <h1 class="title">
       Ben Rodenhäuser
@@ -144,44 +161,46 @@
 
   <div class="content">
     <hr class="line" />
+    
     <div class="sidebar-content-inner">
 
 
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2018/03/07/understanding-sinatra/">Understanding Sinatra</a><span class="pad"></span><small>07 Mar 2018</small>
+              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>18 Dec 2017</small>
             </h2>
-            <div class="sidebar-description">
-              Building a toy version of a popular Ruby framework from the ground up.
-            </div>
+            <p class="sidebar">
+              <small>
+                A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
+              </small>
+            </p>
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="pad"></span><small>18 Dec 2017</small>
+              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="sidebar-pad"></span><small>06 Jul 2017</small>
             </h2>
-            <div class="sidebar-description">
-              A uniform implementation of classical sets, multisets and fuzzy sets, based on a generic set class.
-            </div>
+            <p class="sidebar">
+              <small>
+                Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
+              </small>
+            </p>
         
 
             <h2 class="sidebar">
-              <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="pad"></span><small>06 Jul 2017</small>
+              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="sidebar-pad"></span><small>15 May 2017</small>
             </h2>
-            <div class="sidebar-description">
-              Pass by reference or pass by value? A characterization of the object passing strategy followed by Ruby.
-            </div>
-        
-
-            <h2 class="sidebar">
-              <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="pad"></span><small>15 May 2017</small>
-            </h2>
-            <div class="sidebar-description">
-              Why does Ruby have two sorting methods, rather than one?
-            </div>
+            <p class="sidebar">
+              <small>
+                Why does Ruby have two sorting methods, rather than one?
+              </small>
+            </p>
         
 
     </div>
+    <p class='terminal'>
+      <small>&nbsp;</small>
+    </p>
     <hr class="line" />
 
     <div class="external">
