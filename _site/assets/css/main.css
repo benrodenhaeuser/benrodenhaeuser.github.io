@@ -172,7 +172,7 @@
 .highlight .il { color: #999999; }
 
 /* Literal.Number.Integer.Long */
-body { background-color: #fafafa; padding: 50px; font: 18px 'PT Sans', sans-serif; line-height: 36px; color: #595959; font-weight: 400; }
+body { background-color: #fafafa; padding: 50px; font: 18px 'PT Sans', sans-serif; line-height: 30px; color: #595959; font-weight: 400; }
 
 h1 { font-family: 'Anton', serif; }
 
@@ -234,7 +234,7 @@ blockquote { border-left: 1px solid #e5e5e5; margin: 0; padding: 0 0 0 20px; fon
 
 code, pre { font-family: 'Roboto Mono', monospace; color: #333; }
 
-code { font-size: 17px; }
+p code { font-size: 17px; }
 
 pre { position: relative; padding: 8px 15px; padding-right: 13px; padding-left: 13px; margin-left: 2px; margin-right: 2px; border-radius: 0px; border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; overflow-x: auto; font-size: 14px; line-height: 1.7; }
 
