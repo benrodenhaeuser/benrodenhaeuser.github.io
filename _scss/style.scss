@@ -1,4 +1,4 @@
-@import "syntax.scss";
+@import "syntax-highlighting/syntax";
 
 body {
   background-color: #fafafa;
@@ -50,10 +50,6 @@ h2 code {
   color: #FF7F50;
   font-weight: normal;
 }
-
-// h3 headlines are set inline (inline-block), followed by a '.' character, and
-// the following paragraph. for this to work, we need to display p elements
-// preceded by h3 inline as well
 
 h3 {
   display: inline-block;
