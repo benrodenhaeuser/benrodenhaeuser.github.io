@@ -1,13 +1,2 @@
-<!doctype html>
-<html lang="{{ site.lang | default: "en-US" }}">
-  {% include head.html %}
-  <body>
-    <div class="wrapper">
-      {% assign page = site.posts.first %}
-      {% include content.html %}
-      {% include header.html %}
-      {% include footer.html %}
-    </div>
-    <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
-  </body>
-</html>
+{% assign page = site.posts.first %}
+{% include base.html %}

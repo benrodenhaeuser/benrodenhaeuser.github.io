@@ -3,10 +3,15 @@
 
 // FONT SIZES
 // 12 (very small) - 14 (smallish) - 15 (small) - 18 (regular) - 27 (h1)
+// How to express as a scale?
+
+// VARIABLES
 
 $basefont: 18px;
 $baseline: 30px;
 $bodycolor: #595959;
+
+// ALL THE REST
 
 body {
   background-color: #fafafa;
@@ -52,7 +57,7 @@ h2 code {
 
 h3 {
   display: inline-block;
-  margin-top: 0.74 * $baseline;
+  margin-top: 22px; // fixes a positioning inconsistency
   line-height: $baseline;
   font-size: $basefont;
   font-weight: bold;

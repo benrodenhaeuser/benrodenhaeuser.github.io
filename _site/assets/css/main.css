@@ -202,7 +202,7 @@ h2.sidebar { font-size: 21.6px; line-height: 21.6px; margin-top: 22.2px; }
 
 h2 code { color: #FF7F50; font-weight: normal; }
 
-h3 { display: inline-block; margin-top: 22.2px; line-height: 30px; font-size: 18px; font-weight: bold; color: #303030; }
+h3 { display: inline-block; margin-top: 22px; line-height: 30px; font-size: 18px; font-weight: bold; color: #303030; }
 
 h3:after { content: "."; padding-right: 2px; }
 
