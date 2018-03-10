@@ -200,7 +200,9 @@ h2 { line-height: 27px; font-size: 27px; font-weight: bold; margin-top: 45px; co
 
 h2.sidebar { font-size: 21.6px; line-height: 21.6px; margin-top: 22.2px; }
 
-p.sidebar { line-height: 18px; margin-top: 7.5px; }
+p.sidebar { line-height: 18px; font-size: 14px; margin-top: 7.5px; }
+
+.description { font-size: 15px; line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
 
 h2 code { color: #FF7F50; font-weight: normal; }
 
@@ -217,8 +219,6 @@ a code:hover { color: #494949; }
 .external { margin-top: 40px; }
 
 img.mark { height: 25px; }
-
-.description { font-size: 15px; line-height: 45px; }
 
 .content { margin-top: 45px; }
 

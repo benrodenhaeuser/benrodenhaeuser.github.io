@@ -44,8 +44,19 @@ h2.sidebar {
 
 p.sidebar {
   line-height: $basefont;
+  font-size: 14px;
   margin-top: 0.25 * $baseline;
 }
+
+.description {
+  font-size: 15px;
+  line-height: 0.8 * $baseline;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+
+// 12 - 14 - 15 - 18 ???
 
 // h2.sidebar {
 //   margin-bottom: 10px;
@@ -104,11 +115,6 @@ a code:hover {
 
 img.mark {
   height: 25px;
-}
-
-.description {
-  font-size: 15px;
-  line-height: 45px;
 }
 
 .content {
@@ -224,9 +230,6 @@ img {
 header {
   width:328px;
   float:right;
-  // position: absolute;
-  // top: 58px;
-  // left: 900px;
   -webkit-font-smoothing:subpixel-antialiased;
 }
 
@@ -247,12 +250,6 @@ small {
   color: $bodycolor;
   font-weight: normal;
 }
-
-// hr {
-//   // background:#e5e5e5;
-//   // height:3x;
-//   // margin:0 0 20px;
-// }
 
 hr.line {
   border:0;
@@ -293,10 +290,6 @@ pre.highlight {
   padding-right: 0;
 }
 
-
-// background color: #f8f8f8
-// border color: #e5e5e5
-
 @media print, screen and (max-width: 1150px) {
 
   div.wrapper {
@@ -310,14 +303,7 @@ pre.highlight {
     width:auto;
   }
 
-  // header {
-  //   padding-right:320px;
-  // }
-
   section {
-    // border:1px solid #e5e5e5;
-    // border-width:1px 0;
-    // padding:20px 0;
     margin:0 0 20px;
   }
 
