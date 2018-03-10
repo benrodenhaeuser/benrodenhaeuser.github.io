@@ -15,23 +15,17 @@
   <div class="content">
     <hr class="line" />
 
-    <div class="sidebar-content-inner">
-
-
-        {% for post in site.posts %}
-
-            <h2 class="sidebar">
-              <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="sidebar-pad"></span><small>{{ post.date | date_to_string }}</small>
-            </h2>
-            <p class="sidebar">
-                {{ post.description }}
-            </p>
-        {% endfor %}
-
+    <div class="sidebar-content">
+      {% for post in site.posts %}
+      <h2 class="sidebar">
+        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="sidebar-pad"></span><small>{{ post.date | date_to_string }}</small>
+      </h2>
+      <p class="sidebar">
+          {{ post.description }}
+      </p>
+      {% endfor %}
     </div>
-    <p class='terminal'>
-      <small>&nbsp;</small>
-    </p>
+
     <hr class="line" />
 
     <div class="external">
@@ -39,6 +33,5 @@
         <img class="mark" src="/assets/images/GitHub-Mark-64px.png" />
       </a>
     </div>
-    <!-- <p><small><a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p> -->
   </div>
 </header>

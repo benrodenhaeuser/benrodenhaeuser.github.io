@@ -200,10 +200,6 @@ h2 { line-height: 27px; font-size: 27px; font-weight: bold; margin-top: 45px; co
 
 h2.sidebar { font-size: 21.6px; line-height: 21.6px; margin-top: 22.2px; }
 
-p.sidebar { line-height: 18px; font-size: 14px; margin-top: 7.5px; }
-
-.description { font-size: 15px; line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
-
 h2 code { color: #FF7F50; font-weight: normal; }
 
 h3 { display: inline-block; margin-top: 22.2px; line-height: 30px; font-size: 18px; font-weight: bold; color: #303030; }
@@ -212,11 +208,17 @@ h3:after { content: "."; padding-right: 2px; }
 
 h3 + p { display: inline; }
 
+p.sidebar { line-height: 18px; font-size: 14px; margin-top: 7.5px; }
+
+.sidebar-content { margin-bottom: 24px; }
+
+.external { margin-top: 30px; }
+
+.description { font-size: 16.2px; line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
+
 a code { color: #FF7F50; }
 
 a code:hover { color: #494949; }
-
-.external { margin-top: 40px; }
 
 img.mark { height: 25px; }
 
@@ -234,7 +236,7 @@ a:hover, a:focus { color: #494949; }
 
 ul { list-style-type: none; padding-left: 1.3em; }
 
-ul > li:before { content: "—"; /* em dash here */ position: absolute; margin-left: -1.3em; }
+ul > li:before { content: "—"; position: absolute; margin-left: -1.3em; }
 
 a small { color: #777; margin-top: -0.3em; display: block; }
 
