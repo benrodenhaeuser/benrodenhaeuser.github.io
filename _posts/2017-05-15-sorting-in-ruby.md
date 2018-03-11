@@ -45,8 +45,8 @@ First, we observe that we can actually express the above three steps in Ruby cod
 
 ```ruby
 arr.map { |elem| [elem, elem.to_i] } # step (1)
-  .sort { |pair1, pair2| pair1.last <=> pair2.last } # step (2)
-  .map { |pair| pair.first } # step (3)
+   .sort { |pair1, pair2| pair1.last <=> pair2.last } # step (2)
+   .map { |pair| pair.first } # step (3)
 # => ['0', '3', '10']
 ```
 
