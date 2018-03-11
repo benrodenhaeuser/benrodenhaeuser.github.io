@@ -1,6 +1,6 @@
 ---
 title: "Passing Objects"
-description: "Pass by reference or pass by value? Characterizing the object passing strategy followed by Ruby."
+description: "Pass by reference or pass by value? The object passing strategy followed by Ruby."
 ---
 
 The following characterizations come from [this article](http://javadude.com/articles/passbyvalue.htm) and are quoted verbatim.

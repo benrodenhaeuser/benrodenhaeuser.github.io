@@ -17,9 +17,9 @@
 
     <div class="sidebar-content">
       {% for post in site.posts %}
-      <h2 class="sidebar">
+      <h5>
         <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="sidebar-pad"></span><small>{{ post.date | date_to_string }}</small>
-      </h2>
+      </h5>
       <p class="sidebar">
           {{ post.description }}
       </p>

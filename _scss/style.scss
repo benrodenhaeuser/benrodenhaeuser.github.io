@@ -4,37 +4,15 @@
 // Current Font Sizes
 //                                              1.2-scale
 //                   45      h1                 44.78
-// $basefont * 1.5   27      h2                 25.92
-// $basefont * 1.2   21.6    h2.sidebar         21.6
-// $basefont         18      p, h3              18
-// $basefont * 0.9   16.2    description        15
-//                   14      p.sidebar, pre     12.5
-//                   12      small              10.4
-
-
-// 1.125 scale ...
-
-// 46...
-// 41...
-// 36...
-// 32...
-// 28.833
-// 25.629
-// 22.781
-// 20.25
-// 18
-// 16
-// 14.2
-// 12.642
-// 11.237
-
-// VARIABLES
+// $basefont * 1.5   25.5    h2                 25.92
+// $basefont * 1.2   20.4    h5 (sidebar)       121.6
+// $basefont         17      p, h3              18
+//                   14      p.sidebar, pre
+//                   12      small (for dates)
 
 $basefont: 17px;
 $baseline: 30px;
 $bodycolor: #595959;
-
-// ALL THE REST
 
 body {
   background-color: #fafafa;
@@ -64,12 +42,14 @@ h2 {
   font-weight: bold;
   margin-top: 1.5 * $baseline;
   color: #FF7F50;
-  font-weight: bold;
 }
 
-h2.sidebar {
+h5 {
+  line-height: 1.5 * $basefont;
+  font-weight: bold;
   font-size: 1.2 * $basefont;
   margin-top: 0.74 * $baseline;
+  color: #FF7F50;
 }
 
 h2 code {
@@ -111,7 +91,6 @@ p.sidebar {
 }
 
 .description {
-  font-size: $basefont;
   line-height: 0.8 * $baseline;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -374,3 +353,12 @@ pre.highlight {
     color:#444;
   }
 }
+
+// body {
+//   counter-reset: h2counter;
+// }
+//
+// h2:before {
+//   content: counter(h2counter) "." "\0000a0\0000a0";
+//   counter-increment: h2counter;
+// }

@@ -196,9 +196,9 @@ h1 { color: #303030; font-family: 'Anton', serif; font-weight: normal; font-size
 
 a h1:hover { color: #FF7F50; }
 
-h2 { line-height: 25.5px; font-size: 25.5px; font-weight: bold; margin-top: 45px; color: #FF7F50; font-weight: bold; }
+h2 { line-height: 25.5px; font-size: 25.5px; font-weight: bold; margin-top: 45px; color: #FF7F50; }
 
-h2.sidebar { font-size: 20.4px; margin-top: 22.2px; }
+h5 { line-height: 25.5px; font-weight: bold; font-size: 20.4px; margin-top: 22.2px; color: #FF7F50; }
 
 h2 code { color: #FF7F50; font-weight: normal; }
 
@@ -214,7 +214,7 @@ p.sidebar { line-height: 19.98px; font-size: 14px; margin-top: 7.5px; margin-bot
 
 .external { margin-top: 30px; }
 
-.description { font-size: 17px; line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
+.description { line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
 
 .site-description { font-size: 15.3px; text-transform: uppercase; letter-spacing: 3px; }
 
