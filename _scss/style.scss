@@ -1,14 +1,37 @@
 @import "reset/whitespace_reset";
 @import "syntax-highlighting/syntax";
 
-// FONT SIZES
-// 12 (very small) - 14 (smallish) - 15 (small) - 18 (regular) - 27 (h1)
-// How to express as a scale?
+// Current Font Sizes
+//                                              1.2-scale
+//                   45      h1                 44.78
+// $basefont * 1.5   27      h2                 25.92
+// $basefont * 1.2   21.6    h2.sidebar         21.6
+// $basefont         18      p, h3              18
+// $basefont * 0.9   16.2    description        15
+//                   14      p.sidebar, pre     12.5
+//                   12      small              10.4
+
+
+// 1.125 scale ...
+
+// 46...
+// 41...
+// 36...
+// 32...
+// 28.833
+// 25.629
+// 22.781
+// 20.25
+// 18
+// 16
+// 14.2
+// 12.642
+// 11.237
 
 // VARIABLES
 
-$basefont: 18px;
-$baseline: 30px;
+$basefont: 17px;
+$baseline: 30px; // this is more like the base line-height
 $bodycolor: #595959;
 
 // ALL THE REST
@@ -16,7 +39,7 @@ $bodycolor: #595959;
 body {
   background-color: #fafafa;
   color: $bodycolor;
-  font-family: 'PT Sans', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-size: $basefont;
   font-weight: normal;
   line-height: $baseline;
@@ -57,7 +80,7 @@ h2 code {
 
 h3 {
   display: inline-block;
-  margin-top: 22px; // fixes a positioning inconsistency
+  margin-top: 0.74 * $baseline;
   line-height: $baseline;
   font-size: $basefont;
   font-weight: bold;
