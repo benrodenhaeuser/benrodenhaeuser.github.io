@@ -6,7 +6,7 @@ description: "Building a toy version of a popular Ruby framework from the ground
 
 We are going to develop our toy version of Sinatra in a number of iterations, starting "tiny", and building towards "small". This corresponds to how I built Frankie, too, even though this blog post makes the process perhaps appear a little more orderly than it really was.
 
-## 01. Hello Frankie
+## Hello Frankie
 
 At its core, Sinatra is (1) a mechanism for storing routes, and (2) a mechanism for handling requests based on the routes stored. So this is where we start.
 
@@ -91,7 +91,7 @@ class Application
 end
 ```
 
-## 02. Frankie goes top level
+## Frankie goes top level
 
 
 New module `Frankie::Delegator`:
@@ -148,7 +148,7 @@ module Templates
 end
 ```
 
-## 03. Frankie recognizes patterns
+## Frankie recognizes patterns
 
 Change the `route` class method, and add `compile` class method:
 
@@ -204,7 +204,7 @@ class Application
 end
 ```
 
-## 04. Frankie plays catch
+## Frankie plays catch
 
 The `Application#call` method used to invoke the `Application#route!` method. It now reads `catch(:halt) { dispatch! }`:
 
@@ -270,7 +270,7 @@ class Application
 end
 ```
 
-## 05. Frankie likes cookies
+## Frankie likes cookies
 
 Setting up middleware
 
@@ -360,7 +360,7 @@ class Application
 end
 ```
 
-## 06. Frankie returns
+## Frankie returns
 
 For flexible return values, we need to introduce one additional level of indirection. Within the `call!` method, we invoke `invoke`:
 

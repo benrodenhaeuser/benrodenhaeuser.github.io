@@ -198,7 +198,7 @@ a h1:hover { color: #FF7F50; }
 
 h2 { line-height: 25.5px; font-size: 25.5px; font-weight: bold; margin-top: 45px; color: #FF7F50; font-weight: bold; }
 
-h2.sidebar { font-size: 20.4px; line-height: 20.4px; margin-top: 22.2px; }
+h2.sidebar { font-size: 20.4px; margin-top: 22.2px; }
 
 h2 code { color: #FF7F50; font-weight: normal; }
 
@@ -208,19 +208,21 @@ h3:after { content: "."; padding-right: 2px; }
 
 h3 + p { display: inline; }
 
-p.sidebar { line-height: 17px; font-size: 14px; margin-top: 7.5px; }
+p.sidebar { line-height: 19.98px; font-size: 14px; margin-top: 7.5px; margin-bottom: 30px; }
 
 .sidebar-content { margin-bottom: 24px; }
 
 .external { margin-top: 30px; }
 
-.description { font-size: 15.3px; line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
+.description { font-size: 17px; line-height: 24px; margin-top: 10px; margin-bottom: 10px; }
+
+.site-description { font-size: 15.3px; text-transform: uppercase; letter-spacing: 3px; }
 
 a code { color: #FF7F50; }
 
 a code:hover { color: #494949; }
 
-img.mark { height: 25px; }
+img.mark { height: 22px; }
 
 .content { margin-top: 45px; }
 

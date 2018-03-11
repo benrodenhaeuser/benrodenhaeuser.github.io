@@ -31,7 +31,7 @@
 // VARIABLES
 
 $basefont: 17px;
-$baseline: 30px; // this is more like the base line-height
+$baseline: 30px;
 $bodycolor: #595959;
 
 // ALL THE REST
@@ -69,7 +69,6 @@ h2 {
 
 h2.sidebar {
   font-size: 1.2 * $basefont;
-  line-height: 1.2 * $basefont;
   margin-top: 0.74 * $baseline;
 }
 
@@ -97,9 +96,10 @@ h3+p {
 }
 
 p.sidebar {
-  line-height: $basefont;
+  line-height: 0.666 * $baseline; // 3 lines are the same as 2 normal lines.
   font-size: 14px;
   margin-top: 0.25 * $baseline;
+  margin-bottom: $baseline;
 }
 
 .sidebar-content{
@@ -111,10 +111,16 @@ p.sidebar {
 }
 
 .description {
-  font-size: 0.9 * $basefont;
+  font-size: $basefont;
   line-height: 0.8 * $baseline;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+.site-description {
+  font-size: 0.9 * $basefont;
+  text-transform: uppercase;
+  letter-spacing: 3px;
 }
 
 a code {
@@ -126,7 +132,7 @@ a code:hover {
 }
 
 img.mark {
-  height: 25px;
+  height: 22px;
 }
 
 .content {
