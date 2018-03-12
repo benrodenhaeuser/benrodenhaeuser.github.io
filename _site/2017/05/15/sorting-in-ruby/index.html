@@ -107,8 +107,8 @@
 2
 3
 4</pre></td><td class="code"><pre><span class="n">arr</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">elem</span><span class="o">|</span> <span class="p">[</span><span class="n">elem</span><span class="p">,</span> <span class="n">elem</span><span class="p">.</span><span class="nf">to_i</span><span class="p">]</span> <span class="p">}</span> <span class="c1"># step (1)</span>
-  <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span> <span class="c1"># step (2)</span>
-  <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span> <span class="c1"># step (3)</span>
+   <span class="p">.</span><span class="nf">sort</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair1</span><span class="p">,</span> <span class="n">pair2</span><span class="o">|</span> <span class="n">pair1</span><span class="p">.</span><span class="nf">last</span> <span class="o">&lt;=&gt;</span> <span class="n">pair2</span><span class="p">.</span><span class="nf">last</span> <span class="p">}</span> <span class="c1"># step (2)</span>
+   <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="p">.</span><span class="nf">first</span> <span class="p">}</span> <span class="c1"># step (3)</span>
 <span class="c1"># =&gt; ['0', '3', '10']</span>
 </pre></td></tr></tbody></table>
 </div>
@@ -221,10 +221,10 @@
     <div class="sidebar-content">
       
       <h5>
-        <a class="post-link" href="/2018/03/11/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>11 Mar 2018</small>
+        <a class="post-link" href="/2018/03/12/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>12 Mar 2018</small>
       </h5>
       <p class="sidebar">
-          Building a toy version of a popular Ruby framework from the ground up.
+          Building a toy version of a Ruby web framework from the ground up.
       </p>
       
       <h5>
@@ -268,4 +268,5 @@
     <script src="/assets/js/scale.fix.js"></script>
   </body>
 </html>
+  
 

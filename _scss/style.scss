@@ -64,6 +64,7 @@ h3 {
   font-size: $basefont;
   font-weight: bold;
   color: #303030;
+  vertical-align: bottom;
 }
 
 h3:after {
@@ -73,6 +74,7 @@ h3:after {
 
 h3+p {
   display: inline;
+  vertical-align: bottom;
 }
 
 p.sidebar {

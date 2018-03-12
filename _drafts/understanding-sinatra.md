@@ -1,6 +1,6 @@
 ---
 title: "Understanding Sinatra"
-description: "Building a toy version of a popular Ruby framework from the ground up."
+description: "Building a toy version of a Ruby web framework from the ground up."
 ---
 
 

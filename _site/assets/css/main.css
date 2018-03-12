@@ -202,11 +202,11 @@ h5 { line-height: 25.5px; font-weight: bold; font-size: 20.4px; margin-top: 22.2
 
 h2 code { color: #FF7F50; font-weight: normal; }
 
-h3 { display: inline-block; margin-top: 22.2px; line-height: 30px; font-size: 17px; font-weight: bold; color: #303030; }
+h3 { display: inline-block; margin-top: 22.2px; line-height: 30px; font-size: 17px; font-weight: bold; color: #303030; vertical-align: bottom; }
 
 h3:after { content: "."; padding-right: 2px; }
 
-h3 + p { display: inline; }
+h3 + p { display: inline; vertical-align: bottom; }
 
 p.sidebar { line-height: 19.98px; font-size: 14px; margin-top: 7.5px; margin-bottom: 30px; }
 
