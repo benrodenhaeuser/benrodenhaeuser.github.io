@@ -1,15 +1,23 @@
 @import "reset/whitespace_reset";
 @import "syntax-highlighting/syntax";
 
-// Font Sizes (1.2 scale)
+// Font Sizes (1.2 scale), baseline: 17px/18px
 //
-// 24.48   h2                 24.48
-// 20.4    h5 (sidebar)       20.4
-// 17      p, h3              17
-// 14.1    p.sidebar, pre
-// 11.8    small
+// 17px                                        18px
+//
+// 24.48   h2                         epsilon  25.9
+// 20.4    h5 (sidebar)               delta    21.6
+// 17      p, h3                      gamma    18
+// 14.1    p.sidebar, pre             beta     15
+// 11.8    <small>                    alpha    12.5
 
-$basefont: 17px;
+// Margins (baseline 30px)
+
+// Baseline multiples:
+// 2 * baseline (body margin)
+// baseline (body lineheight)
+
+$basefont: 18px;
 $baseline: 30px;
 $bodycolor: #595959;
 
@@ -39,7 +47,7 @@ h2 {
   line-height: 1.2 * 1.2 * $basefont;
   font-size: 1.2 * 1.2 * $basefont;
   font-weight: bold;
-  margin-top: 1.2 * 1.2 * $baseline;
+  margin-top: 1.2 * 1.2 * $baseline; // really?
   color: #FF7F50;
 }
 
