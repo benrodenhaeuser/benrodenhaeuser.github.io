@@ -153,7 +153,7 @@ And this is really all there is to it! Specializing the capabilities of `SetMap`
 
 Of course, we have not yet demonstrated what the interface for `SetMap` actually looks like. But from now on, we will write methods that work equally well for all three set types under consideration: classical sets, fuzzy sets, and multisets.
 
-### Key insertion.
+### Key insertion
 
 The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the `SetMap#insert` method:
 

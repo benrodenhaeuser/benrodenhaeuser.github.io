@@ -3,7 +3,6 @@ title: "Understanding Sinatra"
 description: "Building a toy version of a Ruby web framework from the ground up."
 ---
 
-
 We are going to develop our toy version of Sinatra in a number of iterations, starting "tiny", and building towards "small". This corresponds to how I built Frankie, too, even though this blog post makes the process perhaps appear a little more orderly than it really was.
 
 ## Hello Frankie
@@ -34,7 +33,7 @@ class Application
         block: block
       }
     end
-  end
+  end 
 end
 ```
 
