@@ -337,7 +337,8 @@ pre.highlight {
 
 @media print, screen and (max-width: 480px) {
   body {
-    padding:15px;
+    padding: 15px;
+    margin: 60px 0;
   }
 
   header ul {
@@ -356,12 +357,3 @@ pre.highlight {
     color:#444;
   }
 }
-
-// body {
-//   counter-reset: h2counter;
-// }
-//
-// h2:before {
-//   content: counter(h2counter) "." "\0000a0\0000a0";
-//   counter-increment: h2counter;
-// }
