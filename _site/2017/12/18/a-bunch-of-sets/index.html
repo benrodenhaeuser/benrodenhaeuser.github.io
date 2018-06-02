@@ -66,25 +66,39 @@
 
 <p>Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word “learner” could be represented by the set</p>
 
-<script type="math/tex; mode=display">\lbrace a, e, l, r, n \rbrace.</script>
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">a,</span><span class="w"> </span><span class="err">e,</span><span class="w"> </span><span class="err">l,</span><span class="w"> </span><span class="err">r,</span><span class="w"> </span><span class="err">n</span><span class="w"> </span><span class="p">}</span></code>.</p>
+</blockquote>
 
 <p>The word “learn” corresponds to the same classical set, as it contains the same letters. The word “land”, on the other hand, corresponds to the set</p>
 
-<script type="math/tex; mode=display">\lbrace a, l, n, d \rbrace.</script>
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">a,</span><span class="w"> </span><span class="err">l,</span><span class="w"> </span><span class="err">n,</span><span class="w"> </span><span class="err">d</span><span class="w"> </span><span class="p">}</span></code>.</p>
+</blockquote>
 
-<p>Taking the intersection of the two sets, which collects the elements occuring in both of them, we obtain the set $\lbrace a, l, n\rbrace$, which captures the overlap of the two words in terms of letters contained—a crude measure of what they have in common. So sets allow us to zoom in on questions of membership, while disregarding other aspects of particular entities we wish to study.</p>
+<p>Taking the intersection of the two sets, which collects the elements occuring in both of them, we obtain the set <code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">a,</span><span class="w"> </span><span class="err">l,</span><span class="w"> </span><span class="err">n</span><span class="w"> </span><span class="p">}</span></code>, which captures the overlap of the two words in terms of letters contained—a crude measure of what they have in common. So sets allow us to zoom in on questions of membership, while disregarding other aspects of particular entities we wish to study.</p>
 
 <h3 id="multisets">Multisets</h3>
 
 <p>Suppose now we would like to count <em>how often</em> letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word “learner” corresponds to the multiset</p>
 
-<script type="math/tex; mode=display">\lbrace a, e, e, l, r, r, n \rbrace</script>
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">a,</span><span class="w"> </span><span class="err">e,</span><span class="w"> </span><span class="err">e,</span><span class="w"> </span><span class="err">l,</span><span class="w"> </span><span class="err">r,</span><span class="w"> </span><span class="err">r,</span><span class="w"> </span><span class="err">n</span><span class="w"> </span><span class="p">}</span></code>.</p>
+</blockquote>
 
-<p>Notice that the word “learn” would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.</p>
+<p>Notice that the word “learn” would be represented by a different multiset, namely</p>
+
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">a,</span><span class="w"> </span><span class="err">e,</span><span class="w"> </span><span class="err">l,</span><span class="w"> </span><span class="err">r,</span><span class="w"> </span><span class="err">n</span><span class="w"> </span><span class="p">}</span></code>.</p>
+</blockquote>
+
+<p>So multisets make finer distinctions than classical sets.</p>
 
 <p>A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word “learner” would be written as</p>
 
-<script type="math/tex; mode=display">\lbrace a: 1, e: 2, l: 1, r: 2, n: 1\rbrace</script>
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">a:</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">e:</span><span class="w"> </span><span class="err">2,</span><span class="w"> </span><span class="err">l:</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">r:</span><span class="w"> </span><span class="err">2,</span><span class="w"> </span><span class="err">n:</span><span class="w"> </span><span class="err">1</span><span class="w"> </span><span class="p">}</span></code></p>
+</blockquote>
 
 <p>In a programming context, the elements of a set (be it a classical set or a multiset) are often called <em>keys</em>. The above multiset has five distinct keys: “a”, “e”, “l”, “r” and “n”. In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the <em>score</em> for that key. The score for the key “e” in the above multiset, for example, is 2.</p>
 
@@ -103,7 +117,9 @@
 
 <p>For the sake of exposition, let us settle on 3 as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or “not similar at all”. Then we can map our edit counts to a scale from 0 to 1, and represent our findings as a fuzzy set which scores the key “learner” with 1.0, “learned” with 0.66, “learn” with 0.33 and “lean” with 0.0, or, using key-value notation:</p>
 
-<script type="math/tex; mode=display">\lbrace\text{learner}: 1.0, \text{learned}: 0.66, \text{learn}: 0.33, \text{lean}: 0.0\rbrace</script>
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">learner:</span><span class="w"> </span><span class="err">1.0,</span><span class="w"> </span><span class="err">learned:</span><span class="w"> </span><span class="err">0.66,</span><span class="w"> </span><span class="err">learn:</span><span class="w"> </span><span class="err">0.33,</span><span class="w"> </span><span class="err">lean:</span><span class="w"> </span><span class="err">0.0</span><span class="w"> </span><span class="p">}</span></code></p>
+</blockquote>
 
 <p>In this fuzzy set, the degree of each element is to be interpreted as the degree of similarity to our target word “learner”.</p>
 
@@ -113,9 +129,11 @@
 
 <h3 id="hash-tables">Hash tables</h3>
 
-<p>What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to 1, while all other objects from a given domain are mapped to 0. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as</p>
+<p>What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to 1, while all other objects from a given domain are mapped to 0. Taking a cue from this, we extend our key-value notation to classical sets, writing the set <code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">0,</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">2</span><span class="w"> </span><span class="p">}</span></code>, for example, as</p>
 
-<script type="math/tex; mode=display">\lbrace 0: 1, 1: 1, 2: 1\rbrace.</script>
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">0:</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">1:</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">2:</span><span class="w"> </span><span class="err">1</span><span class="w"> </span><span class="p">}</span></code>.</p>
+</blockquote>
 
 <p>From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table:</p>
 
@@ -389,18 +407,7 @@
 
 <p>What remains to be implemented is all the interesting operations on sets! The remaining part of the interface will, however, not interact with the internally used hash table directly, but only through the interface developed so far.</p>
 
-<p>For the purpose of implementing those additional operations, we open a new module <code class="highlighter-rouge">SetLike</code>, which we include in <code class="highlighter-rouge">SetMap</code>.</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\begin{matrix}
- && \text{SetLike} & \\
-&& \large\uparrow  \\
-&& \text{SetMap} \\
-&\large\nearrow & \large\uparrow & \large\nwarrow \\
-\text{ClassicalSet} & & \text{MultiSet}&  & \text{FuzzySet}\\
-\end{matrix} %]]></script>
-
-<p>Since our target classes <code class="highlighter-rouge">ClassicalSet</code>, <code class="highlighter-rouge">FuzzySet</code> and <code class="highlighter-rouge">MultiSet</code> inherit from <code class="highlighter-rouge">SetMap</code>, as shown in the above diagram, they will also be able to access the functionality provided by <code class="highlighter-rouge">SetLike</code>.</p>
+<p>For the purpose of implementing those additional operations, we open a new module <code class="highlighter-rouge">SetLike</code>, which we include in <code class="highlighter-rouge">SetMap</code>. Since our target classes <code class="highlighter-rouge">ClassicalSet</code>, <code class="highlighter-rouge">FuzzySet</code> and <code class="highlighter-rouge">MultiSet</code> inherit from <code class="highlighter-rouge">SetMap</code>, they will also be able to access the functionality provided by <code class="highlighter-rouge">SetLike</code>.</p>
 
 <h3 id="division-of-labor">Division of Labor</h3>
 

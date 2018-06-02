@@ -176,10 +176,11 @@ a small {
 }
 
 blockquote {
-  border-left: 1px solid #e5e5e5;
+  // border-left: 1px solid #e5e5e5;
+  // font-style:italic;
   margin:0;
   padding:0 0 0 0.66 * $baseline;
-  font-style:italic;
+  text-align: center;
 }
 
 code, pre {
@@ -193,26 +194,19 @@ p code {
 
 pre {
   position: relative;
-  padding:8px 15px;
-  padding-right: 13px;
-  padding-left: 13px;
+  padding: 8px 13px;
   margin-left: 2px;
   margin-right: 2px;
-  border-top:1px solid #e5e5e5;
-  border-bottom:1px solid #e5e5e5;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
   overflow-x: auto;
   font-size: $basefont / 1.2;
   line-height: 1.7;
 }
 
-table {
-  // width:100%;
-  border-collapse:collapse;
-}
-
 th, td {
   text-align:left;
-  padding:5px 10px;
+  padding: 5px 10px;
 }
 
 dt {
@@ -255,21 +249,14 @@ hr.line {
 }
 
 footer {
-  width:260px;
-  float:right;
-  position:fixed;
-  bottom:50px;
-  -webkit-font-smoothing:subpixel-antialiased;
+  width: 260px;
+  float: right;
+  position: fixed;
+  bottom: 50px;
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
-// styling code blocks with line numbers
-
-pre.highlight {
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  border-color: transparent;
-}
+// code blocks
 
 .gutter, .rouge-gutter {
   padding-right: 1px;
@@ -314,24 +301,15 @@ pre.highlight {
 
 @media print, screen and (max-width: 720px) {
   body {
-    word-wrap:break-word;
+    word-wrap: break-word;
   }
 
   header {
-    padding:0;
+    padding: 0;
   }
 
   header ul, header p.view {
-    position:static;
-  }
-
-  pre, code {
-    word-wrap:normal;
-  }
-
-  table {
-    width: 100%;
-    max-width: 100%;
+    position: static;
   }
 }
 
@@ -342,11 +320,11 @@ pre.highlight {
   }
 
   header ul {
-    width:99%;
+    width: 99%;
   }
 
   header li, header ul li + li + li {
-    width:33%;
+    width: 33%;
   }
 }
 
