@@ -11,11 +11,11 @@ Let's first get an overview of the types of collections we are interested in by 
 
 ### Classical Sets
 
-Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word "$\text{learner}$" could be represented by the set
+Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word "learner" could be represented by the set
 
 $$\lbrace a, e, l, r, n \rbrace.$$
 
-Incidentally, the word "$\text{learn}$" corresponds to the same classical set, as it contains the same letters. The word "$\text{land}$", on the other hand, corresponds to the set
+The word "learn" corresponds to the same classical set, as it contains the same letters. The word "land", on the other hand, corresponds to the set
 
 $$\lbrace a, l, n, d \rbrace.$$
 
@@ -23,30 +23,30 @@ Taking the intersection of the two sets, which collects the elements occuring in
 
 ### Multisets
 
-Suppose now we would like to count *how often* letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word "$\text{learner}$" corresponds to the multiset
+Suppose now we would like to count *how often* letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word "learner" corresponds to the multiset
 
 $$\lbrace a, e, e, l, r, r, n \rbrace$$
 
-Notice that the word "$\text{learn}$" would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.
+Notice that the word "learn" would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.
 
-A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word "$\text{learner}$" would be written as
+A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word "learner" would be written as
 
 $$\lbrace a: 1, e: 2, l: 1, r: 2, n: 1\rbrace$$
 
-In a programming context, the elements of a set (be it a classical set or a multiset) are often called *keys*. The above multiset has five distinct keys: $a$, $e$, $l$, $r$ and $n$. In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the *score* for that key. The score for the key $e$ in the above multiset, for example, is $2$.
+In a programming context, the elements of a set (be it a classical set or a multiset) are often called *keys*. The above multiset has five distinct keys: "a", "e", "l", "r" and "n". In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the *score* for that key. The score for the key "e" in the above multiset, for example, is 2.
 
 ### Fuzzy sets
 
 Fuzzy sets also make finer distinctions compared to classical sets. However, they generalize classical sets in a different direction. As we just saw, in a multiset, the score for a particular key represents *multiplicity* of membership (how many times does the key occur in the set?). In a fuzzy set, the score indicates *degree of membership*. So besides an element being "fully contained" in the set or "not contained", it may also be "partially contained" in the set, so to speak.
 
-To see how this can be useful, take this example: consider the words "$\text{learner}$", "$\text{learn}$", "$\text{learned}$", and "$\text{lean}$". We might wish to capture how similar each of these words is to some other word, let's say the word "$\text{learner}$" again. The similarity of "$\text{learner}$" to itself is perfect, since no edit (letter change) is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word "$\text{learned}$" is very similar to "$\text{learner}$" – substituting the last letter will transform the former into the latter. "$\text{learn}$" is also very similar to "$\text{learner}$", but a little less so – deleting the last two letters from "$\text{learner}$" results in "$\text{learner}$", requiring two steps rather than one. The word "$\text{lean}$" is again a bit less similar to "$\text{learner}$", requiring one additional deletion. So to transform each of the words given into "$\text{learner}$" requires:  
+To see how this can be useful, take this example: consider the words "learner", "learn", "learned", and "lean". We might wish to capture how similar each of these words is to some other word, let's say the word "learner" again. The similarity of "learner" to itself is perfect, since no edit (letter change) is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word "learned" is very similar to "learner" – substituting the last letter will transform the former into the latter. "learn" is also very similar to "learner", but a little less so – deleting the last two letters from "learner" results in "learner", requiring two steps rather than one. The word "lean" is again a bit less similar to "learner", requiring one additional deletion. So to transform each of the words given into "learner" requires:  
 
-- "$\text{learner}$": $0$ edits
-- "$\text{learned}$": $1$ edit
-- "$\text{learn}$": $2$ edits
-- "$\text{lean}$": $3$ edits
+- "learner": 0 edits
+- "learned": 1 edit
+- "learn": 2 edits
+- "lean": 3 edits
 
-For the sake of exposition, let us settle on $3$ as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or "not similar at all". Then we can map our edit counts to a scale from $0$ to $1$, and represent our findings as a fuzzy set which scores the key "$\text{learner}$" with $1.0$, "$\text{learned}$" with $0.66$, "$\text{learn}$" with $0.33$ and "$\text{lean}$" with $0.0$, or, using key-value notation:
+For the sake of exposition, let us settle on 3 as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or "not similar at all". Then we can map our edit counts to a scale from 0 to 1, and represent our findings as a fuzzy set which scores the key "learner" with 1.0, "learned" with 0.66, "learn" with 0.33 and "lean" with 0.0, or, using key-value notation:
 
 $$\lbrace\text{learner}: 1.0, \text{learned}: 0.66, \text{learn}: 0.33, \text{lean}: 0.0\rbrace$$
 
@@ -58,7 +58,9 @@ Equipped with some basic understanding of our problem domain, let us begin to de
 
 ### Hash tables
 
-What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a *characteristic function*, which maps the members of the set to $1$, while all other objects from a given domain are mapped to $0$. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.
+What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a *characteristic function*, which maps the members of the set to 1, while all other objects from a given domain are mapped to 0. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as
+
+$$\lbrace 0: 1, 1: 1, 2: 1\rbrace.$$
 
 From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table:
 
@@ -85,9 +87,9 @@ Besides the `@hash` instance variable, we also decide to maintain an instance va
 
 What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:
 
-- A classical set either contains or does not contain a particular key, so the only valid scores are $0$ and $1$.
-- A multiset may contain a given key $n$ times, where $n$ is a non-negative integer.
-- A fuzzy set scores a given key to a degree in the unit interval from $0$ to $1$.
+- A classical set either contains or does not contain a particular key, so the only valid scores are 0 and 1.
+- A multiset may contain a given key `n` times, where `n` is a non-negative integer.
+- A fuzzy set scores a given key to a degree in the unit interval from 0 to 1.
 
 So in each case, we have to be able to express a range of possible values. We set up a bunch of class methods and class instance variables for this purpose:
 
@@ -137,7 +139,7 @@ class FuzzySet < SetMap
 end
 ```
 
-So any `Numeric` instance in the closed interval $[0, 1]$ is a valid score for a fuzzy set key (we choose `Numeric` so as to allow both floats and integers). Finally, for multisets:
+So any `Numeric` instance in the closed interval `[0, 1]` is a valid score for a fuzzy set key (we choose `Numeric` so as to allow both floats and integers). Finally, for multisets:
 
 ```ruby
 class MultiSet < SetMap
@@ -355,7 +357,7 @@ Our model captures all of this correctly.
 
 ### Set predicates
 
-A classical set $A$ is a subset of a classical set of $B$ if any element of $A$ is also an element of $B$. This can be expressed in terms of keys and their associated scores by saying that the score for any key in $A$ is less than or equal to the score for that same key in $B$. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the `SetLike#subset?` method:
+A classical set `A` is a subset of a classical set of `B` if any element of `A` is also an element of `B`. This can be expressed in terms of keys and their associated scores by saying that the score for any key in `A` is less than or equal to the score for that same key in `B`. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the `SetLike#subset?` method:
 
 ```ruby
 def subset?(other)
@@ -399,7 +401,7 @@ Definitions for the other common set predicates (`proper_subset?`, `superset?` a
 
 ### Equivalence
 
-When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking `subset?` twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the `compare_with?` method defined above, we can more simply write the following code:
+When are two sets `A` and `B` the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., `A` should be a subset of `B`, and `B` a subset of `A`. However, invoking `subset?` twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the `compare_with?` method defined above, we can more simply write the following code:
 
 ```ruby
 def equivalent?(other)

@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <title>Ben Rodenhäuser | Notes on programming</title>
 
-  <link href="https://fonts.googleapis.com/css?family=Lato|Anton|Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Anton|Roboto Mono" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/main.css?v=">
   <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -19,7 +19,7 @@
   </script>
   <script src="/assets/jax/config.js"></script>
 
-  <meta name="viewport" content="width=device-width">
+  <!-- <meta name="viewport" content="width=device-width"> -->
   <!--[if lt IE 9]>
   <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
@@ -64,11 +64,11 @@
 
 <h3 id="classical-sets">Classical Sets</h3>
 
-<p>Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word “$\text{learner}$” could be represented by the set</p>
+<p>Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word “learner” could be represented by the set</p>
 
 <script type="math/tex; mode=display">\lbrace a, e, l, r, n \rbrace.</script>
 
-<p>Incidentally, the word “$\text{learn}$” corresponds to the same classical set, as it contains the same letters. The word “$\text{land}$”, on the other hand, corresponds to the set</p>
+<p>The word “learn” corresponds to the same classical set, as it contains the same letters. The word “land”, on the other hand, corresponds to the set</p>
 
 <script type="math/tex; mode=display">\lbrace a, l, n, d \rbrace.</script>
 
@@ -76,32 +76,32 @@
 
 <h3 id="multisets">Multisets</h3>
 
-<p>Suppose now we would like to count <em>how often</em> letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word “$\text{learner}$” corresponds to the multiset</p>
+<p>Suppose now we would like to count <em>how often</em> letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word “learner” corresponds to the multiset</p>
 
 <script type="math/tex; mode=display">\lbrace a, e, e, l, r, r, n \rbrace</script>
 
-<p>Notice that the word “$\text{learn}$” would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.</p>
+<p>Notice that the word “learn” would be represented by a different multiset, namely $\lbrace a, e, l, r, n \rbrace$. So multisets make finer distinctions than classical sets.</p>
 
-<p>A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word “$\text{learner}$” would be written as</p>
+<p>A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word “learner” would be written as</p>
 
 <script type="math/tex; mode=display">\lbrace a: 1, e: 2, l: 1, r: 2, n: 1\rbrace</script>
 
-<p>In a programming context, the elements of a set (be it a classical set or a multiset) are often called <em>keys</em>. The above multiset has five distinct keys: $a$, $e$, $l$, $r$ and $n$. In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the <em>score</em> for that key. The score for the key $e$ in the above multiset, for example, is $2$.</p>
+<p>In a programming context, the elements of a set (be it a classical set or a multiset) are often called <em>keys</em>. The above multiset has five distinct keys: “a”, “e”, “l”, “r” and “n”. In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the <em>score</em> for that key. The score for the key “e” in the above multiset, for example, is 2.</p>
 
 <h3 id="fuzzy-sets">Fuzzy sets</h3>
 
 <p>Fuzzy sets also make finer distinctions compared to classical sets. However, they generalize classical sets in a different direction. As we just saw, in a multiset, the score for a particular key represents <em>multiplicity</em> of membership (how many times does the key occur in the set?). In a fuzzy set, the score indicates <em>degree of membership</em>. So besides an element being “fully contained” in the set or “not contained”, it may also be “partially contained” in the set, so to speak.</p>
 
-<p>To see how this can be useful, take this example: consider the words “$\text{learner}$”, “$\text{learn}$”, “$\text{learned}$”, and “$\text{lean}$”. We might wish to capture how similar each of these words is to some other word, let’s say the word “$\text{learner}$” again. The similarity of “$\text{learner}$” to itself is perfect, since no edit (letter change) is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word “$\text{learned}$” is very similar to “$\text{learner}$” – substituting the last letter will transform the former into the latter. “$\text{learn}$” is also very similar to “$\text{learner}$”, but a little less so – deleting the last two letters from “$\text{learner}$” results in “$\text{learner}$”, requiring two steps rather than one. The word “$\text{lean}$” is again a bit less similar to “$\text{learner}$”, requiring one additional deletion. So to transform each of the words given into “$\text{learner}$” requires:</p>
+<p>To see how this can be useful, take this example: consider the words “learner”, “learn”, “learned”, and “lean”. We might wish to capture how similar each of these words is to some other word, let’s say the word “learner” again. The similarity of “learner” to itself is perfect, since no edit (letter change) is required to transform one into the other. They are the same, after all. On to the more interesting cases: the word “learned” is very similar to “learner” – substituting the last letter will transform the former into the latter. “learn” is also very similar to “learner”, but a little less so – deleting the last two letters from “learner” results in “learner”, requiring two steps rather than one. The word “lean” is again a bit less similar to “learner”, requiring one additional deletion. So to transform each of the words given into “learner” requires:</p>
 
 <ul>
-  <li>”$\text{learner}$”: $0$ edits</li>
-  <li>”$\text{learned}$”: $1$ edit</li>
-  <li>”$\text{learn}$”: $2$ edits</li>
-  <li>”$\text{lean}$”: $3$ edits</li>
+  <li>“learner”: 0 edits</li>
+  <li>“learned”: 1 edit</li>
+  <li>“learn”: 2 edits</li>
+  <li>“lean”: 3 edits</li>
 </ul>
 
-<p>For the sake of exposition, let us settle on $3$ as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or “not similar at all”. Then we can map our edit counts to a scale from $0$ to $1$, and represent our findings as a fuzzy set which scores the key “$\text{learner}$” with $1.0$, “$\text{learned}$” with $0.66$, “$\text{learn}$” with $0.33$ and “$\text{lean}$” with $0.0$, or, using key-value notation:</p>
+<p>For the sake of exposition, let us settle on 3 as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or “not similar at all”. Then we can map our edit counts to a scale from 0 to 1, and represent our findings as a fuzzy set which scores the key “learner” with 1.0, “learned” with 0.66, “learn” with 0.33 and “lean” with 0.0, or, using key-value notation:</p>
 
 <script type="math/tex; mode=display">\lbrace\text{learner}: 1.0, \text{learned}: 0.66, \text{learn}: 0.33, \text{lean}: 0.0\rbrace</script>
 
@@ -113,7 +113,9 @@
 
 <h3 id="hash-tables">Hash tables</h3>
 
-<p>What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to $1$, while all other objects from a given domain are mapped to $0$. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as $\lbrace 0: 1, 1: 1, 2: 1\rbrace$.</p>
+<p>What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to 1, while all other objects from a given domain are mapped to 0. Taking a cue from this, we extend our key-value notation to classical sets, writing the set $\lbrace 0, 1, 2\rbrace$, for example, as</p>
+
+<script type="math/tex; mode=display">\lbrace 0: 1, 1: 1, 2: 1\rbrace.</script>
 
 <p>From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table:</p>
 
@@ -150,9 +152,9 @@
 <p>What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
 
 <ul>
-  <li>A classical set either contains or does not contain a particular key, so the only valid scores are $0$ and $1$.</li>
-  <li>A multiset may contain a given key $n$ times, where $n$ is a non-negative integer.</li>
-  <li>A fuzzy set scores a given key to a degree in the unit interval from $0$ to $1$.</li>
+  <li>A classical set either contains or does not contain a particular key, so the only valid scores are 0 and 1.</li>
+  <li>A multiset may contain a given key <code class="highlighter-rouge">n</code> times, where <code class="highlighter-rouge">n</code> is a non-negative integer.</li>
+  <li>A fuzzy set scores a given key to a degree in the unit interval from 0 to 1.</li>
 </ul>
 
 <p>So in each case, we have to be able to express a range of possible values. We set up a bunch of class methods and class instance variables for this purpose:</p>
@@ -230,7 +232,7 @@
 </div>
 </div>
 
-<p>So any <code class="highlighter-rouge">Numeric</code> instance in the closed interval $[0, 1]$ is a valid score for a fuzzy set key (we choose <code class="highlighter-rouge">Numeric</code> so as to allow both floats and integers). Finally, for multisets:</p>
+<p>So any <code class="highlighter-rouge">Numeric</code> instance in the closed interval <code class="highlighter-rouge">[0, 1]</code> is a valid score for a fuzzy set key (we choose <code class="highlighter-rouge">Numeric</code> so as to allow both floats and integers). Finally, for multisets:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -251,7 +253,7 @@
 
 <p>Of course, we have not yet demonstrated what the interface for <code class="highlighter-rouge">SetMap</code> actually looks like. But from now on, we will write methods that work equally well for all three set types under consideration: classical sets, fuzzy sets, and multisets.</p>
 
-<h3 id="key-insertion">Key insertion.</h3>
+<h3 id="key-insertion">Key insertion</h3>
 
 <p>The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the <code class="highlighter-rouge">SetMap#insert</code> method:</p>
 
@@ -546,7 +548,7 @@
 
 <h3 id="set-predicates">Set predicates</h3>
 
-<p>A classical set $A$ is a subset of a classical set of $B$ if any element of $A$ is also an element of $B$. This can be expressed in terms of keys and their associated scores by saying that the score for any key in $A$ is less than or equal to the score for that same key in $B$. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the <code class="highlighter-rouge">SetLike#subset?</code> method:</p>
+<p>A classical set <code class="highlighter-rouge">A</code> is a subset of a classical set of <code class="highlighter-rouge">B</code> if any element of <code class="highlighter-rouge">A</code> is also an element of <code class="highlighter-rouge">B</code>. This can be expressed in terms of keys and their associated scores by saying that the score for any key in <code class="highlighter-rouge">A</code> is less than or equal to the score for that same key in <code class="highlighter-rouge">B</code>. This definition also applies to multisets, and fuzzy sets, so that, again, a common implementation is possible. Here is a first stab at the <code class="highlighter-rouge">SetLike#subset?</code> method:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -615,7 +617,7 @@
 
 <h3 id="equivalence">Equivalence</h3>
 
-<p>When are two sets $A$ and $B$ the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., $A$ should be a subset of $B$, and $B$ a subset of $A$. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply write the following code:</p>
+<p>When are two sets <code class="highlighter-rouge">A</code> and <code class="highlighter-rouge">B</code> the same? Again, there is an answer that works for all three target classes: the two sets should be in a mutual inclusion relation, i.e., <code class="highlighter-rouge">A</code> should be a subset of <code class="highlighter-rouge">B</code>, and <code class="highlighter-rouge">B</code> a subset of <code class="highlighter-rouge">A</code>. However, invoking <code class="highlighter-rouge">subset?</code> twice seems slightly redundant, since in the worst case, this amounts to performing every comparison twice. Using the <code class="highlighter-rouge">compare_with?</code> method defined above, we can more simply write the following code:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -720,6 +722,13 @@
     <hr class="line" />
 
     <div class="sidebar-content">
+      
+      <h5>
+        <a class="post-link" href="/2018/06/02/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>02 Jun 2018</small>
+      </h5>
+      <p class="sidebar">
+          Building a toy version of a Ruby web framework from the ground up.
+      </p>
       
       <h5>
         <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>18 Dec 2017</small>

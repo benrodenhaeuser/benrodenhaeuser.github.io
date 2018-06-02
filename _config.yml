@@ -5,6 +5,10 @@ google_analytics: UA-99334571-1
 github: [metadata]
 markdown: kramdown
 highlighter: rouge
+googlefonts:
+  body: Lato
+  display: Anton
+  code: Roboto Mono
 sass:
   sass_dir: _scss
 kramdown:

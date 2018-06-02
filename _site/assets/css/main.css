@@ -250,7 +250,7 @@ blockquote { border-left: 1px solid #e5e5e5; margin: 0; padding: 0 0 0 19.8px; f
 
 code, pre { font-family: 'Roboto Mono', monospace; color: #333; }
 
-p code { font-size: 18px; }
+p code { font-size: 16.2px; }
 
 pre { position: relative; padding: 8px 15px; padding-right: 13px; padding-left: 13px; margin-left: 2px; margin-right: 2px; border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; overflow-x: auto; font-size: 15px; line-height: 1.7; }
 
