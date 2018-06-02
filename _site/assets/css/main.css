@@ -246,7 +246,7 @@ a small { color: #777; margin-top: -0.3em; display: block; }
 
 .wrapper { width: 1150px; margin: 0 auto; }
 
-blockquote { margin: 0; padding: 0 0 0 19.8px; text-align: center; }
+blockquote { margin: 0; padding: 0; text-align: center; }
 
 code, pre { font-family: 'Roboto Mono', monospace; color: #333; }
 
