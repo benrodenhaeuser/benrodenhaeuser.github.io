@@ -13,6 +13,7 @@ body {
   font-weight: normal;
   line-height: $baseline;
   margin: 2 * $baseline;
+  -webkit-text-size-adjust: none;
 }
 
 // todo temp fix
@@ -290,10 +291,6 @@ footer {
 }
 
 @media print, screen and (max-width: 720px) {
-  body {
-    -webkit-text-size-adjust: none;
-  }
-
   header {
     padding: 0;
   }
