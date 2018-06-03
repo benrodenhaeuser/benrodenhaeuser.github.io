@@ -16,7 +16,7 @@ body {
 }
 
 // todo temp fix
-.wrapper { overflow: scroll; }
+// .wrapper { overflow: scroll; }
 
 h1 {
   color: #303030;
@@ -177,6 +177,12 @@ p code {
   font-size: $basefont * 0.9;
 }
 
+.highlight {
+  width: 100%;
+  max-width: 100%;
+  overflow: scroll;
+}
+
 pre:not(.highlight) {
   position: relative;
   padding: 8px 13px;
@@ -184,7 +190,6 @@ pre:not(.highlight) {
   margin-right: 2px;
   border-top: 1px solid #e5e5e5;
   border-bottom: 1px solid #e5e5e5;
-  overflow-x: scroll;
   font-size: $basefont / 1.2;
   line-height: 1.7;
 }

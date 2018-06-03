@@ -41,7 +41,7 @@
       <section>
   <p>
     <small>
-      02 June 2018
+      03 June 2018
     </small>
   </p>
 
@@ -58,10 +58,9 @@
     <div class="content-inner">
       <h2 id="introduction">Introduction</h2>
 
-<blockquote>
-  <p>We are going to develop our toy version of Sinatra in a number of iterations, starting “tiny”, and building towards “small”. This corresponds to how I built Frankie, too, even though this blog post makes the process perhaps appear a little more orderly than it really was. 
-While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinatra code base, I do follow the Sinatra model very very closely. The aim is not to be original. To the contrary, it’s to understand Sinatra by building it from scratch.</p>
-</blockquote>
+<p>This post …</p>
+
+<p>While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinatra code base, I do follow the Sinatra model very very closely. The aim is not to be original. To the contrary, it’s to understand Sinatra by building it from scratch.</p>
 
 <p>Here is what we will be covering:</p>
 
@@ -73,20 +72,21 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
   <li>Rack middleware</li>
 </ul>
 
-<p>On every topic listed above, we will implement a more or less simplified version of core Sinatra functionality. As a result, following along with this post should be a good preparation for digging into the Sinatra code base yourself. My hope is that Frankie could be helpful to some as a launchpad into understanding Sinatra internals.</p>
+<p>On every topic listed above, we will implement a simplified version of core Sinatra functionality. The presentation is in iterations. We start with a super-simple base setting, and start to extend Frankie’s capabilities from there. If you follow along with this post, you should be well-prepared to dig into the Sinatra codebase yourself afterwards.</p>
 
-<p>The version of Frankie linked to at the end of the post has some additional features that I will not discuss in detail in this post:</p>
+<p>Frankie has some additional features that I will not discuss in detail in this post:</p>
 
 <ul>
-  <li>Code organization with view templates</li>
+  <li>Separating logic from presentation with view templates</li>
   <li>Flexible return values for route blocks</li>
-  <li>Flexible control flow with <code class="highlighter-rouge">catch</code>/<code class="highlighter-rouge">throw</code></li>
+  <li>Flexible control flow using <code class="highlighter-rouge">throw</code>/<code class="highlighter-rouge">catch</code></li>
 </ul>
 
-<p>Making sense of these topics should not be too difficult after reading this post.</p>
+<p>If you feel so inclined, skip the following presentation and go straight to Github – the Frankie code with all the features mentioned is <a href="https://github.com/benrodenhaeuser/frankie/blob/master/frankie.rb">here</a> – it’s only 200 or so lines of code.</p>
 
-<h2 id="hello-frankie">Hello Frankie</h2>
+<h2 id="hello-frankie-storing-routes-handling-requests">Hello Frankie: Storing routes, handling requests</h2>
 
+<p><em>Intro:</em></p>
 <ul>
   <li>At its core, Sinatra is (1) a mechanism for storing routes, and (2) a mechanism for handling requests based on the routes stored. So this is where we start.</li>
   <li>Sinatra makes use of the following basic division of labor: storing routes is a class-level concern, but requests are handled by a fresh instance.</li>
@@ -295,7 +295,7 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 
 <p>Well, hello there! We got ourselves a web framework! Of course, the people behind Sinatra like to insist that Sinatra is not a framework. It stands to reason, then, that Frankie is not a framework either. Oh well.</p>
 
-<h2 id="frankie-goes-top-level">Frankie goes top level</h2>
+<h2 id="frankie-goes-top-level-the-dsl">Frankie goes top level: The DSL</h2>
 
 <p>Sinatra is often praised for its elegant top-level DSL. To get a Sinatra application going, all you really need to do is <code class="highlighter-rouge">require 'sinatra'</code> at the top of your file, and go forth writing routes like the following:</p>
 
@@ -370,8 +370,8 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
   <span class="k">class</span> <span class="nc">Application</span>
 	<span class="k">def</span> <span class="nf">route!</span>
 	  <span class="n">match</span> <span class="o">=</span> <span class="no">Application</span><span class="p">.</span><span class="nf">routes</span>
-	                     <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
-	                     <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:path</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@path</span> <span class="p">}</span>
+	                     <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="n">r</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
+	                     <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="n">r</span><span class="p">[</span><span class="ss">:path</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@path</span> <span class="p">}</span>
 	  <span class="k">return</span> <span class="n">status</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="k">unless</span> <span class="n">match</span>
 	
 	  <span class="n">body</span> <span class="nb">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">match</span><span class="p">[</span><span class="ss">:block</span><span class="p">])</span>
@@ -388,14 +388,14 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 
 <p><em>Aside:</em> While early versions of Sinatra used to make use of <code class="highlighter-rouge">instance_eval</code>, later versions (including the current one) employ a different mechanism that is more sophisticated as well as slightly more involved. It involves generating unbound method objects that are dynamically bound to the current instance, and has several advantages that are beyond the scope of this post.</p>
 
-<h2 id="frankie-recognizes-patterns">Frankie recognizes patterns</h2>
+<h2 id="frankie-recognizes-patterns-parametrized-routes">Frankie recognizes patterns: Parametrized routes</h2>
 
 <p>What is sorely missing from Frankie so far is the ability to <em>parametrize routes</em>:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
 3</pre></td><td class="code"><pre><span class="n">get</span> <span class="s1">'/albums/:album/song/:song'</span> <span class="k">do</span>
-  <span class="s2">"My favourite song is '</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="s1">'song'</span><span class="p">]</span><span class="si">}</span><span class="s2">' from '</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="s1">'album'</span><span class="p">]</span><span class="si">}</span><span class="s2">'."</span>
+  <span class="s2">"Next up: '</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="s1">'song'</span><span class="p">]</span><span class="si">}</span><span class="s2">' from '</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="s1">'album'</span><span class="p">]</span><span class="si">}</span><span class="s2">'."</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
 </div>
@@ -510,16 +510,16 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 
 <p>Instead of simply storing a request path, we compile a given path (possible containing parameters) into a <code class="highlighter-rouge">pattern</code> (a regular expression) and a set of <code class="highlighter-rouge">keys</code> (i.e., strings). The keys will eventually become hash keys in our <code class="highlighter-rouge">params</code> hash.</p>
 
-<p>For the above example route, the <code class="highlighter-rouge">[pattern, keys]</code> array returned by the <code class="highlighter-rouge">compile</code> class method looks as follows:</p>
+<p>For the above example route, the <code class="highlighter-rouge">[pattern, keys]</code> array returned by the <code class="highlighter-rouge">compile</code> method looks as follows:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">[</span><span class="sr">/\A\/albums\/([^\/]+)\/songs\/([^\/]+)\z/</span><span class="p">,</span> <span class="p">[</span><span class="s2">"album"</span><span class="p">,</span> <span class="s2">"song"</span><span class="p">]]</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<p>Within the regex, <code class="highlighter-rouge">([^\/]+)</code> matches sequences of characters that do not contain forward slashes.</p>
+<p>Within the regex, <code class="highlighter-rouge">([^\/]+)</code> matches sequences of characters that do not contain forward slashes – these will be the arguments that fill in the slots provided by our route parameters.</p>
 
-<p>Now on the <em>instance level</em>, we exploit the information stored in <code class="highlighter-rouge">pattern</code> and <code class="highlighter-rouge">keys</code>:</p>
+<p>Now on the <em>instance level</em>, we exploit the information stored in <code class="highlighter-rouge">pattern</code> and <code class="highlighter-rouge">keys</code> as follows:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -538,8 +538,8 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
   <span class="k">class</span> <span class="nc">Application</span>
     <span class="k">def</span> <span class="nf">route!</span>
       <span class="n">match</span> <span class="o">=</span> <span class="no">Application</span><span class="p">.</span><span class="nf">routes</span>
-                         <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
-                         <span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">route</span><span class="o">|</span> <span class="n">route</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span> <span class="p">}</span>
+                         <span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="n">r</span><span class="p">[</span><span class="ss">:verb</span><span class="p">]</span> <span class="o">==</span> <span class="vi">@verb</span> <span class="p">}</span>
+                         <span class="p">.</span><span class="nf">find</span>   <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="n">r</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span> <span class="p">}</span>
       <span class="k">return</span> <span class="n">status</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span> <span class="k">unless</span> <span class="n">match</span>
 
       <span class="n">values</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="ss">:pattern</span><span class="p">].</span><span class="nf">match</span><span class="p">(</span><span class="vi">@path</span><span class="p">).</span><span class="nf">captures</span>
@@ -563,18 +563,26 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 
 <p><em>Aside:</em> Sinatra itself goes to considerable length to allow users flexibility in making use of route parameters – we have only scratched the surface here. Also, as of Sinatra 2.0, a dedicated gem is used for pattern matching, the <a href="https://github.com/sinatra/mustermann">Mustermann library</a>. Again, this additional level of sophistication is beyond the scope of this post.</p>
 
-<h2 id="frankie-likes-cookies">Frankie likes cookies</h2>
+<h2 id="frankie-likes-cookies-rack-middleware">Frankie likes cookies: Rack middleware</h2>
 
-<p>Sinatra applications are Rack applications, so they place nice with Rack middleware. If you have a piece of middleware, all you need to do is place a <code class="highlighter-rouge">use</code> statement close to the top of your Sinatra application file, such as:</p>
+<p>The concept of Rack middleware flows naturally out of the concept of a Rack application. A Rack application is an object that responds to <code class="highlighter-rouge">call</code> and returns a three-element array of the appropriate kind (as described above). Nothing prevents a Rack app from sending a <code class="highlighter-rouge">call</code> message to <em>another</em> Rack app, and using the return value of that <code class="highlighter-rouge">call</code> to determine its own return value. If a number of Rack apps are hooked up in this way, each calling the next, the non-terminal nodes in this configuration are <em>middleware</em>. (think of the whole as a linked list of Rack apps and you are not far off from the truth at all).</p>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">use</span> <span class="no">MyMiddleware</span> 
+<p>Sinatra applications are Rack applications, so of course they place nice with Rack middleware. If you have a number of middleware nodes you want to make use of, all you need to do is place corresponding <code class="highlighter-rouge">use</code> statements close to the top of your Sinatra application file, such as:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="n">use</span> <span class="no">MyMiddleware1</span>
+<span class="n">use</span> <span class="no">MyMiddleware2</span>
+<span class="p">.</span><span class="nf">.</span><span class="o">.</span> 
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
+<p>Sinatra will hook up the nodes in the appropriate fashion: a <code class="highlighter-rouge">MyMiddleware1</code> instance will be the first node to receive a <code class="highlighter-rouge">call</code> message, and an instance of <code class="highlighter-rouge">Sinatra::Application</code> will be the last (the Sinatra app <em>fronts</em> the middleware chain).</p>
+
 <p>In this section, we will implement this functionality in Frankie, using cookie-based session management as provided by <code class="highlighter-rouge">Rack::Session::Cookie</code> as an example (which is also what Sinatra uses by default).</p>
 
-<p>First, let’s look at how to set up the middleware chain. The overall app encompassing all middleware nodes (and our application instance) is stored in an instance variable <code class="highlighter-rouge">@prototype</code> (the choice of name will become clear in a minute). Setting up the <code class="highlighter-rouge">@protoype</code> object makes heavy use of the functionality already provided by Rack:</p>
+<p>First, let’s look at how to set up the middleware chain. The entry point to the middleware chain is stored in an instance variable <code class="highlighter-rouge">@prototype</code> (the choice of name will become clear in a minute). Setting up the <code class="highlighter-rouge">@protoype</code> object makes use of the functionality already provided by Rack:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -641,20 +649,11 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 </div>
 </div>
 
-<p>The gist is this: every <code class="highlighter-rouge">use</code> statement in our code adds a middleware node to the <code class="highlighter-rouge">@middleware</code> array. As a <code class="highlighter-rouge">@prototype</code> object is created, all nodes are „wired up“, with our <code class="highlighter-rouge">Frankie::Application</code> instance being the last node in the chain (the node „fronting“ the chain).  As a result, we got ourselves a Rack app accessible via the <code class="highlighter-rouge">prototype</code> method.</p>
+<p>The gist is this: every <code class="highlighter-rouge">use</code> statement in our code adds a middleware node to the <code class="highlighter-rouge">@middleware</code> array. As a <code class="highlighter-rouge">@prototype</code> object is created, all those nodes are „wired up“, with a <code class="highlighter-rouge">Frankie::Application</code> instance being the last node in the chain (the node „fronting“ the chain).</p>
 
-<p>Now how to handle an incoming request given this setting? There <em>is</em> a conceptual conundrum to solve. Our earlier code used to create a fresh application instance for every request that needs to be handled. However, once the middleware chain is set up as above, a single application instance will survive across requests. The solution is to use this instance as a blueprint which is duplicated with every request. Handling a request then involves roughly the following steps:</p>
+<p>Now how to handle an incoming request given this set-up? There <em>is</em> a problem to solve. Our earlier code used to create a <em>fresh</em> application instance for every request that needs to be handled. However, once the middleware chain is set up as above, an instance of <code class="highlighter-rouge">Frankie::Application</code> will front the middleware chain and survive across requests (after all, it’s stored at the class level via the <code class="highlighter-rouge">prototype</code> object). So how are we going to respect the „one instance per request“ principle?</p>
 
-<ul>
-  <li>The class method <code class="highlighter-rouge">call</code> is invoked on <code class="highlighter-rouge">Frankie::Application</code>.</li>
-  <li>The body of that method invokes <code class="highlighter-rouge">call</code> on the <code class="highlighter-rouge">@prototype</code> object, which is a Rack app that contains all middleware nodes and is fronted by a <code class="highlighter-rouge">Frankie::Application</code> instance.</li>
-  <li>If that <code class="highlighter-rouge">@prototype</code> object does not exist already, create it on the fly.</li>
-  <li>Walk through the middleware chain invoking <code class="highlighter-rouge">call</code> on each node. Our <code class="highlighter-rouge">Frankie::Application</code> instance is the last node in the chain.</li>
-  <li>As this last node is <code class="highlighter-rouge">call</code>ed, the instance <em>duplicates itself</em>, and lets the duplicated instance handle the request.</li>
-  <li>In this way, the instance fronting the middleware chain persists across requests, but never actually handles a request itself.</li>
-</ul>
-
-<p>In code, this looks like as follows:</p>
+<p>The solution is to use the stored instance as a blueprint which is duplicated with every request – this also explains the choice of the name „<code class="highlighter-rouge">prototype</code>“. So we add the following code:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -689,7 +688,9 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 </div>
 </div>
 
-<p>Now return to our use case of cookie-based session management. We add a <code class="highlighter-rouge">session</code> method for accessing the session object. This simply wraps the session object provided by Rack:</p>
+<p>As the <code class="highlighter-rouge">Frankie::Application</code> <em>class</em> receives the <code class="highlighter-rouge">call</code> from the web server, it passes the <code class="highlighter-rouge">call</code> to <code class="highlighter-rouge">prototype</code>. The middleware nodes process the request (encoded in <code class="highlighter-rouge">env</code>), until finally, the <code class="highlighter-rouge">Frankie::Application</code> instance fronting the chain is <code class="highlighter-rouge">call</code>ed. The instance duplicates itself and invokes <code class="highlighter-rouge">call!</code> on the duplicate, with the latter handling the request. It’s pretty clever, right? It’s also exactly how Sinatra does it.</p>
+
+<p>As intended, setting up middleware is really easy now. For illustration, return to our use case of cookie-based session management. Let’s add a <code class="highlighter-rouge">session</code> method for accessing the session object. It simply wraps the session object provided by Rack:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -708,7 +709,7 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
 </div>
 </div>
 
-<p>All that we need to do as a Frankie user is to add the earlier-mentioned use statement to our app:</p>
+<p>All we really need to do as a Frankie user is to add the earlier-mentioned use statement to our app:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">use</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Session</span><span class="o">::</span><span class="no">Cookie</span>
 </pre></td></tr></tbody></table>
@@ -760,7 +761,7 @@ While the Frankie code shown here is not lifted <em>verbatim</em> from the Sinat
     <div class="sidebar-content">
       
       <h5>
-        <a class="post-link" href="/2018/06/02/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>02 Jun 2018</small>
+        <a class="post-link" href="/2018/06/03/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>03 Jun 2018</small>
       </h5>
       <p class="sidebar">
           Building a toy version of a Ruby web framework from the ground up.
