@@ -256,6 +256,10 @@ footer {
   padding-right: 0;
 }
 
+.lineno {
+  text-align: right;
+}
+
 // RESPONSIVE
 
 @media print, screen and (max-width: 1150px) {
@@ -290,7 +294,7 @@ footer {
   body {
     -webkit-text-size-adjust: none;
   }
-  
+
   header {
     padding: 0;
   }
