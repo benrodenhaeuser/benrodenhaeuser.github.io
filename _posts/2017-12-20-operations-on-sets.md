@@ -7,7 +7,7 @@ date: 2017-12-20
 > This is the last part of a three part series that starts [here](/2017/12/18/a-bunch-of-sets/).
 {: .aside}
 
-The `SetMap` class discussed in the [previous entry](http://localhost:4000/2017/12/19/the-set-map-class/) essentially serves as a wrapper around our hash table. We have also implemented a mechanism for specifying what constitutes a valid score for a given type of set. And we have provided our three target classes that inherit from `SetMap`. The basics of our model are thus in place.
+The `SetMap` class discussed in the [previous entry](http://localhost:4000/2017/12/19/modeling-sets/) essentially serves as a wrapper around our hash table. We have also implemented a mechanism for specifying what constitutes a valid score for a given type of set. And we have provided our three target classes that inherit from `SetMap`. The basics of our model are thus in place.
 
 What remains to be implemented is all the interesting operations on sets! The remaining part of the interface will, however, not interact with the internally used hash table directly, but only through the interface developed so far.
 
