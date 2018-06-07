@@ -65,5 +65,5 @@ For the sake of exposition, let us settle on 3 as the—pretty arbitrarily chose
 
 In this fuzzy set, the degree of each element is to be interpreted as the degree of similarity to our target word "learner".
 
-> Continue to [part 02 of the series](/2017/12/18/modeling-sets/) where we start to put our model of sets in place.
+> Continue to [part 02 of the series](/2017/12/19/modeling-sets/) where we start to put our model of sets in place.
 {: .aside}
