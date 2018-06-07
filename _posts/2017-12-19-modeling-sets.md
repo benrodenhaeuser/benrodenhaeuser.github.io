@@ -4,10 +4,10 @@ description: 'Part 02 of the "Bunch of Sets" series.'
 date: 2017-12-18
 ---
 
-> This is part 02 of a three part series that starts [here](/2017/12/17/a-bunch-of-sets/).
+> This is part 02 of a three part series that starts [here](/2017/12/18/a-bunch-of-sets/).
 {: .aside}
 
-Equipped with some basic understanding of our problem domain established in [part 01 of this series](/2017/12/17/a-bunch-of-sets/), let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a `SetMap` class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.
+Equipped with some basic understanding of our problem domain established in [part 01 of this series](/2017/12/18/a-bunch-of-sets/), let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a `SetMap` class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.
 
 ### Hash tables
 
@@ -196,5 +196,5 @@ alias each each_pair
 
 As we will see in the next post, `each_pair` forms the basis for all our methods that iterate over sets. This includes pretty much all the interesting operations on sets—`union`, `intersection`, and the like. Since `each_pair` is aliassed as `each`, it also allows us to include the `Enumerable` module, which any respectable Ruby collection class should have access to.
 
-> Continue to [part 03 of the series](/2017/12/19/operations-on-sets/) where we discuss operations on sets.
+> Continue to [part 03 of the series](/2017/12/20/operations-on-sets/) where we discuss operations on sets.
 {: .aside}

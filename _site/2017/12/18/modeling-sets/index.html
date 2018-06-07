@@ -57,10 +57,10 @@
     <hr class="line" />
     <div class="content-inner">
       <blockquote class="aside">
-  <p>This is part 02 of a three part series that starts <a href="/2017/12/17/a-bunch-of-sets/">here</a>.</p>
+  <p>This is part 02 of a three part series that starts <a href="/2017/12/18/a-bunch-of-sets/">here</a>.</p>
 </blockquote>
 
-<p>Equipped with some basic understanding of our problem domain established in <a href="/2017/12/17/a-bunch-of-sets/">part 01 of this series</a>, let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.</p>
+<p>Equipped with some basic understanding of our problem domain established in <a href="/2017/12/18/a-bunch-of-sets/">part 01 of this series</a>, let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.</p>
 
 <h3 id="hash-tables">Hash tables</h3>
 
@@ -337,7 +337,7 @@
 <p>As we will see in the next post, <code class="highlighter-rouge">each_pair</code> forms the basis for all our methods that iterate over sets. This includes pretty much all the interesting operations on sets—<code class="highlighter-rouge">union</code>, <code class="highlighter-rouge">intersection</code>, and the like. Since <code class="highlighter-rouge">each_pair</code> is aliassed as <code class="highlighter-rouge">each</code>, it also allows us to include the <code class="highlighter-rouge">Enumerable</code> module, which any respectable Ruby collection class should have access to.</p>
 
 <blockquote class="aside">
-  <p>Continue to <a href="/2017/12/19/operations-on-sets/">part 03 of the series</a> where we discuss operations on sets.</p>
+  <p>Continue to <a href="/2017/12/20/operations-on-sets/">part 03 of the series</a> where we discuss operations on sets.</p>
 </blockquote>
 
     </div>

@@ -9,8 +9,8 @@ Ruby comes with a [`Set` class](https://github.com/ruby/ruby/blob/trunk/lib/set.
 The series has three parts:
 
 - This part introduces our topic by discussing the three types of sets we would like to capture.
-- [Part 02](/2017/12/18/modeling-sets/) develops a unified model for those types of sets.
-- [Part 03](/2017/12/19/operations-on-sets/) discusses how to implement the typical operations on sets in this model.
+- [Part 02](/2017/12/19/modeling-sets/) develops a unified model for those types of sets.
+- [Part 03](/2017/12/20/operations-on-sets/) discusses how to implement the typical operations on sets in this model.
 
 ## Classical sets, multisets, and fuzzy sets
 
