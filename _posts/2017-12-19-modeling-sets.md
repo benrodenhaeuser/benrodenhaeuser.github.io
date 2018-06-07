@@ -1,7 +1,7 @@
 ---
 title: "Modeling Sets"
 description: 'Part 02 of the "Bunch of Sets" series.'
-date: 2017-12-18
+date: 2017-12-19
 ---
 
 > This is part 02 of a three part series that starts [here](/2017/12/18/a-bunch-of-sets/).

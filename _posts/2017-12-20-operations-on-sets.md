@@ -1,7 +1,7 @@
 ---
 title: "Operations on Sets"
 description: 'Part 03 of the "Bunch of Sets" series.'
-date: 2017-12-19
+date: 2017-12-20
 ---
 
 > This is the last part of a three part series that starts [here](/2017/12/18/a-bunch-of-sets/).
