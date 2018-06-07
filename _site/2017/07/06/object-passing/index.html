@@ -66,7 +66,7 @@
 <p>Why is the latter called “pass-by-reference”?</p>
 
 <blockquote>
-  <p>In programming language design (…) a “reference” is an alias to another variable. Any manipulation done to the reference variable directly changes the original variable.</p>
+  <p>“In programming language design (…) a ‘reference’ is an alias to another variable. Any manipulation done to the reference variable directly changes the original variable.”</p>
 </blockquote>
 
 <p>What is the consequence of this? If <code class="highlighter-rouge">a</code> acts as an alias for <code class="highlighter-rouge">b</code> in the above sense, then reassigning <code class="highlighter-rouge">a</code> will have the effect of reassigning <code class="highlighter-rouge">b</code>: suppose that <code class="highlighter-rouge">a</code> points to the integer <code class="highlighter-rouge">5</code>, and <code class="highlighter-rouge">b</code> is an alias for <code class="highlighter-rouge">b</code>. Then setting <code class="highlighter-rouge">b = 7</code> will make both <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> point to <code class="highlighter-rouge">7</code>, because <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> are one and the same variable.</p>
@@ -77,10 +77,10 @@
 
 <p>Ruby does not use pass-by-reference. It uses pass-by-value. However, to get a better grip on object passing in Ruby, it is useful to distinguish two varieties of pass-by-value: “pass-value-by-value”, and “pass-reference-by-value”. This terminology comes from <a href="http://robertheaton.com/2014/07/22/is-ruby-pass-by-reference-or-pass-by-value/">this article</a>, from which the following explanation heavily borrows:</p>
 
-<ol>
+<ul>
   <li><em>Pass-value-by-value:</em> In pass-value-by-value, the procedure receives a <em>copy of the objects</em> passed to it. There is thus no relationship between either the variables or the objects referenced by the values by the function and the caller. Nothing that happens to one will affect the other.</li>
   <li><em>Pass-reference-by-value:</em> On the pass-reference-by-value model, a procedure receives a reference to the same object in memory that is used by the caller, i.e., caller and callee <em>share</em> the object. However, the variable the procedure uses is <em>not</em> merely an alias for the variable used by the caller. The procedure has its own (“fresh”) variable, which merely happens to point to the same object as the caller variable. This means that changes made to the <em>object</em> made inside the procedure will be visible to the caller. But changes made to the <em>variable</em> inside the procedure will not be.</li>
-</ol>
+</ul>
 
 <p>How does Ruby do it? <em>Ruby follows the second model.</em> So the variable passed into a Ruby method is not a “complete alias” for the original variable. It is distinct. But the method variable and the variable used by the caller <em>share a single value</em>.</p>
 
@@ -165,28 +165,63 @@
     <div class="sidebar-content">
       
       <h5>
-        <a class="post-link" href="/2018/06/03/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>03 Jun 2018</small>
+        <a class="post-link" href="/2018/06/04/frankie-likes-cookies/">Frankie Likes Cookies</a><span class="sidebar-pad"></span><small>06/04/18</small>
       </h5>
       <p class="sidebar">
-          Building a toy version of a Ruby web framework from the ground up.
+          Working with Rack middleware: part 04 of the "Understanding Sinatra" series.
       </p>
       
       <h5>
-        <a class="post-link" href="/2017/12/18/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>18 Dec 2017</small>
+        <a class="post-link" href="/2018/06/03/frankie-recognizes-patterns/">Frankie Recognizes Patterns</a><span class="sidebar-pad"></span><small>06/03/18</small>
       </h5>
       <p class="sidebar">
-          A generic implementation of classical sets, multisets and fuzzy sets.
+          Defining parametrized routes: part 03 of the "Understanding Sinatra" series.
       </p>
       
       <h5>
-        <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="sidebar-pad"></span><small>06 Jul 2017</small>
+        <a class="post-link" href="/2018/06/02/frankie-goes-top-level/">Frankie Goes Top Level</a><span class="sidebar-pad"></span><small>06/02/18</small>
+      </h5>
+      <p class="sidebar">
+          The top-level DSL: part 02 of the "Understanding Sinatra" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2018/06/01/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>06/01/18</small>
+      </h5>
+      <p class="sidebar">
+          Hello Frankie: building a toy version of a Ruby web framework from the ground up.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/12/19/operations-on-sets/">Operations on Sets</a><span class="sidebar-pad"></span><small>12/19/17</small>
+      </h5>
+      <p class="sidebar">
+          Part 03 of the "Bunch of Sets" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/12/18/modeling-sets/">Modeling Sets</a><span class="sidebar-pad"></span><small>12/18/17</small>
+      </h5>
+      <p class="sidebar">
+          Part 02 of the "Bunch of Sets" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/12/17/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>12/17/17</small>
+      </h5>
+      <p class="sidebar">
+          A generic implementation of classical sets, multisets and fuzzy sets in Ruby.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="sidebar-pad"></span><small>07/06/17</small>
       </h5>
       <p class="sidebar">
           Pass by reference or pass by value? The object passing strategy followed by Ruby.
       </p>
       
       <h5>
-        <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="sidebar-pad"></span><small>15 May 2017</small>
+        <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="sidebar-pad"></span><small>05/15/17</small>
       </h5>
       <p class="sidebar">
           Why does Ruby have two sorting methods, rather than one?

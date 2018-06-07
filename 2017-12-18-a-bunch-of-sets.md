@@ -1,6 +1,7 @@
 ---
 title: "A Bunch of Sets"
 description: "A generic implementation of classical sets, multisets and fuzzy sets."
+date: 2017-12-18
 ---
 
 Ruby comes with a [`Set` class](https://github.com/ruby/ruby/blob/trunk/lib/set.rb) as part of its standard library, and there is also a [`Multiset` class](https://github.com/maraigue/multiset/blob/master/lib/multiset.rb) available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of this post—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don't care much for lengthy explanations, head [straight to Github](https://github.com/benrodenhaeuser/sets) to have a look at the code.

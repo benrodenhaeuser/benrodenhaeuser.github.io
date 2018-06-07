@@ -248,6 +248,12 @@ a small { color: #777; margin-top: -0.3em; display: block; }
 
 blockquote { margin: 0; padding: 0; text-align: center; }
 
+.aside { margin: 22.5px 0; text-align: left; padding: 20px; background-color: #F3F3F3; }
+
+.aside p { margin-top: 0; }
+
+.aside h3 { margin-top: 0; }
+
 code, pre { font-family: 'Roboto Mono', monospace; color: #333; }
 
 p code { font-size: 16.2px; }

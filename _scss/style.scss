@@ -4,6 +4,7 @@
 $basefont: 18px;
 $baseline: 30px;
 $bodycolor: #595959;
+$highlightcolor: #FF7F50;
 
 body {
   background-color: #fafafa;
@@ -24,7 +25,7 @@ h1 {
 }
 
 a h1:hover {
-  color: #FF7F50;;
+  color: #FF7F50;
 }
 
 h2 {
@@ -163,6 +164,21 @@ blockquote {
   margin: 0;
   padding: 0;
   text-align: center;
+}
+
+.aside {
+  margin: (0.75 * $baseline) 0;
+  text-align: left;
+  padding: 20px;
+  background-color: #F3F3F3;
+}
+
+.aside p {
+  margin-top: 0;
+}
+
+.aside h3 {
+  margin-top: 0;
 }
 
 code, pre {

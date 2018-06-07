@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title>Ben Rodenhäuser | Notes on programming</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato|Anton|Roboto Mono" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/main.css?v=">
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    CommonHTML: { linebreaks: { automatic: true } },
+    "HTML-CSS": { linebreaks: { automatic: true } },
+           SVG: { linebreaks: { automatic: true } }
+  });
+  </script>
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntilConfig">
+  </script>
+  <script src="/assets/jax/config.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-99334571-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+  
+</head>
+
+  <body>
+    <div class="wrapper">
+      <section>
+  <p>
+    <small>
+      18 December 2017
+    </small>
+  </p>
+
+  <h1 class="title">
+    Modeling Sets
+  </h1>
+
+  <div class="description">
+    Part 02 of the "Bunch of Sets" series.
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+    <div class="content-inner">
+      <blockquote class="aside">
+  <p>This is part 02 of a three part series that starts <a href="/2017/12/17/a-bunch-of-sets/">here</a>.</p>
+</blockquote>
+
+<p>Equipped with some basic understanding of our problem domain established in <a href="/2017/12/17/a-bunch-of-sets/">part 01 of this series</a>, let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a <code class="highlighter-rouge">SetMap</code> class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.</p>
+
+<h3 id="hash-tables">Hash tables</h3>
+
+<p>What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a <em>characteristic function</em>, which maps the members of the set to 1, while all other objects from a given domain are mapped to 0. Taking a cue from this, we extend our key-value notation to classical sets, writing the set <code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">0,</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">2</span><span class="w"> </span><span class="p">}</span></code>, for example, as</p>
+
+<blockquote>
+  <p><code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">0:</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">1:</span><span class="w"> </span><span class="err">1,</span><span class="w"> </span><span class="err">2:</span><span class="w"> </span><span class="err">1</span><span class="w"> </span><span class="p">}</span></code>.</p>
+</blockquote>
+
+<p>From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">1</span> <span class="p">}</span>     <span class="c1"># 'classical set'</span>
+<span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="p">}</span>     <span class="c1"># 'multiset'</span>
+<span class="p">{</span> <span class="s1">'a'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s1">'b'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'c'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="o">.</span><span class="mi">6</span> <span class="p">}</span> <span class="c1"># 'fuzzy set'</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Hash tables will form the basis of our representation of sets. Of course, we would not want to directly expose such a table to the user of our set class. The user need not even be aware that we are using a hash table to store her set. Rather, the hash instance that stores the set keys and their associated scores will be a collaborator object to our set object. The <code class="highlighter-rouge">initialize</code> method of our <code class="highlighter-rouge">SetMap</code> class sets the stage for this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@hash</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="vi">@size</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Besides the <code class="highlighter-rouge">@hash</code> instance variable, we also decide to maintain an instance variable <code class="highlighter-rouge">@size</code>, in the interest of being able to look up the size of our set in constant time. The size of a set is commonly defined as the sum of the scores of its keys, and the idea is that <code class="highlighter-rouge">@size</code> will always store this value in an up-to-date fashion. We also make available a getter method <code class="highlighter-rouge">size</code> that returns the current value of <code class="highlighter-rouge">@size</code>, omitted here.</p>
+
+<h3 id="valid-scores">Valid scores</h3>
+
+<p>What distinguishes the types of sets we have seen above from each other? It is primarily what counts as a valid score according to each type:</p>
+
+<ul>
+  <li>A classical set either contains or does not contain a particular key, so the only valid scores are 0 and 1.</li>
+  <li>A multiset may contain a given key <code class="highlighter-rouge">n</code> times, where <code class="highlighter-rouge">n</code> is a non-negative integer.</li>
+  <li>A fuzzy set scores a given key to a degree in the unit interval from 0 to 1.</li>
+</ul>
+
+<p>So in each case, we have to be able to express a range of possible values. We set up a bunch of class methods and class instance variables for this purpose:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">SetMap</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">score_type</span>
+    <span class="vi">@score_type</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@score_type not initialized'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">min_score</span>
+    <span class="vi">@min_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@min_score not initialized'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">max_score</span>
+    <span class="vi">@max_score</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'@max_score not initialized'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">val</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="n">score_type</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">min_score</span><span class="p">.</span><span class="nf">.</span><span class="n">max_score</span><span class="p">).</span><span class="nf">cover?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The first three class methods defined above are getters (on the level of the class object) for the class instance variables <code class="highlighter-rouge">@score_type</code> (the kind of object we may use as a score for a key), <code class="highlighter-rouge">@min_score</code> (the smallest value that may be used as a score), and <code class="highlighter-rouge">@max_score</code> (the largest value that maye be used as a score). The fourth method uses these getters and describes what constitutes a valid score as a predicate.</p>
+
+<p>As the second disjunct of each of the above getter methods tells us loud and clear, we are missing something so far: our class instance variables have not been set to any value! Initializing those class instance variables is precisely the job description of our target classes.</p>
+
+<h3 id="target-classes">Target classes</h3>
+
+<p><code class="highlighter-rouge">SetMap</code> is meant to be subclassed, with each subclass defining a particular set type by specifying a range of legal scores via the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>. Here is the code for classical sets:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">ClassicalSet</span> <span class="o">&lt;</span> <span class="no">SetMap</span>
+  <span class="vi">@score_type</span> <span class="o">=</span> <span class="no">Integer</span>
+  <span class="vi">@min_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="vi">@max_score</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>In other words, the only valid scores for the keys of classical sets are the integers <code class="highlighter-rouge">0</code> and <code class="highlighter-rouge">1</code>. For fuzzy sets, we write:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">FuzzySet</span> <span class="o">&lt;</span> <span class="no">SetMap</span>
+  <span class="vi">@score_type</span> <span class="o">=</span> <span class="no">Numeric</span>
+  <span class="vi">@min_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="vi">@max_score</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>So any <code class="highlighter-rouge">Numeric</code> instance in the closed interval <code class="highlighter-rouge">[0, 1]</code> is a valid score for a fuzzy set key (we choose <code class="highlighter-rouge">Numeric</code> so as to allow both floats and integers). Finally, for multisets:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="k">class</span> <span class="nc">MultiSet</span> <span class="o">&lt;</span> <span class="no">SetMap</span>
+  <span class="vi">@score_type</span> <span class="o">=</span> <span class="no">Integer</span>
+  <span class="vi">@min_score</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="vi">@max_score</span> <span class="o">=</span> <span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The <code class="highlighter-rouge">Float::INFINITY</code> constant has the property that <code class="highlighter-rouge">x &lt; Float::INFINITY</code> for any numeric <code class="highlighter-rouge">x</code>. Setting <code class="highlighter-rouge">@max_score</code> to <code class="highlighter-rouge">Float::INFINITY</code> is thus a way of saying that, for multisets, there is no maximal score: any non-negative integer is allowed.</p>
+
+<p>And this is really all there is to it! Specializing the capabilities of <code class="highlighter-rouge">SetMap</code> to a particular target class boils down to providing appropriate values for a bunch of class instance variables.</p>
+
+<p>Of course, we have not yet demonstrated what the interface for <code class="highlighter-rouge">SetMap</code> actually looks like. But from now on, we will write methods that work equally well for all three set types under consideration: classical sets, fuzzy sets, and multisets.</p>
+
+<h3 id="key-insertion">Key insertion</h3>
+
+<p>The most basic part of the interface of any set class is arguably the capability of inserting scores for particular keys. Here is the <code class="highlighter-rouge">SetMap#insert</code> method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+  <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+  <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">max_score</span><span class="p">].</span><span class="nf">min</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="vi">@size</span> <span class="o">+</span> <span class="p">(</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_score</span><span class="p">)</span>
+  <span class="nb">self</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>The general idea of this method is to increment the score of <code class="highlighter-rouge">key</code> by <code class="highlighter-rouge">val</code>. As per line 2 of the snippet, this will work only if <code class="highlighter-rouge">val</code> is a valid score according to the implementation of <code class="highlighter-rouge">valid_score?</code> (which in turn depends on the values of the class instance variables <code class="highlighter-rouge">@score_type</code>, <code class="highlighter-rouge">@min_score</code> and <code class="highlighter-rouge">@max_score</code>). If that is the case, we use what is called a <em>bounded sum</em> to add <code class="highlighter-rouge">val</code> to <code class="highlighter-rouge">self[key]</code>, capping off the sum at <code class="highlighter-rouge">@max_score</code> (line 4).</p>
+
+<p>Let’s try this out using our target classes:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</pre></td><td class="code"><pre><span class="n">fuzzy_set</span> <span class="o">=</span> <span class="no">FuzzySet</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">fuzzy_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fuzzy_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">fuzzy_set</span> <span class="c1">#=&gt; #&lt;FuzzySet: {"a": 0.8}&gt;</span>
+
+<span class="n">multi_set</span> <span class="o">=</span> <span class="no">MultiSet</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">multi_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="n">multi_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">multi_set</span> <span class="c1">#=&gt; #&lt;MultiSet: {"a": 3}&gt;</span>
+
+<span class="n">classical_set</span> <span class="o">=</span> <span class="no">ClassicalSet</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">classical_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="n">classical_set</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="n">classical_set</span> <span class="c1">#=&gt; #&lt;ClassicalSet: {"a": 1}&gt;</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>These are the desired results (assuming a—standard—<code class="highlighter-rouge">inspect</code> method which we have not shown). Notice that the score range we have specified for classical sets in tandem with the bounded sum ensures that inserting the same key twice has the same effect as inserting it once: the sum of <code class="highlighter-rouge">1</code> and <code class="highlighter-rouge">1</code> bounded by <code class="highlighter-rouge">1</code> is again <code class="highlighter-rouge">1</code>.</p>
+
+<p>Returning to the earlier snippet, we also need to keep track of the size of our set (line 5). Here, we also neutralize rounding errors that might occur for types of sets that allow <a href="http://floating-point-gui.de">floating point numbers</a> as scores.</p>
+
+<h3 id="key-retrieval">Key retrieval</h3>
+
+<p>Next, consider <code class="highlighter-rouge">SetMap#retrieve</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+  <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">?</span> <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">:</span> <span class="mi">0</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="p">[]</span> <span class="n">retrieve</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+<p>The <code class="highlighter-rouge">retrieve</code> method (which we alias as <code class="highlighter-rouge">[]</code>) wraps the element reference method of our internal hash. If the hash does not contain a certain key, <code class="highlighter-rouge">@hash[key]</code> will return <code class="highlighter-rouge">nil</code>. In that case, <code class="highlighter-rouge">retrieve(key)</code> (or, equivalently as per our alias, <code class="highlighter-rouge">self[key]</code>) will return <code class="highlighter-rouge">0</code>. Alternatively, we could haver set a default value for <code class="highlighter-rouge">@hash</code>, but the current way seems slightly more explicit.</p>
+
+<p>Observe that key retrieval is fast: accessing a hash key takes constant time on average (<a href="https://lemire.me/blog/2009/08/18/do-hash-tables-work-in-constant-time/">disregarding some fine-print</a>), i.e., as the number of keys in a hash increases, the average time necessary to recover the value for a key does not increase. This is one of the main reasons why using hash tables to model sets is an attractive choice.</p>
+
+<h3 id="key-removal">Key removal</h3>
+
+<p>While it would be possible to tweak our approach and express removal of a key as insertion with a negative score, we prefer to keep things simple here:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="k">raise</span><span class="p">(</span><span class="no">SetError</span><span class="p">,</span> <span class="s1">'Illegal value'</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">valid_score?</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+  <span class="n">old_score</span> <span class="o">=</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+  <span class="vi">@hash</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">val</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">min_score</span><span class="p">].</span><span class="nf">max</span>
+  <span class="vi">@size</span> <span class="o">=</span> <span class="vi">@size</span> <span class="o">-</span> <span class="p">(</span><span class="n">old_score</span> <span class="o">-</span> <span class="nb">self</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+  <span class="nb">self</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p><code class="highlighter-rouge">SetMap#remove</code> is perfectly symmetric to the earlier <code class="highlighter-rouge">insert</code> method, using a bounded difference instead of a bounded sum. For our three target classes, this ensures that negative scores cannot occur.</p>
+
+<h3 id="enumeration">Enumeration</h3>
+
+<p>The below <code class="highlighter-rouge">SetMap#each_pair</code> method enumerates set keys and their associated scores in a straightforward manner, piggybacking on <code class="highlighter-rouge">Hash#each_pair</code>. Notice that we only yield key-value pairs for which the value is non-zero, since a key scored with value <code class="highlighter-rouge">0</code> is not considered part of our set.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="k">def</span> <span class="nf">each_pair</span>
+  <span class="k">return</span> <span class="n">to_enum</span><span class="p">(</span><span class="ss">:each_pair</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">block_given?</span>
+
+  <span class="vi">@hash</span><span class="p">.</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="o">|</span>
+    <span class="k">yield</span><span class="p">([</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span> <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="mi">0</span>
+  <span class="k">end</span>
+
+  <span class="nb">self</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="n">each</span> <span class="n">each_pair</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>As we will see in the next post, <code class="highlighter-rouge">each_pair</code> forms the basis for all our methods that iterate over sets. This includes pretty much all the interesting operations on sets—<code class="highlighter-rouge">union</code>, <code class="highlighter-rouge">intersection</code>, and the like. Since <code class="highlighter-rouge">each_pair</code> is aliassed as <code class="highlighter-rouge">each</code>, it also allows us to include the <code class="highlighter-rouge">Enumerable</code> module, which any respectable Ruby collection class should have access to.</p>
+
+<blockquote class="aside">
+  <p>Continue to <a href="/2017/12/19/operations-on-sets/">part 03 of the series</a> where we discuss operations on sets.</p>
+</blockquote>
+
+    </div>
+  </div>
+
+  <p class='terminal'>
+    <small>&nbsp;</small>
+  </p>
+  <hr class="line" />
+</section>
+
+      <header>
+  <p>
+    <small>&nbsp;</small>
+  </p>
+  <a href="http://notes.benrodenhaeuser.io">
+    <h1 class="title">
+      Ben Rodenhäuser
+    </h1>
+  </a>
+
+  <div class="description site-description">
+    Notes on programming
+  </div>
+
+  <div class="content">
+    <hr class="line" />
+
+    <div class="sidebar-content">
+      
+      <h5>
+        <a class="post-link" href="/2018/06/04/frankie-likes-cookies/">Frankie Likes Cookies</a><span class="sidebar-pad"></span><small>06/04/18</small>
+      </h5>
+      <p class="sidebar">
+          Working with Rack middleware: part 04 of the "Understanding Sinatra" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2018/06/03/frankie-recognizes-patterns/">Frankie Recognizes Patterns</a><span class="sidebar-pad"></span><small>06/03/18</small>
+      </h5>
+      <p class="sidebar">
+          Defining parametrized routes: part 03 of the "Understanding Sinatra" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2018/06/02/frankie-goes-top-level/">Frankie Goes Top Level</a><span class="sidebar-pad"></span><small>06/02/18</small>
+      </h5>
+      <p class="sidebar">
+          The top-level DSL: part 02 of the "Understanding Sinatra" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2018/06/01/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>06/01/18</small>
+      </h5>
+      <p class="sidebar">
+          Hello Frankie: building a toy version of a Ruby web framework from the ground up.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/12/19/operations-on-sets/">Operations on Sets</a><span class="sidebar-pad"></span><small>12/19/17</small>
+      </h5>
+      <p class="sidebar">
+          Part 03 of the "Bunch of Sets" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/12/18/modeling-sets/">Modeling Sets</a><span class="sidebar-pad"></span><small>12/18/17</small>
+      </h5>
+      <p class="sidebar">
+          Part 02 of the "Bunch of Sets" series.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/12/17/a-bunch-of-sets/">A Bunch of Sets</a><span class="sidebar-pad"></span><small>12/17/17</small>
+      </h5>
+      <p class="sidebar">
+          A generic implementation of classical sets, multisets and fuzzy sets in Ruby.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/07/06/object-passing/">Passing Objects</a><span class="sidebar-pad"></span><small>07/06/17</small>
+      </h5>
+      <p class="sidebar">
+          Pass by reference or pass by value? The object passing strategy followed by Ruby.
+      </p>
+      
+      <h5>
+        <a class="post-link" href="/2017/05/15/sorting-in-ruby/">Sorting in Ruby</a><span class="sidebar-pad"></span><small>05/15/17</small>
+      </h5>
+      <p class="sidebar">
+          Why does Ruby have two sorting methods, rather than one?
+      </p>
+      
+    </div>
+
+    <hr class="line" />
+
+    <div class="external">
+      <a href="http://github.com/benrodenhaeuser">
+        <img class="mark" src="/assets/images/GitHub-Mark-64px.png" />
+      </a>
+    </div>
+  </div>
+</header>
+
+      <!-- <footer>
+  <p><small>Ben Rodenhäuser 2017 | <a href="http://github.com/benrodenhaeuser">GitHub Profile</a></small></p>
+</footer> -->
+
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>
+  
+

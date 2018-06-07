@@ -10,7 +10,7 @@ The following characterizations come from [this article](http://javadude.com/art
 
 Why is the latter called "pass-by-reference"?
 
-> In programming language design (...) a "reference" is an alias to another variable. Any manipulation done to the reference variable directly changes the original variable.
+> "In programming language design (...) a 'reference' is an alias to another variable. Any manipulation done to the reference variable directly changes the original variable."
 
 What is the consequence of this? If `a` acts as an alias for `b` in the above sense, then reassigning `a` will have the effect of reassigning `b`: suppose that `a` points to the integer `5`, and `b` is an alias for `b`. Then setting `b = 7` will make both `a` and `b` point to `7`, because `a` and `b` are one and the same variable.
 
@@ -20,8 +20,8 @@ So we can think of the pass-by-reference strategy as passing the variable direct
 
 Ruby does not use pass-by-reference. It uses pass-by-value. However, to get a better grip on object passing in Ruby, it is useful to distinguish two varieties of pass-by-value: "pass-value-by-value", and "pass-reference-by-value". This terminology comes from [this article](http://robertheaton.com/2014/07/22/is-ruby-pass-by-reference-or-pass-by-value/), from which the following explanation heavily borrows:
 
-1. *Pass-value-by-value:* In pass-value-by-value, the procedure receives a *copy of the objects* passed to it. There is thus no relationship between either the variables or the objects referenced by the values by the function and the caller. Nothing that happens to one will affect the other.
-2. *Pass-reference-by-value:* On the pass-reference-by-value model, a procedure receives a reference to the same object in memory that is used by the caller, i.e., caller and callee *share* the object. However, the variable the procedure uses is *not* merely an alias for the variable used by the caller. The procedure has its own ("fresh") variable, which merely happens to point to the same object as the caller variable. This means that changes made to the *object* made inside the procedure will be visible to the caller. But changes made to the *variable* inside the procedure will not be.
+- *Pass-value-by-value:* In pass-value-by-value, the procedure receives a *copy of the objects* passed to it. There is thus no relationship between either the variables or the objects referenced by the values by the function and the caller. Nothing that happens to one will affect the other.
+- *Pass-reference-by-value:* On the pass-reference-by-value model, a procedure receives a reference to the same object in memory that is used by the caller, i.e., caller and callee *share* the object. However, the variable the procedure uses is *not* merely an alias for the variable used by the caller. The procedure has its own ("fresh") variable, which merely happens to point to the same object as the caller variable. This means that changes made to the *object* made inside the procedure will be visible to the caller. But changes made to the *variable* inside the procedure will not be.
 
 How does Ruby do it? *Ruby follows the second model.* So the variable passed into a Ruby method is not a "complete alias" for the original variable. It is distinct. But the method variable and the variable used by the caller *share a single value*.
 
