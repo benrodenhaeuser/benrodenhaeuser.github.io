@@ -84,12 +84,12 @@
   <li>Flexible control flow using <code class="highlighter-rouge">throw</code>/<code class="highlighter-rouge">catch</code></li>
 </ul>
 
-<p>My criterion for selecting the topics listed rather than others was simple: I wrote a <a href="https://github.com/benrodenhaeuser/frankie/blob/master/examples/quotes/app.rb">basic Sinatra app</a> (for maintaining a list of quotes by famous people), and then figured out what it takes to run this app while replacing Sinatra with Frankie.</p>
+<p>My criterion for what features to include in Frankie was simple: I wrote a <a href="https://github.com/benrodenhaeuser/frankie/blob/master/examples/quotes/app.rb">basic Sinatra sample app</a> (for maintaining a list of quotes by famous people), and then figured out what it takes to run this app while replacing <code class="highlighter-rouge">require 'sinatra'</code> with <code class="highlighter-rouge">require 'frankie'</code>.</p>
 
-<p>The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to understand than <a href="https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb"><code class="highlighter-rouge">sinatra/base.rb</code></a>, which has slightly less than 2000 lines of code.</p>
+<p>The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to find your way around than <a href="https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb"><code class="highlighter-rouge">sinatra/base.rb</code></a>, which has slightly less than 2000 lines of code.</p>
 
 <blockquote class="aside">
-  <p>Besides following this series of posts, one approach I would invite you to take is to read the Frankie source code <a href="https://github.com/benrodenhaeuser/frankie">on Github</a>, and use that as a launchpad for subsequently diving into the Sinatra source itself.</p>
+  <p>Besides following this series of posts, another approach would be to jump right into the Frankie source code <a href="https://github.com/benrodenhaeuser/frankie">on Github</a>, and use that as a launchpad for a subsequent exploration of the Sinatra codebase itself.</p>
 </blockquote>
 
 <h2 id="hello-frankie">Hello Frankie</h2>

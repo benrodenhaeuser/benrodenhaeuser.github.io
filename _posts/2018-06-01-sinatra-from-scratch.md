@@ -26,11 +26,11 @@ On every topic listed above, I will discuss how to implement a pared down versio
 - Flexible return values for route blocks
 - Flexible control flow using `throw`/`catch`
 
-My criterion for selecting the topics listed rather than others was simple: I wrote a [basic Sinatra app][6] (for maintaining a list of quotes by famous people), and then figured out what it takes to run this app while replacing Sinatra with Frankie.
+My criterion for what features to include in Frankie was simple: I wrote a [basic Sinatra sample app][6] (for maintaining a list of quotes by famous people), and then figured out what it takes to run this app while replacing `require 'sinatra'` with `require 'frankie'`.
 
-The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to understand than [`sinatra/base.rb`][7], which has slightly less than 2000 lines of code.
+The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to find your way around than [`sinatra/base.rb`][7], which has slightly less than 2000 lines of code.
 
-> Besides following this series of posts, one approach I would invite you to take is to read the Frankie source code [on Github][8], and use that as a launchpad for subsequently diving into the Sinatra source itself.
+> Besides following this series of posts, another approach would be to jump right into the Frankie source code [on Github][8], and use that as a launchpad for a subsequent exploration of the Sinatra codebase itself.
 {: .aside}
 
 ## Hello Frankie

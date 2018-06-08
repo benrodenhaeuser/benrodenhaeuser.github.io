@@ -86,7 +86,7 @@ class Application
 end
 ```
 
-As the `Frankie::Application` *class* receives a `call` from the web server, it passes the `call` to the `prototype` object. This results in the middleware nodes being `call`ed in turn, until finally, the `Frankie::Application` instance fronting the chain is `call`ed. At this point, the instance *duplicates itself* and invokes `call!` on the duplicate. The actual route-handling code that used to live in `Frankie::Application#call` is simply moved to `call!`. Overall, this is really elegant, and it’s just how Sinatra does it.   
+As the `Frankie::Application` *class* receives a `call` from the web server, it passes the `call` to the `prototype` object. This results in the middleware nodes being `call`ed in turn, until finally, the `Frankie::Application` instance fronting the chain is `call`ed. At this point, the instance *duplicates itself* and invokes `call!` on the duplicate. The actual route-handling code that used to live in `Frankie::Application#call` is simply moved to `call!`. Overall, this is really elegant, and it’s just how Sinatra does it.  
 
 As promised, setting up middleware is really easy now. For illustration, return to our use case of cookie-based session management. Let’s first add a `session` method for accessing the session object. It simply wraps the session object provided by Rack:
 
@@ -129,10 +129,10 @@ This completes our small tour of Sinatra functionality rebuilt from scratch. See
 
 > ### There’s More
 > As mentioned earlier, there is more to Frankie than I could cover in this series of posts. Here is a quick overview of what Sinatra-inspired features you will find in the [complete Frankie source][8] beyond what we discussed here:
-> - View templates: to better organize your code, separate presentation from application logic with view templates. The bindings of the application instance are passed into the template so that instance variables remain useable. Frankie’s [`Templates` module][9] does the job.
-> - Throw/catch: Sinatra makes quite heavy use of the `throw`/`catch` mechanism when handling requests. This is what makes Sinatra’s `halt` possible, as praised in [this post][10]. To see how this is implemented in Frankie, start at the  `invoke { dispatch! }` method call [here][11].
-> - Flexible return values: Frankie allows return values of route blocks to be strings (that end up as the response body), numbers (status codes) or „Rack triples“. The relevant code is [part of the `invoke` method][12].
-> - Launching your application: the way Sinatra is set up, you simply `require 'sinatra'` at the top of an `app.rb` file, write your routes, and launch the app with `ruby app.rb` (at least if you code in the so-called „classical style“). In this way, you don’t need a `config.ru` file (even though you can still use one if you want). To make this possible, Sinatra uses the [`at_exit` trick][13], and so does Frankie.
+> - View templates: to better organize your code, separate presentation from application logic with view templates. The bindings of the application instance are passed into the template so that instance variables remain useable. An additional [`Templates` module][9] does the job.
+> - Throw/catch: Sinatra makes quite heavy use of the `throw`/`catch` mechanism when handling requests. This is what makes Sinatra’s `halt` possible, praised in [this post][10]. To see how this is implemented in Frankie, start at the  `invoke { dispatch! }` method call [here][11].
+> - Flexible return values: Frankie allows return values of route blocks to be strings (that end up as the response body), numbers (status codes) or Rack-compliant arrays. The code that allows for this flexibility is [part of the `invoke` method][12].
+> - Launching your application: the way Sinatra is set up, you simply `require 'sinatra'` at the top of an `app.rb` file, write your routes, and launch the app with `ruby app.rb` (at least if you code in the so-called „classical style“). To make this possible, Sinatra uses the [`at_exit` trick][13], and so does Frankie.
 {: .aside}
 
 [1]:	/2018/06/01/sinatra-from-scratch/
