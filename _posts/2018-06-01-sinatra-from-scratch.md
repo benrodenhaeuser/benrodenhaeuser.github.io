@@ -1,5 +1,5 @@
 ---
-title: "Sinatra from Scratch"
+title: "Sinatra From Scratch"
 description: "Building a toy version of a Ruby web framework from the ground up."
 date: 2018-06-01
 ---

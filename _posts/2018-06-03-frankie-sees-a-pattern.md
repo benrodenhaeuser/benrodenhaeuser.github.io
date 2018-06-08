@@ -1,6 +1,6 @@
 ---
 title: "Frankie Sees a Pattern"
-description: 'Defining parametrized routes: part 03 of the "Sinatra from Scratch" series.'
+description: 'Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.'
 date: 2018-06-03
 ---
 
