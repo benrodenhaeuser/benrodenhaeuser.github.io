@@ -106,7 +106,7 @@ Now all we really need to do as a Frankie user is to add the earlier-mentioned u
 use Rack::Session::Cookie, :key => 'rack.session', :secret => "secret"
 ```
 
-To verify that our session management works, we send ourselves a message across requests: 
+To verify that our session management works, we send ourselves a message across requests:
 
 ```ruby
 get '/set_message' do
@@ -123,20 +123,28 @@ get '/get_message' do
 end
 ```
 
-Use [this file][5] to see for yourself, if you like. So now we have a version of Frankie that can handle cookies, as well as other pieces of middleware that may come in handy. Neat!
+Use [this file][5] (which provides a snapshot of the state of Frankie after these four posts) to see for yourself, if you like. So now we have a version of Frankie that can handle cookies, as well as other pieces of middleware that may come in handy. Neat!
 
-This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for some additional features that I have not discussed in detail. 
+This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for pointers to some additional features that I have not discussed in detail. You might also want to check out the Frankie sample app mentioned in [part 01][6], if only to conclude that it really does look like a Sinatra app. You can find all the material in the Frankie repo [on Github][7].
 
 > ### There’s More
-> As mentioned earlier, there is more to Frankie than I could cover in this series of posts. Here is a quick overview of what you will find in the Frankie source beyond what we discussed here:
-> - View templates
-> - Throw/catch
-> - Flexible return values
-> - `at_exit`
+> As mentioned earlier, there is more to Frankie than I could cover in this series of posts. Here is a quick overview of what Sinatra-inspired features you will find in the [complete Frankie source][8] beyond what we discussed here:
+> - View templates: to better organize your code, separate presentation from application logic with view templates. The bindings of the application instance are passed into the template so that instance variables remain useable. Frankie’s [`Templates` module][9] does the job.
+> - Throw/catch: Sinatra makes quite heavy use of the `throw`/`catch` mechanism when handling requests. This is what makes Sinatra’s `halt` possible, as praised in [this post][10]. To see how this is implemented in Frankie, start at the  `invoke { dispatch! }` method call [here][11].
+> - Flexible return values: Frankie allows return values of route blocks to be strings (that end up as the response body), numbers (status codes) or „Rack triples“. The relevant code is [part of the `invoke` method][12].
+> - Launching your application: the way Sinatra is set up, you simply `require 'sinatra'` at the top of an `app.rb` file, write your routes, and launch the app with `ruby app.rb` (at least if you code in the so-called „classical style“). In this way, you don’t need a `config.ru` file (even though you can still use one if you want). To make this possible, Sinatra uses the [`at_exit` trick][13], and so does Frankie.
 {: .aside}
 
 [1]:	/2018/06/01/sinatra-from-scratch/
-[2]:	/2018/06/03/frankie-recognizes-patterns/
+[2]:	/2018/06/03/frankie-sees-a-pattern/
 [3]:	/2018/06/01/sinatra-from-scratch/
 [4]:	/2018/06/01/sinatra-from-scratch/
 [5]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/04_frankie_likes_cookies/frankie.rb
+[6]:	http://localhost:4000/2018/06/01/sinatra-from-scratch/
+[7]:	https://github.com/benrodenhaeuser/frankie
+[8]:	https://github.com/benrodenhaeuser/frankie/blob/master/frankie.rb
+[9]:	https://github.com/benrodenhaeuser/frankie/blob/459a2a2997b8fd96d2af5617665eed53cbe7a4a6/frankie.rb#L4
+[10]:	http://myronmars.to/n/dev-blog/2012/01/why-sinatras-halt-is-awesome
+[11]:	https://github.com/benrodenhaeuser/frankie/blob/459a2a2997b8fd96d2af5617665eed53cbe7a4a6/frankie.rb#L114
+[12]:	https://github.com/benrodenhaeuser/frankie/blob/459a2a2997b8fd96d2af5617665eed53cbe7a4a6/frankie.rb#L139
+[13]:	https://blog.arkency.com/2013/06/are-we-abusing-at-exit/

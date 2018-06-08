@@ -58,7 +58,7 @@
     <div class="content-inner">
       <p>This series of posts grew out of my own attempt to understand the inner workings of <a href="http://sinatrarb.com">Sinatra</a>, a popular Ruby tool for quickly building web applications. The Sinatra code base is comparatively compact, but dense. I found it quite challenging to read initially. My hope is that this series could be of help for people who would like to get a better understanding of Sinatra internals, just as I did when I started diving into its source code.</p>
 
-<p>Rather than picking parts of the Sinatra source and commenting on them, I will present „Frankie“, a toy version of Sinatra I built to aid my own learning process. When I say „toy version of Sinatra“, I really mean four things: Frankie …</p>
+<p>Rather than commenting on selected parts of the Sinatra source, I will discuss „Frankie“, a toy version of Sinatra I built to aid my own learning process. When I say „toy version of Sinatra“, I really mean four things: Frankie …</p>
 
 <ol>
   <li>is fully functional,</li>
@@ -67,12 +67,12 @@
   <li>implements a <em>selection</em> of the Sinatra feature set only.</li>
 </ol>
 
-<p>In this post, we start even smaller: our initial version of Frankie will only run a couple dozen lines of code, and won’t be very capable at all. Subsequent iterations will extend and refine this base setting. Here is what we will be covering:</p>
+<p>In this post, we start even smaller: our initial version of Frankie will only consist of a couple dozen lines of code, and won’t be very capable at all. Subsequent iterations will extend and refine this base setting. Here is what we will be covering:</p>
 
 <ul>
   <li>Storing routes and handling requests (this post)</li>
   <li>The top-level DSL (<a href="/2018/06/02/frankie-reaches-for-the-top/">part 02</a> of the series)</li>
-  <li>Route parameters (<a href="/2018/06/03/frankie-recognizes-patterns/">part 03</a>)</li>
+  <li>Route parameters (<a href="/2018/06/03/frankie-sees-a-pattern/">part 03</a>)</li>
   <li>Rack middleware (<a href="/2018/06/04/frankie-likes-cookies/">part 04</a>)</li>
 </ul>
 
@@ -83,6 +83,8 @@
   <li>Flexible return values for route blocks</li>
   <li>Flexible control flow using <code class="highlighter-rouge">throw</code>/<code class="highlighter-rouge">catch</code></li>
 </ul>
+
+<p>My criterion for selecting the topics listed rather than others was simple: I wrote a <a href="https://github.com/benrodenhaeuser/frankie/blob/master/examples/quotes/app.rb">basic Sinatra app</a> (for maintaining a list of quotes by famous people), and then figured out what it takes to run this app while replacing Sinatra with Frankie.</p>
 
 <p>The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to understand than <a href="https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb"><code class="highlighter-rouge">sinatra/base.rb</code></a>, which has slightly less than 2000 lines of code.</p>
 
@@ -328,7 +330,7 @@
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/03/frankie-recognizes-patterns/">Frankie Recognizes Patterns</a><span class="sidebar-pad"></span><small>06/03/18</small>
+        <a class="post-link" href="/2018/06/03/frankie-sees-a-pattern/">Frankie Sees a Pattern</a><span class="sidebar-pad"></span><small>06/03/18</small>
       </h5>
       <p class="sidebar">
           Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.

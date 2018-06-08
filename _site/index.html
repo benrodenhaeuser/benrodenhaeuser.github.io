@@ -61,7 +61,7 @@
   <p>This is the final part in a four part series of blog posts that starts <a href="/2018/06/01/sinatra-from-scratch/">here</a>.</p>
 </blockquote>
 
-<p>The <a href="/2018/06/03/frankie-recognizes-patterns/">previous part</a> of this series of blog posts on Sinatra internals dealt with route parameters. In this final part, we turn to Sinatra’s take on Rack middleware, and briefly discuss those aspects of Frankie that are <em>not</em> covered in detail in the series.</p>
+<p>The <a href="/2018/06/03/frankie-sees-a-pattern/">previous part</a> of this series of blog posts on Sinatra internals dealt with route parameters. In this final part, we turn to Sinatra’s take on Rack middleware, and briefly discuss those aspects of Frankie that are <em>not</em> covered in detail in the series.</p>
 
 <p>The concept of Rack middleware grows naturally out of the concept of a Rack application. As described in part 01, a Rack application is an object that responds to <code class="highlighter-rouge">call</code> and returns a three-element array of the appropriate kind. Now nothing prevents a Rack app from sending a <code class="highlighter-rouge">call</code> message to <em>another</em> Rack app, and using the return value of that <code class="highlighter-rouge">call</code> to determine its own return value. If a number of Rack apps are hooked up in this way, each calling the next, the non-terminal nodes in this configuration are <em>middleware</em> (think of the middleware chain as a linked list of Rack apps and you are not far off from the truth). We can then wrap the whole chain in <em>another</em> object that responds to <code class="highlighter-rouge">call</code> (and returns an appropriate array) and provides an entry point to the whole middleware chain.</p>
 
@@ -247,18 +247,18 @@
 </div>
 </div>
 
-<p>Use <a href="https://github.com/benrodenhaeuser/frankie/blob/master/iterations/04_frankie_likes_cookies/frankie.rb">this file</a> to see for yourself, if you like. So now we have a version of Frankie that can handle cookies, as well as other pieces of middleware that may come in handy. Neat!</p>
+<p>Use <a href="https://github.com/benrodenhaeuser/frankie/blob/master/iterations/04_frankie_likes_cookies/frankie.rb">this file</a> (which provides a snapshot of the state of Frankie after these four posts) to see for yourself, if you like. So now we have a version of Frankie that can handle cookies, as well as other pieces of middleware that may come in handy. Neat!</p>
 
-<p>This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for some additional features that I have not discussed in detail.</p>
+<p>This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for pointers to some additional features that I have not discussed in detail. You might also want to check out the Frankie sample app mentioned in <a href="http://localhost:4000/2018/06/01/sinatra-from-scratch/">part 01</a>, if only to conclude that it really does look like a Sinatra app. You can find all the material in the Frankie repo <a href="https://github.com/benrodenhaeuser/frankie">on Github</a>.</p>
 
 <blockquote class="aside">
   <h3 id="theres-more">There’s More</h3>
-  <p>As mentioned earlier, there is more to Frankie than I could cover in this series of posts. Here is a quick overview of what you will find in the Frankie source beyond what we discussed here:</p>
+  <p>As mentioned earlier, there is more to Frankie than I could cover in this series of posts. Here is a quick overview of what Sinatra-inspired features you will find in the <a href="https://github.com/benrodenhaeuser/frankie/blob/master/frankie.rb">complete Frankie source</a> beyond what we discussed here:</p>
   <ul>
-    <li>View templates</li>
-    <li>Throw/catch</li>
-    <li>Flexible return values</li>
-    <li><code class="highlighter-rouge">at_exit</code></li>
+    <li>View templates: to better organize your code, separate presentation from application logic with view templates. The bindings of the application instance are passed into the template so that instance variables remain useable. Frankie’s <a href="https://github.com/benrodenhaeuser/frankie/blob/459a2a2997b8fd96d2af5617665eed53cbe7a4a6/frankie.rb#L4"><code class="highlighter-rouge">Templates</code> module</a> does the job.</li>
+    <li>Throw/catch: Sinatra makes quite heavy use of the <code class="highlighter-rouge">throw</code>/<code class="highlighter-rouge">catch</code> mechanism when handling requests. This is what makes Sinatra’s <code class="highlighter-rouge">halt</code> possible, as praised in <a href="http://myronmars.to/n/dev-blog/2012/01/why-sinatras-halt-is-awesome">this post</a>. To see how this is implemented in Frankie, start at the  <code class="highlighter-rouge">invoke { dispatch! }</code> method call <a href="https://github.com/benrodenhaeuser/frankie/blob/459a2a2997b8fd96d2af5617665eed53cbe7a4a6/frankie.rb#L114">here</a>.</li>
+    <li>Flexible return values: Frankie allows return values of route blocks to be strings (that end up as the response body), numbers (status codes) or „Rack triples“. The relevant code is <a href="https://github.com/benrodenhaeuser/frankie/blob/459a2a2997b8fd96d2af5617665eed53cbe7a4a6/frankie.rb#L139">part of the <code class="highlighter-rouge">invoke</code> method</a>.</li>
+    <li>Launching your application: the way Sinatra is set up, you simply <code class="highlighter-rouge">require 'sinatra'</code> at the top of an <code class="highlighter-rouge">app.rb</code> file, write your routes, and launch the app with <code class="highlighter-rouge">ruby app.rb</code> (at least if you code in the so-called „classical style“). In this way, you don’t need a <code class="highlighter-rouge">config.ru</code> file (even though you can still use one if you want). To make this possible, Sinatra uses the <a href="https://blog.arkency.com/2013/06/are-we-abusing-at-exit/"><code class="highlighter-rouge">at_exit</code> trick</a>, and so does Frankie.</li>
   </ul>
 </blockquote>
 
@@ -299,7 +299,7 @@
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/03/frankie-recognizes-patterns/">Frankie Recognizes Patterns</a><span class="sidebar-pad"></span><small>06/03/18</small>
+        <a class="post-link" href="/2018/06/03/frankie-sees-a-pattern/">Frankie Sees a Pattern</a><span class="sidebar-pad"></span><small>06/03/18</small>
       </h5>
       <p class="sidebar">
           Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.

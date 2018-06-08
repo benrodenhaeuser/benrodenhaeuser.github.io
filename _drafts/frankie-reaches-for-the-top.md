@@ -76,4 +76,4 @@ Fair enough. Let’s move on [to the next part of the series][6], where we talk 
 [3]:	http://ruby-doc.org/core-2.4.1/BasicObject.html#method-i-instance_eval
 [4]:	https://github.com/sinatra/sinatra/blob/a1e36db87e9d6bc3a2d8721078da18e704ee8ba3/lib/sinatra/base.rb#L1614
 [5]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/02_frankie_reaches_for_the_top/frankie.rb
-[6]:	/2018/06/03/frankie-recognizes-patterns/
+[6]:	/2018/06/03/frankie-sees-a-pattern/

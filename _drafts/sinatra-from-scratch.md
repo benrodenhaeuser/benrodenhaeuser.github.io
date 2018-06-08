@@ -6,14 +6,14 @@ date: 2018-06-01
 
 This series of posts grew out of my own attempt to understand the inner workings of [Sinatra][1], a popular Ruby tool for quickly building web applications. The Sinatra code base is comparatively compact, but dense. I found it quite challenging to read initially. My hope is that this series could be of help for people who would like to get a better understanding of Sinatra internals, just as I did when I started diving into its source code.
 
-Rather than picking parts of the Sinatra source and commenting on them, I will present „Frankie“, a toy version of Sinatra I built to aid my own learning process. When I say „toy version of Sinatra“, I really mean four things: Frankie …
+Rather than commenting on selected parts of the Sinatra source, I will discuss „Frankie“, a toy version of Sinatra I built to aid my own learning process. When I say „toy version of Sinatra“, I really mean four things: Frankie …
 
 1. is fully functional,
 2. is not meant for real-world use,
 3. follows the way Sinatra does things very closely, and
 4. implements a *selection* of the Sinatra feature set only.
 
-In this post, we start even smaller: our initial version of Frankie will only run a couple dozen lines of code, and won’t be very capable at all. Subsequent iterations will extend and refine this base setting. Here is what we will be covering:
+In this post, we start even smaller: our initial version of Frankie will only consist of a couple dozen lines of code, and won’t be very capable at all. Subsequent iterations will extend and refine this base setting. Here is what we will be covering:
 
 - Storing routes and handling requests (this post)
 - The top-level DSL ([part 02][2] of the series)
@@ -26,9 +26,11 @@ On every topic listed above, I will discuss how to implement a pared down versio
 - Flexible return values for route blocks
 - Flexible control flow using `throw`/`catch`
 
-The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to understand than [`sinatra/base.rb`][6], which has slightly less than 2000 lines of code. 
+My criterion for selecting the topics listed rather than others was simple: I wrote a [basic Sinatra app][6] (for maintaining a list of quotes by famous people), and then figured out what it takes to run this app while replacing Sinatra with Frankie.
 
-> Besides following this series of posts, one approach I would invite you to take is to read the Frankie source code [on Github][7], and use that as a launchpad for subsequently diving into the Sinatra source itself.
+The overall result is around 200 lines of code that – hopefully – give a pretty good impression of the way Sinatra works, and which should – hopefully – be a lot easier to understand than [`sinatra/base.rb`][7], which has slightly less than 2000 lines of code.
+
+> Besides following this series of posts, one approach I would invite you to take is to read the Frankie source code [on Github][8], and use that as a launchpad for subsequently diving into the Sinatra source itself.
 {: .aside}
 
 ## Hello Frankie
@@ -67,7 +69,7 @@ module Frankie
 end
 ```
 
-It’s quite straightforward, really: a class instance variable `@routes` (accessible via the class method `Frankie::Application.routes`) is maintained that holds an array of routes. In our implementation, each route is a hash with three keys, `:verb`, `:path`, and `:block`. Requests will be matched against this array of route. 
+It’s quite straightforward, really: a class instance variable `@routes` (accessible via the class method `Frankie::Application.routes`) is maintained that holds an array of routes. In our implementation, each route is a hash with three keys, `:verb`, `:path`, and `:block`. Requests will be matched against this array of route.
 
 Running the following sample code against the above class definition:
 
@@ -135,9 +137,9 @@ module Frankie
 end
 ```
 
-First, have a look at the class method `Frankie::Application.call`. Sinatra implements the [Rack interface][8], and, of course, Frankie follows suit. This means (1) that  `Frankie::Application` responds to `call` in the first place, and  (2) that the class method `call` returns a three-element array `[status, headers, body]`. Rack does the heavy lifting of parsing the HTTP request into the `env` hash that is passed to `call`, and assembling a valid HTTP response from `call`’s return value.
+First, have a look at the class method `Frankie::Application.call`. Sinatra implements the [Rack interface][9], and, of course, Frankie follows suit. This means (1) that  `Frankie::Application` responds to `call` in the first place, and  (2) that the class method `call` returns a three-element array `[status, headers, body]`. Rack does the heavy lifting of parsing the HTTP request into the `env` hash that is passed to `call`, and assembling a valid HTTP response from `call`’s return value.
 
-In the above code, the *class* method `call` creates a new instance of `Frankie::Application`, and invokes the *instance* method `call` on that new instance, passing along `env`. Instance level `call` will do the work, and its return value will determine the return value of class level `call`. 
+In the above code, the *class* method `call` creates a new instance of `Frankie::Application`, and invokes the *instance* method `call` on that new instance, passing along `env`. Instance level `call` will do the work, and its return value will determine the return value of class level `call`.
 
 The idea of generating a new instance for every request reflects the stateless nature of the HTTP protocol: if the class itself were to handle the request, information could easily leak across requests. It also puts the division of labour mentioned above into practice: handling the request is an instance-level responsibility, so the class simply forwards the `call` to such an instance.
 
@@ -150,18 +152,19 @@ Frankie::Application.get('/') { "Frankie says hello." }
 Rack::Handler::WEBrick.run Frankie::Application
 ```
 
-Run the code (the file is [here][9]), point your browser to `localhost:8080` (8080 is the port [set by the `Rack::Handler::WEBrick.run` method][10]), and you will be greeted by Frankie.
+Run the code (the file is [here][10]), point your browser to `localhost:8080` (8080 is the port [set by the `Rack::Handler::WEBrick.run` method][11]), and you will be greeted by Frankie.
 
-So we got ourselves the beginnings of a web framework, or the beginnings of a „tool for solving HTTP“, if you prefer. But, of course, we are just getting started. In [part 02 of the series][11], we will have a look at one of the signature features of Sinatra: it’s elegant top level DSL.
+So we got ourselves the beginnings of a web framework, or the beginnings of a „tool for solving HTTP“, if you prefer. But, of course, we are just getting started. In [part 02 of the series][12], we will have a look at one of the signature features of Sinatra: it’s elegant top level DSL.
 
 [1]:	http://sinatrarb.com
 [2]:	/2018/06/02/frankie-reaches-for-the-top/
-[3]:	/2018/06/03/frankie-recognizes-patterns/
+[3]:	/2018/06/03/frankie-sees-a-pattern/
 [4]:	/2018/06/04/frankie-likes-cookies/
 [5]:	/2018/06/04/frankie-likes-cookies/
-[6]:	https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
-[7]:	https://github.com/benrodenhaeuser/frankie
-[8]:	https://rack.github.io
-[9]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/01_hello_frankie/frankie.rb
-[10]:	https://github.com/rack/rack/blob/42e48013dd1b6dbda990dfa3851856c199b0b1f9/lib/rack/handler/webrick.rb#L32
-[11]:	/2018/06/02/frankie-reaches-for-the-top/
+[6]:	https://github.com/benrodenhaeuser/frankie/blob/master/examples/quotes/app.rb
+[7]:	https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
+[8]:	https://github.com/benrodenhaeuser/frankie
+[9]:	https://rack.github.io
+[10]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/01_hello_frankie/frankie.rb
+[11]:	https://github.com/rack/rack/blob/42e48013dd1b6dbda990dfa3851856c199b0b1f9/lib/rack/handler/webrick.rb#L32
+[12]:	/2018/06/02/frankie-reaches-for-the-top/

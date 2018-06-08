@@ -1,5 +1,5 @@
 ---
-title: "Frankie Recognizes Patterns"
+title: "Frankie Sees a Pattern"
 description: 'Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.'
 date: 2018-06-03
 ---
@@ -121,7 +121,7 @@ which we merge into `params`. Done!
 > Sinatra goes out of its way to allow users flexibility in making use of route parameters. In addition to strings, regular expressions are allowed as route paths, and route paths may contain wildcards („splats“) and/or optional parameters. So we have merely scratched the surface here. Also, the way Sinatra stores and processes parametrized routes has changed somewhat with the advent of the [Mustermann string processing library][4] in Sinatra 2.0. Our approach here is closer to how things used to work up to Sinatra 1.4.x.
 {: .aside}
 
-Try it out using [this file][5], if you like, requesting your favourite song from your favourite album.
+Try it out using [this file][5] (which contains the Frankie code as of the end of this part of our series), requesting your favourite song from your favourite album.
 
 Next up in the series: [working with Rack middleware][6].
 
@@ -129,5 +129,5 @@ Next up in the series: [working with Rack middleware][6].
 [2]:	/2018/06/02/frankie-reaches-for-the-top/
 [3]:	/2018/06/01/sinatra-from-scratch/
 [4]:	https://github.com/sinatra/mustermann
-[5]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/03_frankie_recognizes_patterns/frankie.rb
+[5]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/03_frankie_sees_a_pattern/frankie.rb
 [6]:	/2018/06/04/frankie-likes-cookies/
