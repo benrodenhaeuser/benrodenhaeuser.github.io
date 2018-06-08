@@ -1,6 +1,6 @@
 ---
 title: "Frankie Likes Cookies"
-description: 'Working with Rack middleware: part 04 of the "Sinatra From Scratch" series.'
+description: 'Working with Rack middleware: part 04 of the "Sinatra from Scratch" series.'
 date: 2018-06-04
 ---
 
