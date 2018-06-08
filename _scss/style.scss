@@ -138,15 +138,27 @@ a:hover, a:focus {
   color: #494949;
 }
 
-ul {
+ul, ol {
     list-style-type: none;
     padding-left: 1.3em;
 }
 
-ul > li:before {
-    content: "—";
+ol {
+  counter-reset: list;
+}
+
+ul > li:before, ol > li:before {
     position: absolute;
     margin-left: -1.3em;
+}
+
+ul > li:before {
+  content: "—";
+}
+
+ol > li:before {
+  counter-increment: list;
+  content: counter(list) ".";
 }
 
 a small {
@@ -164,6 +176,10 @@ blockquote {
   margin: 0;
   padding: 0;
   text-align: center;
+}
+
+blockquote:last-child {
+  margin-bottom: 0;
 }
 
 .aside {

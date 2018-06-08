@@ -50,21 +50,21 @@
   </h1>
 
   <div class="description">
-    Defining parametrized routes: part 03 of the "Understanding Sinatra" series.
+    Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.
   </div>
 
   <div class="content">
     <hr class="line" />
     <div class="content-inner">
       <blockquote class="aside">
-  <p>This is part 03 in a four part series of blog posts that starts <a href="/2018/06/01/understanding-sinatra/">here</a>.</p>
+  <p>This is part 03 in a four part series of blog posts that starts <a href="/2018/06/01/sinatra-from-scratch/">here</a>.</p>
 </blockquote>
 
-<p>In the <a href="/2018/06/02/frankie-goes-top-level/">previous installation</a> of this blog post series, Frankie picked up a bit of Sinatra’s signature DSL magic. Next, let’s expand Frankie’s capabilities a bit. What is sorely missing from our toy version of Sinatra so far is the ability to <em>parametrize routes</em>:</p>
+<p>In the <a href="/2018/06/02/frankie-reaches-for-the-top/">previous installation</a> of this blog post series, Frankie picked up a bit of Sinatra’s signature DSL magic. Next, let’s make Frankie a bit more capable. What is sorely missing from our toy version of Sinatra so far is the ability to <em>parametrize routes</em>:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
-3</pre></td><td class="code"><pre><span class="n">get</span> <span class="s1">'/albums/:album/song/:song'</span> <span class="k">do</span>
+3</pre></td><td class="code"><pre><span class="n">get</span> <span class="s1">'/albums/:album/songs/:song'</span> <span class="k">do</span>
   <span class="s2">"Next up: '</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="s1">'song'</span><span class="p">]</span><span class="si">}</span><span class="s2">' from '</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="s1">'album'</span><span class="p">]</span><span class="si">}</span><span class="s2">'."</span>
 <span class="k">end</span>
 </pre></td></tr></tbody></table>
@@ -77,16 +77,16 @@
   <p><code class="highlighter-rouge">/albums/greatest-hits/songs/my-way</code></p>
 </blockquote>
 
-<p>In this example, <code class="highlighter-rouge">'greatest-hits'</code> and <code class="highlighter-rouge">'my-way</code> are essentially arguments that fill in the slots provided by the parameters <code class="highlighter-rouge">:album</code> and <code class="highlighter-rouge">:song</code>. As the route block shows, the mapping from parameters to arguments supplied should be available as key-value pairs within a <code class="highlighter-rouge">params</code> hash, for Frankie users to freely make use of.</p>
+<p>In this example, <code class="highlighter-rouge">'greatest-hits'</code> and <code class="highlighter-rouge">'my-way</code> are essentially arguments that fill in the slots provided by the parameters <code class="highlighter-rouge">:album</code> and <code class="highlighter-rouge">:song</code>. As the route block shows, the mappings from parameters to arguments supplied by the user making the request should be available as key-value pairs within a <code class="highlighter-rouge">params</code> hash, for „Frankie developers“ to freely make use of.</p>
 
-<p>Here is an idea how to make this work: Let’s match the request path against a regular expression stored along with the route in <code class="highlighter-rouge">Frankie::Application</code>. In our example, we expect the matching to produce the captures <code class="highlighter-rouge">greatest-hits</code> and <code class="highlighter-rouge">my-way</code>. These should be linked with the route parameters to form a hash</p>
+<p>Here is an idea how to make this work: Let’s match the request path against a regular expression stored along with the route in <code class="highlighter-rouge">Frankie::Application</code>. In our example, we expect the matching to produce regex captures <code class="highlighter-rouge">greatest-hits</code> and <code class="highlighter-rouge">my-way</code>. These should be linked with the route parameters to form a hash</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="p">{</span> <span class="s1">'album'</span> <span class="o">=&gt;</span> <span class="s1">'greatest-hits'</span><span class="p">,</span> <span class="s1">'song'</span> <span class="o">=&gt;</span> <span class="s1">'my-way'</span> <span class="p">}</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<p>which should be merged into the <code class="highlighter-rouge">params</code> hash (which is stored as part of the Rack <code class="highlighter-rouge">@request</code> object). The <code class="highlighter-rouge">params</code> hash, in turn, needs to be available to the instance handling the request, so it should be the return value of an instance method <code class="highlighter-rouge">params</code>.  As we saw above, route blocks are evaluated in the context of the current instance, so if the current instance has access to an instance method, then we can call it from a route block.</p>
+<p>which should then be merged into a <code class="highlighter-rouge">params</code> hash. The <code class="highlighter-rouge">params</code> hash, in turn, needs to be available to the instance handling the request, so it should be the return value of an instance method <code class="highlighter-rouge">params</code>.  As we saw above, route blocks are evaluated in the context of the current instance, so if the current instance has access to an instance method, then we can call it from a route block.</p>
 
 <p>Starting at the end, we implement the <code class="highlighter-rouge">params</code> method first:</p>
 
@@ -107,9 +107,9 @@
 </div>
 </div>
 
-<p>Remember that <code class="highlighter-rouge">@request</code> is an instance of <code class="highlighter-rouge">Rack::Request</code>. Conveniently, <code class="highlighter-rouge">@request</code> is a hash we can use for our purposes.</p>
+<p>Remember that <code class="highlighter-rouge">@request</code> is an instance of <code class="highlighter-rouge">Rack::Request</code>. Conveniently, <code class="highlighter-rouge">@request.params</code> is a hash we can use for our purposes.</p>
 
-<p>Next, let’s adapt our mechanism for <em>storing</em> routes with parameters. Keeping in mind what was said in <a href="/2018/06/01/understanding-sinatra/">part 01 of this series</a>, this needs to happen at the <em>class level</em>:</p>
+<p>Next, let’s adapt our mechanism for <em>storing</em> routes with parameters. Keeping in mind what was said in <a href="/2018/06/01/sinatra-from-scratch/">part 01 of this series</a>, this needs to happen at the <em>class level</em>. The method we need to change is the class method <code class="highlighter-rouge">route</code>.</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -180,7 +180,7 @@
 </div>
 </div>
 
-<p>The <code class="highlighter-rouge">route</code> method compiles a given path (possible containing parameters) into a <code class="highlighter-rouge">pattern</code> (a regular expression) and a set of string <code class="highlighter-rouge">keys</code>. During request handling, those strings will eventually become keys in the <code class="highlighter-rouge">params</code> hash.</p>
+<p>This new version of the <code class="highlighter-rouge">route</code> method compiles a given path (possible containing parameters) into a <code class="highlighter-rouge">pattern</code> (a regular expression) and an array of strings called <code class="highlighter-rouge">keys</code>. During request handling, those strings will eventually become keys in the <code class="highlighter-rouge">params</code> hash.</p>
 
 <p>For the above example route, the <code class="highlighter-rouge">[pattern, keys]</code> array returned by the <code class="highlighter-rouge">compile</code> method looks as follows:</p>
 
@@ -189,7 +189,7 @@
 </div>
 </div>
 
-<p>Within the regex, <code class="highlighter-rouge">([^\/]+)</code> matches sequences of characters that do not contain forward slashes – these will be the arguments that fill in the slots provided by our route parameters.</p>
+<p>Within the regex, <code class="highlighter-rouge">([^\/]+)</code> captures sequences of characters that do not contain forward slashes – these will be the arguments that fill in the slots provided by our route parameters.</p>
 
 <p>Now on the <em>instance level</em>, we exploit the information stored in <code class="highlighter-rouge">pattern</code> and <code class="highlighter-rouge">keys</code> as follows:</p>
 
@@ -234,7 +234,7 @@
 <p>which we merge into <code class="highlighter-rouge">params</code>. Done!</p>
 
 <blockquote class="aside">
-  <p>Sinatra goes out of its way to allow users flexibility in making use of route parameters. For instance, regular expressions are allowed as route paths, and route paths may contain wildcards („splats“) and/or optional parameters. So we have merely scratched the surface here. Also, the way Sinatra stores and processes parametrized routes has changed somewhat with the advent of the s<a href="https://github.com/sinatra/mustermann">Mustermann string processing library</a> in Sinatra 2.0. Our approach here is closer to how things used to work up to Sinatra 1.4.x.</p>
+  <p>Sinatra goes out of its way to allow users flexibility in making use of route parameters. In addition to strings, regular expressions are allowed as route paths, and route paths may contain wildcards („splats“) and/or optional parameters. So we have merely scratched the surface here. Also, the way Sinatra stores and processes parametrized routes has changed somewhat with the advent of the <a href="https://github.com/sinatra/mustermann">Mustermann string processing library</a> in Sinatra 2.0. Our approach here is closer to how things used to work up to Sinatra 1.4.x.</p>
 </blockquote>
 
 <p>Try it out using <a href="https://github.com/benrodenhaeuser/frankie/blob/master/iterations/03_frankie_recognizes_patterns/frankie.rb">this file</a>, if you like, requesting your favourite song from your favourite album.</p>
@@ -274,28 +274,28 @@
         <a class="post-link" href="/2018/06/04/frankie-likes-cookies/">Frankie Likes Cookies</a><span class="sidebar-pad"></span><small>06/04/18</small>
       </h5>
       <p class="sidebar">
-          Working with Rack middleware: part 04 of the "Understanding Sinatra" series.
+          Working with Rack middleware: part 04 of the "Sinatra From Scratch" series.
       </p>
       
       <h5>
         <a class="post-link" href="/2018/06/03/frankie-recognizes-patterns/">Frankie Recognizes Patterns</a><span class="sidebar-pad"></span><small>06/03/18</small>
       </h5>
       <p class="sidebar">
-          Defining parametrized routes: part 03 of the "Understanding Sinatra" series.
+          Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/02/frankie-goes-top-level/">Frankie Goes Top Level</a><span class="sidebar-pad"></span><small>06/02/18</small>
+        <a class="post-link" href="/2018/06/02/frankie-reaches-for-the-top/">Frankie Reaches for the Top</a><span class="sidebar-pad"></span><small>06/02/18</small>
       </h5>
       <p class="sidebar">
-          The top-level DSL: part 02 of the "Understanding Sinatra" series.
+          The top-level DSL: part 02 of the "Sinatra From Scratch" series.
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/01/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>06/01/18</small>
+        <a class="post-link" href="/2018/06/01/sinatra-from-scratch/">Sinatra From Scratch</a><span class="sidebar-pad"></span><small>06/01/18</small>
       </h5>
       <p class="sidebar">
-          Hello Frankie: building a toy version of a Ruby web framework from the ground up.
+          Building a toy version of a Ruby web framework from the ground up.
       </p>
       
       <h5>

@@ -238,15 +238,23 @@ a { color: #FF7F50; text-decoration: none; }
 
 a:hover, a:focus { color: #494949; }
 
-ul { list-style-type: none; padding-left: 1.3em; }
+ul, ol { list-style-type: none; padding-left: 1.3em; }
 
-ul > li:before { content: "—"; position: absolute; margin-left: -1.3em; }
+ol { counter-reset: list; }
+
+ul > li:before, ol > li:before { position: absolute; margin-left: -1.3em; }
+
+ul > li:before { content: "—"; }
+
+ol > li:before { counter-increment: list; content: counter(list) "."; }
 
 a small { color: #777; margin-top: -0.3em; display: block; }
 
 .wrapper { width: 1150px; margin: 0 auto; }
 
 blockquote { margin: 0; padding: 0; text-align: center; }
+
+blockquote:last-child { margin-bottom: 0; }
 
 .aside { margin: 22.5px 0; text-align: left; padding: 20px; background-color: #F3F3F3; }
 

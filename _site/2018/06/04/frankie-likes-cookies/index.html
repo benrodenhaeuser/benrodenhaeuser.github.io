@@ -50,19 +50,19 @@
   </h1>
 
   <div class="description">
-    Working with Rack middleware: part 04 of the "Understanding Sinatra" series.
+    Working with Rack middleware: part 04 of the "Sinatra From Scratch" series.
   </div>
 
   <div class="content">
     <hr class="line" />
     <div class="content-inner">
       <blockquote class="aside">
-  <p>This is the final part in a four part series of blog posts that starts <a href="/2018/06/01/understanding-sinatra/">here</a>.</p>
+  <p>This is the final part in a four part series of blog posts that starts <a href="/2018/06/01/sinatra-from-scratch/">here</a>.</p>
 </blockquote>
 
-<p>The <a href="/2018/06/03/frankie-recognizes-patterns/">previous part</a> of this series of blog posts on Sinatra internals dealt with route parameters. This final part turns to Sinatra’s take on Rack middleware.</p>
+<p>The <a href="/2018/06/03/frankie-recognizes-patterns/">previous part</a> of this series of blog posts on Sinatra internals dealt with route parameters. In this final part, we turn to Sinatra’s take on Rack middleware, and briefly discuss those aspects of Frankie that are <em>not</em> covered in detail in the series.</p>
 
-<p>The concept of Rack middleware grows naturally out of the concept of a Rack application. A Rack application is an object that responds to <code class="highlighter-rouge">call</code> and returns a three-element array of the appropriate kind (as described above). Nothing prevents a Rack app from sending a <code class="highlighter-rouge">call</code> message to <em>another</em> Rack app, and using the return value of that <code class="highlighter-rouge">call</code> to determine its own return value. If a number of Rack apps are hooked up in this way, each calling the next, the non-terminal nodes in this configuration are <em>middleware</em> (think of the middleware chain as a linked list of Rack apps and you are not far off from the truth).</p>
+<p>The concept of Rack middleware grows naturally out of the concept of a Rack application. As described in part 01, a Rack application is an object that responds to <code class="highlighter-rouge">call</code> and returns a three-element array of the appropriate kind. Now nothing prevents a Rack app from sending a <code class="highlighter-rouge">call</code> message to <em>another</em> Rack app, and using the return value of that <code class="highlighter-rouge">call</code> to determine its own return value. If a number of Rack apps are hooked up in this way, each calling the next, the non-terminal nodes in this configuration are <em>middleware</em> (think of the middleware chain as a linked list of Rack apps and you are not far off from the truth). We can then wrap the whole chain in <em>another</em> object that responds to <code class="highlighter-rouge">call</code> (and returns an appropriate array) and provides an entry point to the whole middleware chain.</p>
 
 <p>Sinatra applications are Rack applications, so of course they place nice with Rack middleware. If you have a number of middleware nodes you want to make use of, all you need to do is place corresponding <code class="highlighter-rouge">use</code> statements close to the top of your Sinatra application file, such as:</p>
 
@@ -77,7 +77,7 @@
 
 <p>Sinatra will hook up the nodes in such way that, as a new request comes in, a <code class="highlighter-rouge">MyMiddleware1</code> instance will be the first node to receive a <code class="highlighter-rouge">call</code> message, and an instance of <code class="highlighter-rouge">Sinatra::Application</code> will be the last (the Sinatra app <em>fronts</em> the middleware chain), with each but the last node <code class="highlighter-rouge">call</code>ing the next node in turn. This is simply the way Rack does it, and Sinatra sticks to the protocol.</p>
 
-<p>In this section, we will implement the same functionality in Frankie, using cookie-based session management as provided by <code class="highlighter-rouge">Rack::Session::Cookie</code> as an example for a commonly used piece of middleware we simply take off the shelf. As we will see, the presence of middleware will necessitate a more sophisticated way of handling the division of labour between class and instance that we first talked about in <a href="/2018/06/01/understanding-sinatra/">part 01</a> of this series.</p>
+<p>In this section, we will implement the same functionality in Frankie, using cookie-based session management as provided by <code class="highlighter-rouge">Rack::Session::Cookie</code> as an example for a commonly used piece of middleware we can simply take off the shelf. As we will see, the presence of middleware will necessitate a more sophisticated way of handling the division of labour between class and instance that we first talked about in <a href="/2018/06/01/sinatra-from-scratch/">part 01</a> of this series.</p>
 
 <blockquote class="aside">
   <p><code class="highlighter-rouge">Rack::Session::Cookie</code>  is also the default session management solution used by Sinatra. However, Sinatra goes one step further and makes sessions a setting, so beside <code class="highlighter-rouge">use Rack:Session::Cookies</code>, you can also simply do <code class="highlighter-rouge">enable :sessions</code>.</p>
@@ -150,9 +150,9 @@
 </div>
 </div>
 
-<p>The gist is this: every <code class="highlighter-rouge">use</code> statement in our code adds a middleware node to the <code class="highlighter-rouge">@middleware</code> array. As a <code class="highlighter-rouge">@prototype</code> object is newly created (making use of the <code class="highlighter-rouge">Rack::Builder</code> class), all those nodes are „wired up“, with a <code class="highlighter-rouge">Frankie::Application</code> instance fronting the middleware chain. Note that the <code class="highlighter-rouge">@prototype</code> object is created only once and stored in the <code class="highlighter-rouge">@prototype</code> class instance variable. The next time around, <code class="highlighter-rouge">protoype</code> will return the value of that variable, rather than setting up the middleware chain again.</p>
+<p>The gist is this: every <code class="highlighter-rouge">use</code> statement in our code adds a middleware node to the <code class="highlighter-rouge">@middleware</code> array (for this to work, we need to <em>delegate</em> <code class="highlighter-rouge">use</code> statements from <code class="highlighter-rouge">main</code> to <code class="highlighter-rouge">Frankie::Application</code>, as described in <a href="/2018/06/01/sinatra-from-scratch/">part 01</a>). As a <code class="highlighter-rouge">@prototype</code> object is newly created (making use of the <code class="highlighter-rouge">Rack::Builder</code> class), all those nodes are „wired up“, with a <code class="highlighter-rouge">Frankie::Application</code> instance fronting the middleware chain. Note that the <code class="highlighter-rouge">@prototype</code> object is created only once and stored in the <code class="highlighter-rouge">@prototype</code> class instance variable. The next time around, <code class="highlighter-rouge">protoype</code> will return the value of that variable, rather than setting up the middleware chain again.</p>
 
-<p>This points to a problem for our earlier approach of creating a new instance of <code class="highlighter-rouge">Frankie::Application</code> on every incoming request. Namely, once the middleware chain is set up as above, a specific instance of <code class="highlighter-rouge">Frankie::Application</code> will persistently front the middleware chain, i.e., it will survive across requests. After all, it’s stored in the <code class="highlighter-rouge">prototype</code> object. The question is how to reinstate the „one instance per request“ principle in this context.</p>
+<p>While this is clearly the right approach, it points to a problem for our earlier way of creating a new instance of <code class="highlighter-rouge">Frankie::Application</code> on every incoming request. Namely, once the middleware chain is set up as above, a specific instance of <code class="highlighter-rouge">Frankie::Application</code> will persistently front the middleware chain, i.e., it will survive across requests. After all, it’s stored as part of the middleware configuration in the <code class="highlighter-rouge">prototype</code> object. The question then is how to reinstate the „one instance per request“ principle in this context.</p>
 
 <p>Sinatra’s, and accordingly, Frankie’s, solution is to use the stored instance as a blueprint which is duplicated with every request (hence the choice of the name „<code class="highlighter-rouge">prototype</code>“). So we add the following code:</p>
 
@@ -189,9 +189,9 @@
 </div>
 </div>
 
-<p>As the <code class="highlighter-rouge">Frankie::Application</code> <em>class</em> receives the <code class="highlighter-rouge">call</code> from the web server, it passes the <code class="highlighter-rouge">call</code> to the <code class="highlighter-rouge">prototype</code> object. The middleware nodes process the request (encoded in <code class="highlighter-rouge">env</code>) in turn, until finally, the <code class="highlighter-rouge">Frankie::Application</code> instance fronting the chain is <code class="highlighter-rouge">call</code>ed. At this point, the instance <em>duplicates itself</em> and invokes <code class="highlighter-rouge">call!</code> on the duplicate. The actual route-handling code that used to live in <code class="highlighter-rouge">Frankie::Application#call</code> is simply moved to <code class="highlighter-rouge">call!</code>.</p>
+<p>As the <code class="highlighter-rouge">Frankie::Application</code> <em>class</em> receives a <code class="highlighter-rouge">call</code> from the web server, it passes the <code class="highlighter-rouge">call</code> to the <code class="highlighter-rouge">prototype</code> object. This results in the middleware nodes being <code class="highlighter-rouge">call</code>ed in turn, until finally, the <code class="highlighter-rouge">Frankie::Application</code> instance fronting the chain is <code class="highlighter-rouge">call</code>ed. At this point, the instance <em>duplicates itself</em> and invokes <code class="highlighter-rouge">call!</code> on the duplicate. The actual route-handling code that used to live in <code class="highlighter-rouge">Frankie::Application#call</code> is simply moved to <code class="highlighter-rouge">call!</code>. Overall, this is really elegant, and it’s just how Sinatra does it.</p>
 
-<p>As promised, setting up middleware is really easy now. For illustration, return to our use case of cookie-based session management. Let’s add a <code class="highlighter-rouge">session</code> method for accessing the session object. It simply wraps the session object provided by Rack:</p>
+<p>As promised, setting up middleware is really easy now. For illustration, return to our use case of cookie-based session management. Let’s first add a <code class="highlighter-rouge">session</code> method for accessing the session object. It simply wraps the session object provided by Rack:</p>
 
 <div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
 2
@@ -212,14 +212,43 @@
 
 <p>Now all we really need to do as a Frankie user is to add the earlier-mentioned use statement to our app:</p>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">use</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Session</span><span class="o">::</span><span class="no">Cookie</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="n">use</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Session</span><span class="o">::</span><span class="no">Cookie</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'rack.session'</span><span class="p">,</span> <span class="ss">:secret</span> <span class="o">=&gt;</span> <span class="s2">"secret"</span>
 </pre></td></tr></tbody></table>
 </div>
 </div>
 
-<p>(TODO: The Test)</p>
+<p>To verify that our session management works, we send ourselves a message across requests:</p>
 
-<p>(TODO: Conclusion)</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="n">get</span> <span class="s1">'/set_message'</span> <span class="k">do</span>
+  <span class="n">session</span><span class="p">[</span><span class="ss">:message</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Hello, there."</span>
+  <span class="s2">"Message has been set."</span>
+<span class="k">end</span>
+
+<span class="n">get</span> <span class="s1">'/get_message'</span> <span class="k">do</span>
+  <span class="k">if</span> <span class="n">session</span><span class="p">[</span><span class="ss">:message</span><span class="p">]</span>
+	<span class="s2">"Your message: "</span> <span class="o">+</span> <span class="n">session</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:message</span><span class="p">)</span>
+  <span class="k">else</span>
+	<span class="s2">"There is no message."</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table>
+</div>
+</div>
+
+<p>Use <a href="https://github.com/benrodenhaeuser/frankie/blob/master/iterations/04_frankie_likes_cookies/frankie.rb">this file</a> to see for yourself, if you like. So now we have a version of Frankie that can handle cookies, as well as other pieces of middleware that may come in handy. Neat!</p>
+
+<p>This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for some additional features that I have not discussed in detail.</p>
 
 <blockquote class="aside">
   <h3 id="theres-more">There’s More</h3>
@@ -265,28 +294,28 @@
         <a class="post-link" href="/2018/06/04/frankie-likes-cookies/">Frankie Likes Cookies</a><span class="sidebar-pad"></span><small>06/04/18</small>
       </h5>
       <p class="sidebar">
-          Working with Rack middleware: part 04 of the "Understanding Sinatra" series.
+          Working with Rack middleware: part 04 of the "Sinatra From Scratch" series.
       </p>
       
       <h5>
         <a class="post-link" href="/2018/06/03/frankie-recognizes-patterns/">Frankie Recognizes Patterns</a><span class="sidebar-pad"></span><small>06/03/18</small>
       </h5>
       <p class="sidebar">
-          Defining parametrized routes: part 03 of the "Understanding Sinatra" series.
+          Defining parametrized routes: part 03 of the "Sinatra From Scratch" series.
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/02/frankie-goes-top-level/">Frankie Goes Top Level</a><span class="sidebar-pad"></span><small>06/02/18</small>
+        <a class="post-link" href="/2018/06/02/frankie-reaches-for-the-top/">Frankie Reaches for the Top</a><span class="sidebar-pad"></span><small>06/02/18</small>
       </h5>
       <p class="sidebar">
-          The top-level DSL: part 02 of the "Understanding Sinatra" series.
+          The top-level DSL: part 02 of the "Sinatra From Scratch" series.
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/01/understanding-sinatra/">Understanding Sinatra</a><span class="sidebar-pad"></span><small>06/01/18</small>
+        <a class="post-link" href="/2018/06/01/sinatra-from-scratch/">Sinatra From Scratch</a><span class="sidebar-pad"></span><small>06/01/18</small>
       </h5>
       <p class="sidebar">
-          Hello Frankie: building a toy version of a Ruby web framework from the ground up.
+          Building a toy version of a Ruby web framework from the ground up.
       </p>
       
       <h5>
