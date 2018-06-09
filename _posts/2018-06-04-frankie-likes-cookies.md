@@ -11,6 +11,8 @@ The [previous part][2] of this series of blog posts on Sinatra internals dealt w
 
 The concept of Rack middleware grows naturally out of the concept of a Rack application. As described in [part 01](http://notes.benrodenhaeuser.io/2018/06/01/sinatra-from-scratch/), a Rack application is an object that responds to `call` and returns a three-element array of the appropriate kind. Now nothing prevents a Rack app from sending a `call` message to *another* Rack app, and using the return value of that `call` to determine its own return value. If a number of Rack apps are hooked up in this way, each calling the next, the non-terminal nodes in this configuration are *middleware* (think of the middleware chain as a linked list of Rack apps and you are not far off from the truth). We can then wrap the whole chain in *another* object that responds to `call` (and returns an appropriate array) and provides an entry point to the whole middleware chain.
 
+The purpose of setting up such a chain (or "pipeline") of processing steps is to cleanly separate the various tasks that arise during a request-response cycle – which besides the actual request handling (which is the responsibility of your route controllers) may include authentication, logging, session management and a host of other things (see [this](https://stackoverflow.com/a/2257031/2744529) Stack Overflow answer for an excellent explanation and further pointers).
+
 Sinatra applications are Rack applications, so of course they place nice with Rack middleware. If you have a number of middleware nodes you want to make use of, all you need to do is place corresponding `use` statements close to the top of your Sinatra application file, such as:
 
 ```ruby

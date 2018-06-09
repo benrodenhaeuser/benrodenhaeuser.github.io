@@ -143,7 +143,7 @@ In the above code, the *class* method `call` creates a new instance of `Frankie:
 
 The idea of generating a new instance for every request reflects the stateless nature of the HTTP protocol: if the class itself were to handle the request, information could easily leak across requests. It also puts the division of labour mentioned above into practice: handling the request is an instance-level responsibility, so the class simply forwards the `call` to such an instance.
 
-The `route!` method (an instance method, not to be confused with the earlier class method `route`) which is invoked from the instance method`call` is really the heart of the matter. Given an incoming request, `route!` attempts to fetch a matching route from the `routes` array maintained by the class. If successful, the Proc object stored for that route is called. The return value of that call determines the body of our HTTP response. If, on the other hand, no matching route is found, we send a 404 response to the client.
+The `route!` method (an instance method, not to be confused with the earlier class method `route`) which is invoked from the instance method `call` is really the heart of the matter. Given an incoming request, `route!` attempts to fetch a matching route from the `routes` array maintained by the class. If successful, the Proc object stored for that route is called. The return value of that call determines the body of our HTTP response. If, on the other hand, no matching route is found, we send a 404 response to the client.
 
 To see this in action, let's add `require 'rack'` to the top of the file, and the following code to the bottom:
 
