@@ -67,7 +67,7 @@ end
 
 Recall that `match[:block]` is a Proc object. We convert this object to a block `&match[:block]`, and pass it into `instance_eval`. Since the receiver of the `instance_eval` message is our `Frankie::Application` instance, this instance provides the context in which the block is evaluated. So in particular, all the instance methods of `Frankie::Application` are available to the block at evaluation time.
 
-Summing up, two main ingredients enable top-level route controlers: delegated method calls, and route blocks that are scoped to the current application instance as a request is handled. Run [this file][5] (our code so far), head to `localhost:8080/ditty`, and you will see that our sample request from above works: we get back a 301, indicating that the requested resource has been moved.
+Summing up, two main ingredients enable top-level route controllers: delegated method calls, and route blocks that are scoped to the current application instance as a request is handled. Run [this file][5] (our code so far), head to `localhost:8080/ditty`, and you will see that our sample request from above works: we get back a 301, indicating that the requested resource has been moved.
 
 Fair enough. Let’s move on [to the next part of the series][6], where we talk about route parameters.
 

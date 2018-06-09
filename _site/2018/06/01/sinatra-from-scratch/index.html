@@ -96,7 +96,7 @@
 
 <p>The people behind Sinatra like to emphasize that Sinatra is not a framework, but rather a tool for „solving HTTP“, a „DSL for quickly creating web applications in Ruby with minimal effort“.</p>
 
-<p>While I will continue to use the term „framework“ (for lack of a better word, not to make some kind of point), the idea of „solving HTTP“ provides as good a starting point as any for our exploration. The most basic aspect of this is arguably the capability to set up route controlers that handle incoming HTTP requests. Sinatra sets up a basic division of labour in this regard: while routes are stored on the class level, requests are handled on the level of the instance.</p>
+<p>While I will continue to use the term „framework“ (for lack of a better word, not to make some kind of point), the idea of „solving HTTP“ provides as good a starting point as any for our exploration. The most basic aspect of this is arguably the capability to set up route controllers that handle incoming HTTP requests. Sinatra sets up a basic division of labour in this regard: while routes are stored on the class level, requests are handled on the level of the instance.</p>
 
 <p>To get started with our Frankie toy framework, let’s first see how to store routes.</p>
 
@@ -278,7 +278,7 @@
 
 <p>The idea of generating a new instance for every request reflects the stateless nature of the HTTP protocol: if the class itself were to handle the request, information could easily leak across requests. It also puts the division of labour mentioned above into practice: handling the request is an instance-level responsibility, so the class simply forwards the <code class="highlighter-rouge">call</code> to such an instance.</p>
 
-<p>The <code class="highlighter-rouge">route!</code> method (an instance method, not to be confused with the earlier class method <code class="highlighter-rouge">route</code>) which is invoked from the instance method<code class="highlighter-rouge">call</code> is really the heart of the matter. Given an incoming request, <code class="highlighter-rouge">route!</code> attempts to fetch a matching route from the <code class="highlighter-rouge">routes</code> array maintained by the class. If successful, the Proc object stored for that route is called. The return value of that call determines the body of our HTTP response. If, on the other hand, no matching route is found, we send a 404 response to the client.</p>
+<p>The <code class="highlighter-rouge">route!</code> method (an instance method, not to be confused with the earlier class method <code class="highlighter-rouge">route</code>) which is invoked from the instance method <code class="highlighter-rouge">call</code> is really the heart of the matter. Given an incoming request, <code class="highlighter-rouge">route!</code> attempts to fetch a matching route from the <code class="highlighter-rouge">routes</code> array maintained by the class. If successful, the Proc object stored for that route is called. The return value of that call determines the body of our HTTP response. If, on the other hand, no matching route is found, we send a 404 response to the client.</p>
 
 <p>To see this in action, let’s add <code class="highlighter-rouge">require 'rack'</code> to the top of the file, and the following code to the bottom:</p>
 

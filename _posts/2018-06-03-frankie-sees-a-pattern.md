@@ -78,7 +78,7 @@ module Frankie
       end
     end
   end
-enda
+end
 ```
 
 This new version of the `route` method compiles a given path (possible containing parameters) into a `pattern` (a regular expression) and an array of strings called `keys`. During request handling, those strings will eventually become keys in the `params` hash.
@@ -121,7 +121,7 @@ which we merge into `params`. Done!
 > Sinatra goes out of its way to allow users flexibility in making use of route parameters. In addition to strings, regular expressions are allowed as route paths, and route paths may contain wildcards („splats“) and/or optional parameters. So we have merely scratched the surface here. Also, the way Sinatra stores and processes parametrized routes has changed somewhat with the advent of the [Mustermann string processing library][4] in Sinatra 2.0. Our approach here is closer to how things used to work up to Sinatra 1.4.x.
 {: .aside}
 
-Try it out using [this file][5] (which contains the Frankie code as of the end of this part of our series), requesting your favourite song from your favourite album.
+Try it out using [this file][5] (which contains the Frankie code as of the end of this part of our series), requesting your favorite song from your favorite album.
 
 Next up in the series: [working with Rack middleware][6].
 

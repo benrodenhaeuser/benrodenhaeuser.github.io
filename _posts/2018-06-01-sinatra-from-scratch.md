@@ -37,7 +37,7 @@ The overall result is around 200 lines of code that – hopefully – give a pre
 
 The people behind Sinatra like to emphasize that Sinatra is not a framework, but rather a tool for „solving HTTP“, a „DSL for quickly creating web applications in Ruby with minimal effort“.
 
-While I will continue to use the term „framework“ (for lack of a better word, not to make some kind of point), the idea of „solving HTTP“ provides as good a starting point as any for our exploration. The most basic aspect of this is arguably the capability to set up route controlers that handle incoming HTTP requests. Sinatra sets up a basic division of labour in this regard: while routes are stored on the class level, requests are handled on the level of the instance.
+While I will continue to use the term „framework“ (for lack of a better word, not to make some kind of point), the idea of „solving HTTP“ provides as good a starting point as any for our exploration. The most basic aspect of this is arguably the capability to set up route controllers that handle incoming HTTP requests. Sinatra sets up a basic division of labour in this regard: while routes are stored on the class level, requests are handled on the level of the instance.
 
 To get started with our Frankie toy framework, let's first see how to store routes.
 
