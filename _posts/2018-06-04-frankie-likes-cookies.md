@@ -127,7 +127,7 @@ end
 
 Use [this file][7] (which provides a snapshot of the state of Frankie after these four posts) to see for yourself, if you like. So now we have a version of Frankie that can handle cookies, as well as other pieces of middleware that may come in handy. Neat!
 
-This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for pointers to some additional features that I have not discussed in detail. You might also want to check out the Frankie sample app mentioned in [part 01][8], if only to conclude that it really does look like a Sinatra app. You can find all the material in the Frankie repo [on Github][9].
+This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for pointers to some additional features that I have not discussed in detail. You might also want to check out the Frankie sample app mentioned in [part 01][8] (to run it, `cd` into the `examples/quotes` directory, followed by `ruby app.rb`), if only to conclude that it really does look like a Sinatra app. You can find all the material in the Frankie repo [on Github][9].
 
 > ### There’s More
 > As mentioned earlier, there is more to Frankie than I could cover in this series of posts. Here is a quick overview of what Sinatra-inspired features you will find in the [complete Frankie source][10] beyond what we discussed here:
