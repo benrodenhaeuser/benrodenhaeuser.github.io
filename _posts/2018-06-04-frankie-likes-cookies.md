@@ -143,7 +143,7 @@ This completes our small tour of Sinatra functionality rebuilt from scratch. See
 [4]:	https://stackoverflow.com/a/2257031/2744529
 [5]:	/2018/06/01/sinatra-from-scratch/
 [6]:	/2018/06/01/sinatra-from-scratch/
-[7]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/04_frankie_likes_cookies/frankie.rb
+[7]:	https://github.com/benrodenhaeuser/frankie/blob/master/blog/04_frankie_likes_cookies/frankie.rb
 [8]:	/2018/06/01/sinatra-from-scratch/
 [9]:	https://github.com/benrodenhaeuser/frankie
 [10]:	https://github.com/benrodenhaeuser/frankie/blob/master/frankie.rb

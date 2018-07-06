@@ -165,6 +165,6 @@ So we got ourselves the beginnings of a web framework, or the beginnings of a â€
 [7]:	https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
 [8]:	https://github.com/benrodenhaeuser/frankie
 [9]:	https://rack.github.io
-[10]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/01_hello_frankie/frankie.rb
+[10]:	https://github.com/benrodenhaeuser/frankie/blob/master/blog/01_hello_frankie/frankie.rb
 [11]:	https://github.com/rack/rack/blob/42e48013dd1b6dbda990dfa3851856c199b0b1f9/lib/rack/handler/webrick.rb#L32
 [12]:	/2018/06/02/frankie-reaches-for-the-top/

@@ -129,5 +129,5 @@ Next up in the series: [working with Rack middleware][6].
 [2]:	/2018/06/02/frankie-reaches-for-the-top/
 [3]:	/2018/06/01/sinatra-from-scratch/
 [4]:	https://github.com/sinatra/mustermann
-[5]:	https://github.com/benrodenhaeuser/frankie/blob/master/iterations/03_frankie_sees_a_pattern/frankie.rb
+[5]:	https://github.com/benrodenhaeuser/frankie/blob/master/blog/03_frankie_sees_a_pattern/frankie.rb
 [6]:	/2018/06/04/frankie-likes-cookies/
