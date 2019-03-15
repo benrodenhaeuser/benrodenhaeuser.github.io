@@ -46,7 +46,7 @@
   </p>
 
   <h1 class="title">
-    Frankie Reaches for the Top
+    Frankie Reaches for the Top (Level)
   </h1>
 
   <div class="description">
@@ -151,7 +151,7 @@
 
 <p>Recall that <code class="highlighter-rouge">match[:block]</code> is a Proc object. We convert this object to a block <code class="highlighter-rouge">&amp;match[:block]</code>, and pass it into <code class="highlighter-rouge">instance_eval</code>. Since the receiver of the <code class="highlighter-rouge">instance_eval</code> message is our <code class="highlighter-rouge">Frankie::Application</code> instance, this instance provides the context in which the block is evaluated. So in particular, all the instance methods of <code class="highlighter-rouge">Frankie::Application</code> are available to the block at evaluation time.</p>
 
-<p>Summing up, two main ingredients enable top-level route controllers: delegated method calls, and route blocks that are scoped to the current application instance as a request is handled. Run <a href="https://github.com/benrodenhaeuser/frankie/blob/master/iterations/02_frankie_reaches_for_the_top/frankie.rb">this file</a> (our code so far), head to <code class="highlighter-rouge">localhost:8080/ditty</code>, and you will see that our sample request from above works: we get back a 301, indicating that the requested resource has been moved.</p>
+<p>Summing up, two main ingredients enable top-level route controllers: delegated method calls, and route blocks that are scoped to the current application instance as a request is handled. Run <a href="https://github.com/benrodenhaeuser/frankie/blob/master/blog/02_frankie_reaches_for_the_top/frankie.rb">this file</a> (our code so far), head to <code class="highlighter-rouge">localhost:8080/ditty</code>, and you will see that our sample request from above works: we get back a 301, indicating that the requested resource has been moved.</p>
 
 <p>Fair enough. Let’s move on <a href="/2018/06/03/frankie-sees-a-pattern/">to the next part of the series</a>, where we talk about route parameters.</p>
 
@@ -199,7 +199,7 @@
       </p>
       
       <h5>
-        <a class="post-link" href="/2018/06/02/frankie-reaches-for-the-top/">Frankie Reaches for the Top</a><span class="sidebar-pad"></span><small>06/02/18</small>
+        <a class="post-link" href="/2018/06/02/frankie-reaches-for-the-top/">Frankie Reaches for the Top (Level)</a><span class="sidebar-pad"></span><small>06/02/18</small>
       </h5>
       <p class="sidebar">
           The top-level DSL: part 02 of the "Sinatra From Scratch" series.

@@ -1,0 +1,70 @@
+<h2 id="proxy-objects">Proxy objects</h2>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">Stack</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">prototype</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">push</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="na">pop</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">data</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
+    <span class="p">},</span>
+
+    <span class="na">print</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+
+  <span class="na">handler</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">get</span><span class="p">:</span> <span class="p">(</span><span class="nx">instance</span><span class="p">,</span> <span class="nx">prop</span><span class="p">,</span> <span class="nx">proxy</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">proto</span>      <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">instance</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">hasOwnProp</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">instance</span><span class="p">,</span> <span class="nx">prop</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">hasProp</span>    <span class="o">=</span> <span class="nx">instance</span><span class="p">[</span><span class="nx">prop</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasOwnProp</span> <span class="o">&amp;&amp;</span> <span class="nx">hasProp</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="kd">function</span><span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">proto</span><span class="p">[</span><span class="nx">prop</span><span class="p">].</span><span class="nx">apply</span><span class="p">(</span><span class="nx">proxy</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">data</span><span class="p">]));</span>
+          <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">instance</span><span class="p">[</span><span class="nx">prop</span><span class="p">];</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="na">factory</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nx">instance</span><span class="p">.</span><span class="nx">proxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Proxy</span><span class="p">(</span><span class="nx">instance</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">handler</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+    <span class="k">return</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">proxy</span><span class="p">;</span>
+  <span class="p">},</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<p>We are working here on the assumption that behaviour should be defined on the prototype, while (publicly accessible) data should be captured via own properties of the instance.</p>
+
+<h2 id="breaking-privacy">Breaking Privacy</h2>
+
+<p>By dynamically changing <code class="highlighter-rouge">Stack.prototype</code>, we can expose the data hidden in a stack:</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">stack</span> <span class="o">=</span> <span class="nx">Stack</span><span class="p">.</span><span class="nx">factory</span><span class="p">();</span>
+<span class="nx">stack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'a'</span><span class="p">).</span><span class="nx">push</span><span class="p">(</span><span class="s1">'b'</span><span class="p">);</span>
+<span class="nx">Stack</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nx">data</span><span class="p">());</span> <span class="c1">// ['a', 'b']</span>
+</code></pre>
+</div>
+
+<p>To prevent it, we would need to freeze the prototype:</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nb">Object</span><span class="p">.</span><span class="nx">freeze</span><span class="p">(</span><span class="nx">Stack</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">stack</span> <span class="o">=</span> <span class="nx">Stack</span><span class="p">.</span><span class="nx">factory</span><span class="p">();</span>
+<span class="nx">stack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'a'</span><span class="p">).</span><span class="nx">push</span><span class="p">(</span><span class="s1">'b'</span><span class="p">);</span>
+<span class="nx">Stack</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nx">data</span><span class="p">());</span> <span class="c1">// ['a', 'b']</span>
+</code></pre>
+</div>
+
+<p>But then, of course, that makes our class less “malleable”.</p>

@@ -1,5 +1,5 @@
 ---
-title: "Frankie Reaches for the Top"
+title: "Frankie Reaches for the Top (Level)"
 description: 'The top-level DSL: part 02 of the "Sinatra From Scratch" series.'
 date: 2018-06-02
 ---

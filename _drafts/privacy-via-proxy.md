@@ -1,0 +1,397 @@
+---
+title: "Privacy via Proxy"
+description: „Patterns for data hiding using ES6 Proxy objects."
+---
+
+JavaScript supports data hiding via closures. Providing instances of a given prototype with their own private data presents some challenges, however, if additional requirements come into play. This post discusses those challenges and suggests a pattern for data hiding that sticks to the closure approach while taking advantage of the Proxy object that was introduced in ES6.
+
+Section 1 sets the stage by formulating a number of natural requirements to be placed on objects that handle private data. In section 2, we discuss some partial solutions that fail to completely adress our desiderata. In section 3, I present what I call the "Privacy via Proxy" pattern.
+
+## 1. Setting the Stage
+
+### Stacks
+
+Our starting point is a modest example: let's make a stack. A stack is an ordered lists of values with a simple interface: we can either *push* a value to the top of the stack, or *pop* a value off the stack. That's it. A good data structure for storing stack data internally is an array. However, we have to ensure that array is hidden from public access, for otherwise people will use the far more powerful array API to mess with our stack data!
+
+This example will serve to illustrate the challenges that arise with respect to data hiding in JavaScript. Let's be more explicit how we would like to see our stack implemented:
+
+> Implement a stack with `push`/`pop` API satisfying the following requirements:
+>
+> 1. Stack instances share a common, meaningful type `Stack`.
+> 2. Stack instance data is private, i.e., accessible *only* through the `Stack` API.
+> 3. The API is implemented on the level of the type, not the instance. (NOTE: (1) and (3) are really one criterion).
+> 4. The API is dynamically extensible: new methods can be added to the `Stack` type after its creation, including methods that handle private data.
+{: .aside}
+
+To provide some context for these—perhaps trivial-sounding—requirements, let's switch languages for a moment.
+
+### A Ruby solution
+
+Consider the following Ruby implementation of a stack:
+
+```ruby
+class Stack
+  def initialize()
+    @data = []
+  end
+
+  def push(value)
+    @data << value
+  end
+
+  def pop
+    @data.pop
+  end
+end
+```
+
+Instances of the class `Stack` obviously (and rather tautologically) belong to the `Stack` class. So they have a meaningful common "type" (requirement 1). Stack instance data is stored in an instance variable `@data` which is part of the private state of a stack, inaccessible from the outside as long as we do not provide accessors (requirement 2). Further, Stack instances get their behaviour from the class they belong to, rather than implementing the Stack API themselves. Their behaviour is thus fully determined by their class, and by the private data they store (requirement 3). The `Stack` class is also extensible in the sense that we can reopen it after the fact, and add further methods that automatically become available to instances, even to those already created earlier (requirement 4):
+
+```ruby
+stack = Stack.new
+stack << 'a'
+
+class Stack
+  def size
+    @data.size
+  end
+end
+
+stack.size # 1
+```
+
+Notice in particular that the `size` method accesses the `@data` instance variable. So even though stack data is private, we can still jump inside the class, and make use of the private data it encapsulates, thereby changing the "contract" between the class and its users via an API extension.
+
+At the risk of stating the obvious: this also means that private data is private only "until further notice":
+
+```ruby
+class Stack
+  attr_reader :data
+end
+
+stack = Stack.new
+stack << 'a' << 'b'
+stack.data # ['a', 'b']
+```
+
+Here, the internal data of a stack is exposed by providing a getter method. In other words: Private data can always be made public if so desired (many languages will even provide generic ways to bypass access restrictions without making API changes. Ruby, e.g., has `instance_variable_get` in the `Object` class).
+
+### Back to JavaScript
+
+The upshot of the preceding section is that, in a Ruby context, satisfying our requirements is almost trivial. It's the default behaviour, the way things work out of the box. I would say that this is fairly typical for a classical object-oriented language.
+
+In JavaScript, the situations is more complicated. For once, JavaScript does not have classes, the fact that ES6 provides a `class` keyword notwithstanding. JavaScript also does not have anything resembling the concept of an instance variable that would store data "internal" to an object. Still, our requirements do make sense in the context of JavaScript. Let's reformulate them in light of the preceding discussion, using more specific JavaScript terminology:
+
+1. Stack instances should have a common prototype `Stack`.
+2. Stack instance data should be private, i.e., accessible *only* through the Stack API.
+3. Stack instances should have no own properties: the prototype, rather than the instance, implements the Stack API.
+4. It should be possible to dynamically add methods to the prototype that become available automatically to all Stack instances. Such additional methods may frustrate the attempts of the original prototype creator to hide data from public access.
+
+In other words, we would like to see our requirements satisfied in the context of JavaScript's prototype-based approach to object-oriented programming.
+
+## Understanding the Problem
+
+> Aim: To get clearer why it is a problem to satisfy the requirements.
+
+This section discusses three approaches that *fail* to satisfy all of our requirements. Combining their strengths will, however, lead us to our "Privacy via Proxy" pattern, discussed in section 3.
+
+### Approach 1: Object Factory
+
+When faced with the task of implementing a stack, the obvious choice that comes to mind first would be to reach for a factory function:
+
+```javascript
+function stackFactory() {
+  var data = [];
+
+  return {
+    push: function (value) {
+      data.push(value);
+    },
+
+    pop: function() {
+      return data.pop();
+    }
+  };
+}
+```
+
+The function above allows us to create a series of stacks, each with its own private data, hidden in a *closure* that both the `push` and the `pop` function have access to. So our second requirement, pertaining to data hiding, is satisfied. This is as far as it goes, however:
+
+The prototype of objects returned by `stack` invocations is `Object.prototype` rather than some meaningful `Stack` type. This violates our requirement 1:
+
+```javascript
+const stack = stackFactory();
+Object.getPrototypeOf(stack) === Object.prototype; // true
+```
+
+Furthermore, each stack that comes out of the factory has *own* methods `push` and `pop`. This violates requirement 3:
+
+```javascript
+stack.hasOwnProperty('push'); // true
+```
+
+Finally, in violation of requirement 4, dynamically attaching methods to stacks that handle private data is not possible:
+
+```javascript
+stack.prototype.size = function() {
+  return data.length;
+}
+stack.size(); // undefined
+```
+
+The problem is that we don't have access to the data array anymore after the factory function returns. That array is available only to the `push` and `pop` methods. We would thus have to go and change the original implementation of the factory function.
+
+This is a disadvantage if we like to keep things modular. Suppose you want to use stackjs, the Stack library everyone's talking about, in your project. However, your stacks need a size method that keeps track of the number of items on the stack. If stackjs implements stacks via a factory function, your best bet is to mess with the library itself, rather than extending it in your own code.
+
+### Approach 2: IIFEs
+
+Immediately invoked function expressions are often used to create an inner scope that sets up a closure. The following solution, which was suggested to me by Victor Paolo Reyes in a discussion about the topic of this post, makes use of ids to link each stack created to its internal data array:
+
+```javascript
+const Stack = (function() {
+  const data = {};
+
+  const nextId = (function() {
+    var id = 0;
+    return function() { return id++; };
+  })();
+
+  return {
+    push(value) {
+      data[this.id].push(value);
+      return this;
+    },
+
+    pop() {
+      return data[this.id].pop();
+    },
+
+    init() {
+      this.id = nextId();
+      data[this.id] = [];
+      return this;
+    },
+  };
+})();
+```
+
+This solution addresses our requirements to a far greater extent. First, the common prototype of all stacks we create is `Stack` (requirement 1).
+
+```javascript
+const stack = Object.create(Stack).init();
+Object.getPrototypeOf(stack) === Stack; // true
+```
+
+Also, since we continue to work with a closure, stack data is kept private, as in the previous solution (requirement 2). Furthermore, the `push` and `pop` methods are not own properties of a stack instance (requirement 3):
+
+```javascript
+stack.hasOwnProperty('push'); // false
+```
+
+There is a concession in that stacks have an (own) `id` property. This violates the letter, if not so much the spirit of requirement 3.
+
+```javascript
+stack.hasOwnProperty('id') // true
+```
+
+While this seems to be a minor issue, our last requirement remains a problem: if we wish to extend the Stack API on the fly with our earlier `size` method (or any other method that handles the private data), we run into the problem that there is no way to get a handle on the private data stored in the closure. (TODO revise paragraph)
+
+### Approach 3: Tweaking methods
+
+Here is another idea: What if we define the Stack API on the prototype, but override the inherited methods on the instance in a way that allows us to smuggle in the array that keeps our stack data. Here is an illustration, limited to the `push` method:
+
+```javascript
+const prototype = {
+  push(value, data) {
+    data.push(value);
+    return this;
+  },
+};
+
+const stack = Object.create(prototype);
+stack.push = function(...args) {
+  return prototype.push.apply(stack, [...args, data]);
+};
+```
+
+To be sure, this does not solve any of our problems right-away. In fact, having `push` as an own property on stack instances is precisely what we did *not* want.
+
+
+## Privacy via Proxy: Parameter Injection
+
+We are working here on the assumption that behaviour should be defined on the prototype, while (publicly accessible) data should be captured via own properties of the instance.
+
+### The Closure of the Trap
+
+The data object is stored in the closure of the `get` trap.
+
+### Breaking Privacy
+
+By dynamically changing `Stack.prototype`, we can expose the data hidden in a stack:
+
+```javascript
+var stack = Stack.factory();
+stack.push('a').push('b');
+Stack.prototype.data = function() { return arguments[0]; }
+console.log(stack.data()); // ['a', 'b']
+```
+
+To prevent it, we could freeze the prototype (ES6 has various ways to do this, I think):
+
+```javascript
+Object.freeze(Stack.prototype);
+var stack = Stack.factory();
+stack.push('a').push('b');
+Stack.prototype.data = function() { return arguments[0]; }
+console.log(stack.data()); // ['a', 'b']
+```
+
+But then, of course, that makes our class less "malleable".
+
+### The Pattern
+
+```javascript
+const Stack = {
+  api: {
+    push(item, hidden) {
+      hidden.items.push(item);
+      return this;
+    },
+
+    pop(hidden) {
+      return hidden.items.pop();
+    },
+  },
+
+  private: {
+    init() {
+      this.items = [];
+      return this;
+    },
+  },
+
+  create() {
+    const instance = Object.create(this.api);
+    const hidden   = Object.create(this.private).init();
+
+    const handler = {
+      get(instance, key, proxy) {
+        const value = instance[key];
+
+        if (typeof value === 'function') {
+          return (...args) => value.apply(proxy, [...args, hidden]);
+        }
+
+        return value;
+      },
+    }
+
+    return new Proxy(instance, handler);
+  },
+};
+```
+
+### Disadvantages of closures as used normally
+
+- As the closure grows, and an increasing number of objects is created carrying around these closure, the memory footprint of the application grows as well. (But isn't the performance hit due to proxy objects much bigger?)
+- Closures are not extensible. But what are good use cases for this? Testing, perhaps. Monkey patches for testing are much easier).
+- Organization. It feels a little disorganized.
+- Closures as used usually are perhaps bit too "iron-clad"? We cannot even programatically expose the data in our closure without touching our original implementation (even though the language could provide us with the means to do so – after all, Chrome has a way to inspect closures).
+
+## Access Control
+
+```javascript
+const Stack = {
+  api: {
+    push(item) {
+      this._private.items.push(item);
+      return this.proxy;
+    },
+
+    pop() {
+      return this._private.items.pop();
+    },
+
+    print() {
+      console.log(this._private.items)
+    },
+
+    _private: {
+      init() {
+        this.items = [];
+        return this;
+      },
+    },
+  },
+
+  create() {
+    const instance = Object.create(this.api);
+    instance._private.init();
+
+    const handler = {
+      get(instance, key, proxy) {
+        var value = instance[key];
+
+        if (key === '_private') {
+          throw 'Invalid attempt to access private property';
+        }
+
+        if (typeof value === 'function') {
+          return function(...args) {
+            return value.apply(instance, args);
+          };
+        }
+
+        return value;
+
+      },
+    }
+
+    var proxy = new Proxy(instance, handler);
+    instance.proxy = proxy;
+    return proxy;
+  },
+};
+```
+
+## Comparison between the two approaches
+
+Access Manipulation vs Access Control
+
+- From the perspective of a user, there does not seem to be much of a difference.
+- Is there a performance difference?
+- On the access control approach, we can never return `this`, because this exposes the instance (including its private properties). If we want to do method chaining, we have to return `this.proxy`, so an additional property needs to be set on the instance.
+- On the "parameter injection" approach, all methods need to be defined with an additional `hidden` param.
+
+
+Are there other differences of note?
+
+## Format
+
+- An object with `api`, `_private` and `create` properties
+- A non-nested object with an `init` method
+
+## Tradeoffs
+
+Both approaches seem to have a single clear downside:
+- blocking access to property: `this` inside the interface methods
+  is not the object representing our stack that is exposed to the user (when calling `stack.push`). Rather, it is the instance wrapped by our proxy.
+  If we want to do method chaining, we need an additional `proxy` property on the instance. Then we can return `this.proy`.
+- injecting a parameter: a `hidden` parameter becomes part of the method    
+  signature, but is omitted when the method is called. Forgetting this can lead to subtle bugs.
+
+Both are less relevant from the perspective of an api user.
+
+Relevant from the user perspective:
+- if we forget to call `init` on an access-blocked stack, then we are working
+  with a stack who has its internals exposed.
+- this is less of a problem in the case of "param injection", because the api
+  will not work as advertised. in other words, there will be a warning.
+
+We can work around this by not exposing the prototype directly to the user.
+
+But now the user has to learn that Stack objects are created by calling `Stack.create()` rather than `Object.create(Stack).init()`.
+
+Exposing the internals of a stack should not be possible without changing the API. => The access blocking approach comes close to skirting that requirement.
+
+Performance? Manipulate a number of stacks and see how long it takes. The access blocking approach is presumably faster, since the proxy simply passes through most property lookups.
