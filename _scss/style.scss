@@ -522,7 +522,6 @@ header {
 .modal .profile-picture {
   height: 400px;
   align-self: center;
-
 }
 
 
@@ -567,5 +566,9 @@ header {
     padding: 0;
     position: relative;
     top: -20px;
+  }
+
+  .modal .profile-picture {
+    height: 300px;
   }
 }
