@@ -1,37 +1,10 @@
 <header>
-  <p>
-    <small>&nbsp;</small>
-  </p>
-  <a href="http://notes.benrodenhaeuser.io">
-    <h1 class="title">
+  <a href="/">
+    <h1 class="site-title">
       {{ site.title }}
     </h1>
+    <span class="description site-description">
+      {{ site.description }}
+    </span>
   </a>
-
-  <div class="description site-description">
-    {{ site.description }}
-  </div>
-
-  <div class="content">
-    <hr class="line" />
-
-    <div class="sidebar-content">
-      {% for post in site.posts %}
-      <h5>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a><span class="sidebar-pad"></span><small>{{ post.date | date: "%m/%d/%y" }}</small>
-      </h5>
-      <p class="sidebar">
-          {{ post.description }}
-      </p>
-      {% endfor %}
-    </div>
-
-    <hr class="line" />
-
-    <div class="external">
-      <a href="http://github.com/benrodenhaeuser">
-        <img class="mark" src="/assets/images/GitHub-Mark-64px.png" />
-      </a>
-    </div>
-  </div>
 </header>
