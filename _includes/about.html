@@ -1,0 +1,8 @@
+{% assign about = site.snippets | where: "snippet", "About" | first %}
+<div class="personal-details">
+  <div class="personal-info">
+    <h2 class="title front"><img class="profile-picture" src="/assets/images/ben.png" alt="">{{ about.title }}</h2>
+    {{ about.content }}
+  </div>
+</div>
+<hr class="line">

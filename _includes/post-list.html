@@ -1,0 +1,51 @@
+<div class="post-list" id="post-list">
+  {% for page in site.posts %}
+
+  {% if page.case-study %}
+  <a href="{{ page.url }}">
+    <h2 class="title">
+      {{ page.title }}
+    </h2>
+  </a>
+  {% else %}
+    <h2 class="title">
+      {{ page.title }}
+    </h2>
+  {% endif %}
+
+  <div class="description">
+    {% if page.long-description %}
+      {{ page.long-description }}
+    {% else %}
+      {{ page.description }}
+    {% endif %}
+  </div>
+
+  <div class="external-links">
+    {% if page.case-study %}
+    <a href="{{ page.url }}">
+      {% include icons/case-study-icon.html %}
+      <p>Case Study</p>
+    </a>
+    {% endif %}
+
+    {% if page.external-links.github %}
+    <a href="{{ page.external-links.github }}">
+      {% include icons/github-icon.html %}
+      <p>Repository</p>
+    </a>
+    {% endif %}
+
+    {% if page.external-links.demo %}
+    <a href="{{ page.external-links.demo }}">
+      {% include icons/demo-version-icon.html %}
+      <p>Demo Version</p>
+    </a>
+    {% endif %}
+  </div>
+
+  <hr class="line" />
+
+  {% endfor %}
+
+</div>

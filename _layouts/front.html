@@ -1,77 +1,15 @@
 <!doctype html>
 <html lang="{{ site.lang | default: "en-US" }}">
   {% include head.html %}
-
   <body>
     <div class="wrapper">
       {% include header.html %}
-
       <main>
-        {% assign about = site.snippets | where: "snippet", "About" | first %}
-        <div class="personal-details">
-          <div class="personal-info">
-            <h2 class="title front"><img class="profile-picture" src="/assets/images/ben.png" alt="">{{ about.title }}</h2>
-            {{ about.content }}
-          </div>
-        </div>
-
-        <hr class="line">
-
-        <div class="post-list" id="post-list">
-          {% for page in site.posts %}
-
-          {% if page.case-study %}
-          <a href="{{ page.url }}">
-            <h2 class="title">
-              {{ page.title }}
-            </h2>
-          </a>
-          {% else %}
-            <h2 class="title">
-              {{ page.title }}
-            </h2>
-          {% endif %}
-
-          <div class="description">
-            {% if page.long-description %}
-              {{ page.long-description }}
-            {% else %}
-              {{ page.description }}
-            {% endif %}
-          </div>
-
-          <div class="external-links">
-            {% if page.case-study %}
-            <a href="{{ page.url }}">
-              {% include icons/case-study-icon.html %}
-              <p>Case Study</p>
-            </a>
-            {% endif %}
-
-            {% if page.external-links.github %}
-            <a href="{{ page.external-links.github }}">
-              {% include icons/github-icon.html %}
-              <p>Repository</p>
-            </a>
-            {% endif %}
-
-            {% if page.external-links.demo %}
-            <a href="{{ page.external-links.demo }}">
-              {% include icons/demo-version-icon.html %}
-              <p>Demo Version</p>
-            </a>
-            {% endif %}
-          </div>
-
-          <hr class="line" />
-
-          {% endfor %}
-
-        </div>
+        {% include about.html %}
+        {% include post-list.html %}
       </main>
-
       {% include footer.html %}
     </div>
-    <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
+    {% include fix.html %}
   </body>
 </html>
