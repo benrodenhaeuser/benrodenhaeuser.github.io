@@ -7,20 +7,11 @@
       {% include header.html %}
 
       <main>
+        {% assign about = site.pages | where: "snippet", "About" | first %}
         <div class="personal-details">
           <div class="personal-info">
-            <h2 class="title front"><img class="profile-picture" src="/assets/images/ben.png" alt="">Hello! My name is Ben.</h2>
-
-            <p>I am a Software Engineer based in Berlin.</p>
-
-            <ul>
-              <li>I have a doctorate in Computer Science, and a sound education in front-end and back-end technologies (Ruby, SQL, MongoDB, JavaScript, HTML/CSS).
-              <li>To get an impression of my work, please have a look at the projects below.</li>
-              <li>Before moving into Software Engineering, I worked as a researcher in Theoretical Computer Science, and as a Foresight researcher and consultant.</li>
-              <!-- <li>More information about my background is available on my <a href="https://www.linkedin.com/in/benrodenhaeuser/">LinkedIn page</a>.</li> -->
-            </ul>
-
-            <p>I am currently looking for new opportunities, and would love for you to <a href="mailto:ben@rodenhaeuser.de">get in touch</a>.</p>
+            <h2 class="title front"><img class="profile-picture" src="/assets/images/ben.png" alt="">{{ about.title }}</h2>
+            {{ about.content }}
           </div>
         </div>
 
