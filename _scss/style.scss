@@ -545,6 +545,10 @@ header {
   h2.title.front {
     font-size: 1.4 * $basefont;
   }
+
+  p.header-image-caption {
+    font-size: 0.5 * $basefont;
+  }
 }
 
 @media print, screen and (max-width: 370px) {
