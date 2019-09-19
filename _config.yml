@@ -5,7 +5,9 @@ google_analytics: UA-99334571-1
 github: [metadata]
 markdown: kramdown
 highlighter: rouge
-include: ['_snippets']
+collections:
+  - snippets
+collections_dir: collections
 googlefonts:
   body: Lato
   display: Anton
