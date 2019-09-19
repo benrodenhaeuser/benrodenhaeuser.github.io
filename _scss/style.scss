@@ -23,10 +23,6 @@ h1 {
   line-height: 1.5 * $baseline;
 }
 
-h1:hover {
-  color: $highlightcolor;
-}
-
 h1.site-title {
   color: #c3c3c3;
   font-size: $basefont;
@@ -501,7 +497,7 @@ header {
   display: inline;
   height: 50px;
   vertical-align: middle;
-  padding-right: 10px;
+  padding-right: 20px;
   line-height: 45px;
   cursor: pointer;
 }
@@ -535,13 +531,25 @@ header {
   }
 
   header a small {
-    display:inline;
+    display: inline;
   }
 
   header ul {
-    position:absolute;
-    right:50px;
-    top:52px;
+    position: absolute;
+    right: 50px;
+    top: 52px;
+  }
+}
+
+@media print, screen and (max-width: 550px) {
+  h2.title.front {
+    font-size: 1.4 * $basefont;
+  }
+}
+
+@media print, screen and (max-width: 370px) {
+  h2.title.front img {
+    display: block;
   }
 }
 
@@ -569,6 +577,6 @@ header {
   }
 
   .modal .profile-picture {
-    height: 300px;
+    height: 250px;
   }
 }
