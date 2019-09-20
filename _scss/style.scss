@@ -205,7 +205,7 @@ p.terminal {
 
 a {
   color: #FF7F50;
-  text-decoration:none;
+  text-decoration: none;
 }
 
 a:hover,
@@ -218,7 +218,6 @@ a small {
   margin-top:-0.3em;
   display:block;
 }
-
 
 blockquote {
   margin: 0;
@@ -614,4 +613,9 @@ header {
   text-align: left;
   background-color: yellow;
   font-size: 0.8 * $basefont;
+}
+
+.notes a {
+  color: $bodycolor;
+  text-decoration: underline;
 }
