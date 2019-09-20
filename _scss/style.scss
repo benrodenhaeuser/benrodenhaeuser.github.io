@@ -6,6 +6,10 @@ $baseline: 30px;
 $bodycolor: #595959;
 $highlightcolor: #FF7F50;
 
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
   background-color: white;
   color: $bodycolor;
