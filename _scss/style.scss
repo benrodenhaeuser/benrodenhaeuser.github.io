@@ -34,9 +34,9 @@ header a:hover .site-description {
   color: $highlightcolor;
 }
 
-.site-description {
+.description.site-description {
   color: #c3c3c3;
-  font-size: 0.7 * $basefont;
+  font-size: 0.5 * $basefont;
   font-family: 'Source Sans Pro', sans-serif;
   text-transform: uppercase;
   letter-spacing: 2.5px;
@@ -143,6 +143,7 @@ p.sidebar {
 .post-list{
   margin-bottom: 0.8 * $baseline;
   margin-top: 100px;
+  max-width: 500px; // want this?
 }
 
 ul.external-links {
@@ -233,6 +234,7 @@ blockquote:last-child {
 .aside,
 .toc {
   margin: (0.75 * $baseline) 0;
+  font-size: 0.9 * $basefont;
   text-align: left;
   padding: 20px;
   background-color: #F3F3F3;
@@ -382,7 +384,6 @@ footer {
 // table of contents
 ul#markdown-toc {
   padding-left: 0;
-  font-size: 0.9 * $basefont;
   margin-top: 0;
 }
 
@@ -424,7 +425,7 @@ ul#markdown-toc ul {
   background-color: #d3d3d3;
   text-transform: uppercase;
   letter-spacing: 3px;
-  font-size: 0.6 * $basefont;
+  font-size: 0.5 * $basefont;
   content: 'Contents';
 }
 
