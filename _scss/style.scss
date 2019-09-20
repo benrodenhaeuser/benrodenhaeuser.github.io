@@ -271,12 +271,8 @@ pre {
   color:#333;
 }
 
-p
-code {
-  font-size: $basefont * 0.9;
-}
-
 p code {
+  font-size: $basefont * 0.9;
   overflow-wrap: break-word;
 }
 
