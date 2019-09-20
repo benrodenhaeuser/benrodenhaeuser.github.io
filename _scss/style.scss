@@ -54,10 +54,15 @@ h2 {
 
 h2.title {
   color: black;
-  font-family: 'Anton', serif;
+  // font-family: 'Anton', serif;
+  // font-size: 1.5 * $baseline;
+  // line-height: 1.5 * $baseline;
+  // font-weight: normal;
+}
+
+h2.title.front {
   font-size: 1.5 * $baseline;
   line-height: 1.5 * $baseline;
-  font-weight: normal;
 }
 
 a h2.title {
@@ -162,6 +167,7 @@ ul.external-links li::before {
   line-height: $baseline;
   margin-top: 0.33 * $baseline;
   margin-bottom: 0.33 * $baseline;
+  font-size: 0.9 * $basefont;
 }
 
 a code {
@@ -242,7 +248,7 @@ blockquote:last-child {
 
 .personal-details ul,
 .personal-details p {
-  font-size: 0.9 * $basefont;
+  // font-size: 0.9 * $basefont;
 }
 
 .aside p,
