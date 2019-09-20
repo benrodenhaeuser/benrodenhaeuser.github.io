@@ -276,8 +276,8 @@ code {
   font-size: $basefont * 0.9;
 }
 
-code {
-  overflow: scroll;
+p code {
+  overflow-wrap: break-word;
 }
 
 .highlight {
