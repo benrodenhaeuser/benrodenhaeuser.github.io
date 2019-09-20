@@ -2,7 +2,7 @@
 title: Frankie
 case-study: true
 description: Building a toy version of a Ruby web framework from scratch.
-long-description: "Building a toy version of the \"Sinatra\" web framework from the ground up: handling requests, the top-level DSL, parametrized routes and Rack middleware."
+abstract: "Building a toy version of the \"Sinatra\" web framework from the ground up: handling requests, the top-level DSL, parametrized routes and Rack middleware."
 date: 2018-06-01
 header-image: /assets/images/frankie/frankie.jpg
 image-caption: A young Frank Sinatra surrounded by admirers.
