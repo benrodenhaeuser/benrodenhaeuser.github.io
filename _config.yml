@@ -8,8 +8,8 @@ highlighter: rouge
 collections:
   - snippets
 collections_dir: content
-googlefonts:
-  body: Lato
+fonts:
+  body: Source Sans Pro
   display: Anton
   code: Roboto Mono
 sass:

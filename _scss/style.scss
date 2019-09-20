@@ -1,7 +1,7 @@
 @import "reset/whitespace_reset";
 @import "syntax-highlighting/syntax";
 
-$basefont: 20px;
+$basefont: 21px;
 $baseline: 30px;
 $bodycolor: #595959;
 $highlightcolor: #FF7F50;
@@ -9,7 +9,7 @@ $highlightcolor: #FF7F50;
 body {
   background-color: white;
   color: $bodycolor;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
   font-size: $basefont;
   font-weight: normal;
   line-height: $baseline;
@@ -37,16 +37,17 @@ header a:hover .site-description {
 .site-description {
   color: #c3c3c3;
   font-size: 0.7 * $basefont;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   padding-left: 10px;
 }
 
 h2 {
+  font-family: 'Anton', serif;
+  font-weight: normal;
   line-height: 1.2 * 1.2 * $basefont;
   font-size: 1.2 * 1.2 * $basefont;
-  font-weight: bold;
   margin-top: 1.2 * 1.2 * $baseline;
   color: #FF7F50;
 }
