@@ -11,7 +11,7 @@ collections_dir: content
 fonts:
   body: Source Sans Pro
   display: Anton
-  code: Roboto Mono
+  code: Source Code Pro
 sass:
   sass_dir: _scss
 kramdown:
