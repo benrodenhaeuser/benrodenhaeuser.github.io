@@ -583,7 +583,7 @@ header {
 }
 
 @media print, screen and (max-width: 500px) {
-  header .site-description {
+  header .description.site-description {
     font-size: 0.5 * $basefont;
   }
 
@@ -597,7 +597,7 @@ header {
     display: block;
   }
 
-  header .site-description {
+  header .description.site-description {
     padding: 0;
     position: relative;
     top: -20px;
