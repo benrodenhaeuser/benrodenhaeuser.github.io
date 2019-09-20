@@ -29,7 +29,8 @@ h1.site-title {
   display: inline;
 }
 
-header a:hover .site-title, header a:hover .site-description {
+header a:hover .site-title,
+header a:hover .site-description {
   color: $highlightcolor;
 }
 
@@ -142,7 +143,8 @@ ul.external-links {
   float: right;
 }
 
-ul.external-links, ul.external-links li {
+ul.external-links,
+ul.external-links li {
   display: inline;
 }
 
@@ -177,7 +179,11 @@ img.mark {
   margin-top: 1.5 * $baseline;
 }
 
-p, ul, ol, pre, dl {
+p,
+ul,
+ol,
+pre,
+dl {
   margin-top: 0.5 * $baseline;
 }
 
@@ -195,7 +201,8 @@ a {
   text-decoration:none;
 }
 
-a:hover, a:focus {
+a:hover,
+a:focus {
   color: #494949;
 }
 
@@ -216,7 +223,8 @@ blockquote:last-child {
   margin-bottom: 0;
 }
 
-.aside, .toc {
+.aside,
+.toc {
   margin: (0.75 * $baseline) 0;
   text-align: left;
   padding: 20px;
@@ -231,24 +239,29 @@ blockquote:last-child {
   font-weight: normal;
 }
 
-.personal-details ul, .personal-details p {
+.personal-details ul,
+.personal-details p {
   font-size: 0.9 * $basefont;
 }
 
-.aside p, .toc p {
+.aside p,
+.toc p {
   margin-top: 0;
 }
 
-.aside h3, .toc h3 {
+.aside h3,
+.toc h3 {
   margin-top: 0;
 }
 
-code, pre {
+code,
+pre {
   font-family: 'Roboto Mono', monospace;
   color:#333;
 }
 
-p code {
+p
+code {
   font-size: $basefont * 0.9;
 }
 
@@ -269,8 +282,9 @@ pre:not(.highlight) {
   line-height: 1.7;
 }
 
-th, td {
-  text-align:left;
+th,
+td {
+  text-align: left;
   padding: 5px 10px;
 }
 
@@ -341,12 +355,14 @@ footer {
 
 // code blocks
 
-.gutter, .rouge-gutter {
+.gutter,
+.rouge-gutter {
   padding-right: 1px;
   padding-left: 0;
 }
 
-.code, .rouge-code {
+.code,
+.rouge-code {
   width: 100%;
   padding-left: 0;
   padding-right: 0;
@@ -363,11 +379,13 @@ ul#markdown-toc {
   margin-top: 0;
 }
 
-ul#markdown-toc a, ul#markdown-toc code {
+ul#markdown-toc a,
+ul#markdown-toc code {
   color: $bodycolor;
 }
 
-ul#markdown-toc a:hover, ul#markdown-toc code:hover {
+ul#markdown-toc a:hover,
+ul#markdown-toc code:hover {
   color: $highlightcolor;
 }
 
@@ -461,7 +479,8 @@ p.image img {
   color: $highlightcolor;
 }
 
-.external-links a:hover path {
+.external-links a:hover path,
+.external-links a:hover circle {
   fill: $highlightcolor;
 }
 
@@ -581,4 +600,11 @@ header {
   .modal .profile-picture {
     height: 250px;
   }
+}
+
+.notes {
+  font-family: 'Roboto Mono';
+  text-align: left;
+  background-color: yellow;
+  font-size: 0.8 * $basefont;
 }

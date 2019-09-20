@@ -1,6 +1,6 @@
 ---
-snippet: about
 title: Hello! My name is Ben.
+snippet: about
 ---
 
 I am a Software Engineer based in Berlin.

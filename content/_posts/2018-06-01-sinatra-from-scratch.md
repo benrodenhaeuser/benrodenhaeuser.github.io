@@ -1,18 +1,11 @@
 ---
 title: Frankie
-
-description: Building a toy version of a Ruby web framework from scratch.
-
-long-description: "Building a toy version of the \"Sinatra\" web framework from the ground up: handling requests, the top-level DSL, parametrized routes and Rack middleware."
-
-date: 2018-06-01
-
 case-study: true
-
+description: Building a toy version of a Ruby web framework from scratch.
+long-description: "Building a toy version of the \"Sinatra\" web framework from the ground up: handling requests, the top-level DSL, parametrized routes and Rack middleware."
+date: 2018-06-01
 header-image: /assets/images/frankie/frankie.jpg
-
 image-caption: A young Frank Sinatra surrounded by admirers.
-
 external-links:
   github: https://github.com/benrodenhaeuser/frankie
 ---
@@ -475,7 +468,7 @@ Use [this file][16] (which provides a snapshot of the state of Frankie after the
 This completes our small tour of Sinatra functionality rebuilt from scratch. See the box below for pointers to some additional features that I have not discussed in detail. You might also want to check out the Frankie sample app mentioned in [part 01][17] (to run it, `cd` into the `examples/quotes` directory, followed by `ruby app.rb`), if only to conclude that it really does look like a Sinatra app. You can find all the material in the Frankie repo [on Github][18].
 
 > ### There’s More
-> {:.no_toc}
+> {:.no\_toc}
 > As mentioned earlier, there is more to Frankie than I could cover in this case study. Here is a quick overview of what Sinatra-inspired features you will find in the [complete Frankie source][19] beyond what we discussed here:
 > - View templates: to better organize your code, separate presentation from application logic with view templates. The bindings of the application instance are passed into the template so that instance variables remain useable. An additional [`Templates` module][20] does the job.
 > - Throw/catch: Sinatra makes quite heavy use of the `throw`/`catch` mechanism when handling requests. This is what makes Sinatra’s `halt` possible, praised in [this post][21]. To see how this is implemented in Frankie, start at the  `invoke { dispatch! }` method call [here][22].
