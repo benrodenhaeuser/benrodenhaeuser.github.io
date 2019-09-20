@@ -276,6 +276,10 @@ code {
   font-size: $basefont * 0.9;
 }
 
+code {
+  overflow: scroll;
+}
+
 .highlight {
   width: 100%;
   max-width: 100%;
