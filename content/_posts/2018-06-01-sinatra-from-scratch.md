@@ -76,7 +76,7 @@ module Frankie
 end
 ```
 
-It’s quite straightforward, really: a class instance variable `@routes` (accessible via the class method `Frankie::Application.routes`) is maintained that holds an array of routes. In our implementation, each route is a hash with three keys, `:verb`, `:path`, and `:block`. Requests will be matched against this array of route.
+It’s quite straightforward, really: a class instance variable `@routes` is maintained that holds an array of routes. In our implementation, each route is a hash with three keys, `:verb`, `:path`, and `:block`. Requests will be matched against this array of route.
 
 Running the following sample code against the above class definition:
 
