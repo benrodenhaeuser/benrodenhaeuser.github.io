@@ -462,7 +462,7 @@ end
 
 Here, we simply map each key-value pair (a two-element array) yielded by `each` to its `hash` value and sum up the result, trusting that `Array#hash` is implemented in a meaningful way. And this indeed ensures that `eql?` sets have the same `hash` return value.
 
-## Coda
+## Conclusion
 
 What has been achieved? As mentioned at the beginning of part 01, the set functionality that we have discussed is either readily available as part of Ruby's Standard Library (for classical sets), or via an easily accesible Ruby gem (for multisets). However, the code presented here presents a *uniform* perspective on classical sets and multisets. While I have written `SetMap` and its child classes as an exercise for myself, I consider this uniformity an advantage over the pre-existing implementation. We have also seen how easily the approach generalizes to further use cases by considering fuzzy sets.
 
