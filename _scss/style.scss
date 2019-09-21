@@ -417,6 +417,7 @@ footer {
   ul#markdown-toc {
     padding-left: 0;
     margin-top: 0;
+    line-height: 0.9 * $basefont;
 
     a, code {
       color: $bodycolor;
@@ -435,7 +436,7 @@ footer {
     }
 
     ul {
-      margin-top: 2px;
+      margin-top: 5px;
       padding-left: 0;
       font-size: 0.7 * $basefont;
       line-height: 0.7 * $basefont;
