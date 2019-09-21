@@ -1,6 +1,7 @@
 ---
 title: Frankie
 case-study: true
+type: major
 description: Building a toy version of a Ruby web framework from scratch.
 abstract: "Building a toy version of the \"Sinatra\" web framework from the ground up: handling requests, the top-level DSL, parametrized routes and Rack middleware."
 date: 2018-06-01

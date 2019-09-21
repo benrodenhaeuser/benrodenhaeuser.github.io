@@ -1,5 +1,9 @@
 <div class="post-list" id="post-list">
-  {% for page in site.posts %}
+  {% assign major_projects = site.posts | where: "type", "major" %}
+  {% assign minor_projects = site.posts | where: "type", "minor" %}
+  {% assign projects = major_projects | concat: minor_projects %}
+
+  {% for page in projects %}
 
   {% if page.case-study %}
   <a href="{{ page.url }}">
