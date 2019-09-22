@@ -39,7 +39,10 @@
 
   <div class="content">
     <hr class="line" />
-    <div class="content-inner">    
+    <div class="content-inner">
+      {% if page.toc %}
+        {% include toc.html %}
+      {% endif %}
       {{ page.content }}
     </div>
   </div>
