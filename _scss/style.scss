@@ -6,20 +6,6 @@ $baseline: 30px;
 $bodycolor: #595959;
 $highlightcolor: #FF7F50;
 
-.content-inner {
-  counter-reset: h2counter;
-}
-
-.content-inner h1 {
-  counter-reset: h2counter;
-}
-
-.content-inner h2:before {
-  content: "0" counter(h2counter) ".\0000a0\0000a0";
-  counter-increment: h2counter;
-  counter-reset: h3counter;
-}
-
 body {
   background-color: white;
   color: $bodycolor;
@@ -205,6 +191,17 @@ img.mark {
 
 .content {
   margin-top: 1.5 * $baseline;
+  counter-reset: h2counter;
+
+  h2:before {
+    content: "0" counter(h2counter) ".\0000a0";
+    counter-increment: h2counter;
+  }
+
+  h2.no_toc:before {
+    content: none;
+    counter-increment: none;
+  }
 }
 
 p,
@@ -307,13 +304,18 @@ blockquote {
     }
 
     ol {
-      list-style: decimal-leading-zero;
       padding-left: 0;
       margin-top: 0;
       line-height: 0.9 * $basefont;
+      counter-reset: olist;
 
       a, code {
         color: $bodycolor;
+      }
+
+      & > li > a::before {
+        content: '0'counter(olist)'. ';
+	      counter-increment: olist;
       }
 
       a:hover, code:hover {
@@ -321,18 +323,17 @@ blockquote {
       }
 
       & > li {
-        margin-top: 8px;
-        margin-left: 1.5em;
+        margin-top: 10px;
       }
 
-      li:first-of-type {
+      & > li:first-of-type {
         margin-top: 0;
       }
 
       ul {
         margin-top: 5px;
         padding-left: 0;
-        margin-left: -1.8em;
+        // margin-left: 0;
         font-size: 0.7 * $basefont;
         line-height: 0.7 * $basefont;
         font-style: italic;

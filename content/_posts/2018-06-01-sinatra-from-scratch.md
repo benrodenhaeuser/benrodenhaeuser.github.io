@@ -12,6 +12,7 @@ external-links:
 ---
 
 ## Introduction
+{: .no_toc }
 
 This project grew out of my own attempt to understand the inner workings of [Sinatra][1], a popular Ruby tool for quickly building web applications. The Sinatra code base is comparatively compact, but dense. I found it quite challenging to read initially. My hope is that this case study could be of help for people who would like to get a better understanding of Sinatra internals, just as I did when I started diving into its source code.
 

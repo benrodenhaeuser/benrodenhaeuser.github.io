@@ -39,14 +39,12 @@
 
   <div class="content">
     <hr class="line" />
-    <div class="content-inner">
       {% if page.toc %}
       <blockquote id="toc">
         {% include toc.html html=page.content class="toc" h_max=3 %}
       </blockquote>
       {% endif %}
       {{ page.content }}
-    </div>
   </div>
 
   <p class='terminal'>
