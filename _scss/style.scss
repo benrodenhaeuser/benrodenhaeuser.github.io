@@ -73,7 +73,7 @@ h5 {
   color: #FF7F50;
 }
 
-h3 {
+h3, h4 {
   display: inline-block;
   margin-top: 0.74 * $baseline;
   line-height: $baseline;
@@ -83,7 +83,7 @@ h3 {
   vertical-align: bottom;
 }
 
-h3:after {
+h3:after, h4:after {
   content: ".";
   padding-right: 2px;
 }
@@ -92,7 +92,7 @@ p:first-of-type {
   margin-top: 0.75 * $baseline;
 }
 
-h3+p {
+h3+p, h4+p {
   display: inline;
   vertical-align: bottom;
 }
@@ -233,12 +233,16 @@ blockquote {
   padding: 20px;
   background-color: #F3F3F3;
 
-  & > p:first-of-type, & > h3:first-of-type {
+  & > p:first-of-type, & > h4:first-of-type {
     margin-top: 0;
   }
 
   & > ul {
     margin-top: 0;
+  }
+
+  h4 {
+    font-size: 0.9 * $basefont;
   }
 
   p code {

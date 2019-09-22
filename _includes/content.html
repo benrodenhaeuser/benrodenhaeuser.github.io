@@ -42,7 +42,7 @@
     <div class="content-inner">
       {% if page.toc %}
       <blockquote id="toc">
-        {% include toc.html html=page.content %}
+        {% include toc.html html=page.content h_max=3 %}
       </blockquote>
       {% endif %}
       {{ page.content }}
