@@ -33,12 +33,12 @@
     {% assign maxHeader = include.h_max | default: 6 %}
     {% assign nodes = include.html | split: '<h' %}
     {% assign firstHeader = true %}
-    {% capture listModifier %}{% if orderedList %}1.{% else %}-{% endif %}{% endcapture %}
     {% for node in nodes %}
         {% if node == "" %}
             {% continue %}
         {% endif %}
         {% assign headerLevel = node | replace: '"', '' | slice: 0, 1 | times: 1 %}
+        {% capture listModifier %}{% if headerLevel == 2 %}1.{% else %}-{% endif %}{% endcapture %}
         {% if headerLevel < minHeader or headerLevel > maxHeader %}
             {% continue %}
         {% endif %}

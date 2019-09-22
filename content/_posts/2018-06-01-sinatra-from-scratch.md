@@ -37,7 +37,7 @@ The overall result is a tiny code base that – hopefully – give a pretty good
 > Besides following this post, another approach would be to jump right into the Frankie source code [on Github][4], and use that as a launchpad for a subsequent exploration of the Sinatra codebase itself.
 {: .aside}
 
-## 01. Hello Frankie: Storing Routes and Handling Requests
+## Hello Frankie: Storing Routes and Handling Requests
 
 The people behind Sinatra like to emphasize that Sinatra is not a framework, but rather a tool for „solving HTTP“, a „DSL for quickly creating web applications in Ruby with minimal effort“.
 
@@ -160,7 +160,7 @@ Run the code (the file is [here][6]), point your browser to `localhost:8080` (80
 
 So we got ourselves the beginnings of a web framework, or the beginnings of a „tool for solving HTTP“, if you prefer. But, of course, we are just getting started.
 
-## 02. Frankie Reaches for the Stars: The Top-Level DSL
+## Frankie Reaches for the Stars: The Top-Level DSL
 
 Let’s turn to some aspects of the top-level DSL for which Sinatra is often praised. To get a Sinatra application going, all you really need to do is `require 'sinatra'` at the top of your file, and go forth writing routes like the following:
 
@@ -222,7 +222,7 @@ Recall that `match[:block]` is a Proc object. We convert this object to a block 
 
 Summing up, two main ingredients enable top-level route controllers: delegated method calls, and route blocks that are scoped to the current application instance as a request is handled. Run [this file][10] (our code so far), head to `localhost:8080/ditty`, and you will see that our sample request from above works: we get back a 301, indicating that the requested resource has been moved.
 
-## 03. Frankie Sees a Pattern: Route Parameters
+## Frankie Sees a Pattern: Route Parameters
 
 Next, let’s make Frankie a bit more capable. What is sorely missing from our toy version of Sinatra so far is the ability to *parametrize routes*. Here, is the kind of code we would like to be able to write:
 
@@ -340,7 +340,7 @@ which we merge into `params`. Done!
 
 Try it out using [this file][12] (which contains the Frankie code as of the end of this section), requesting your favorite song from your favorite album.
 
-## 04. Frankie Likes Cookies: Rack Middleware
+## Frankie Likes Cookies: Rack Middleware
 
 In this final section, we turn to Sinatra’s take on Rack middleware, and briefly discuss those aspects of Frankie that are *not* covered in detail here.
 

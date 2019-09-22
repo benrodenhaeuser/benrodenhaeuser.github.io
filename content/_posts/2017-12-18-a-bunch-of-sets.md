@@ -14,7 +14,7 @@ Ruby comes with a [`Set` class][1] as part of its standard library, and there is
 
 The first section introduces our topic by discussing the three types of sets we would like to capture. We then develop a unified model for those types. The third and final section discusses how to implement the typical operations on sets in this model.
 
-## 01. Three Types of Sets
+## Three Types of Sets
 
 Let's first get an overview of the types of collections we are interested in by means of some quick examples.
 
@@ -67,7 +67,7 @@ For the sake of exposition, let us settle on 3 as the—pretty arbitrarily chose
 
 In this fuzzy set, the degree of each element is to be interpreted as the degree of similarity to our target word "learner".
 
-## 02. A Unified Model For Sets in Ruby
+## A Unified Model For Sets in Ruby
 
 Equipped with some basic understanding of our problem domain established in [part 01 of this series][4], let us begin to develop the main ingredients for a Ruby model of sets that encompasses the types of sets we have discussed (as well as potentially other ones). We start by discussing a `SetMap` class that captures the commonalities of classical sets, fuzzy sets, and multisets, while allowing us to easily define each of these specific types via inheritance.
 
@@ -258,7 +258,7 @@ alias each each_pair
 
 As we will see in the next post, `each_pair` forms the basis for all our methods that iterate over sets. This includes pretty much all the interesting operations on sets—`union`, `intersection`, and the like. Since `each_pair` is aliassed as `each`, it also allows us to include the `Enumerable` module, which any respectable Ruby collection class should have access to.
 
-## 03. Operations on Sets
+## Operations on Sets
 
 The `SetMap` class discussed in the [previous entry][7] essentially serves as a wrapper around our hash table. We have also implemented a mechanism for specifying what constitutes a valid score for a given type of set. And we have provided our three target classes that inherit from `SetMap`. The basics of our model are thus in place.
 

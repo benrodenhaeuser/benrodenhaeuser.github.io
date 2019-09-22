@@ -6,6 +6,20 @@ $baseline: 30px;
 $bodycolor: #595959;
 $highlightcolor: #FF7F50;
 
+.content-inner {
+  counter-reset: h2counter;
+}
+
+.content-inner h1 {
+  counter-reset: h2counter;
+}
+
+.content-inner h2:before {
+  content: "0" counter(h2counter) ".\0000a0\0000a0";
+  counter-increment: h2counter;
+  counter-reset: h3counter;
+}
+
 body {
   background-color: white;
   color: $bodycolor;
@@ -292,7 +306,8 @@ blockquote {
       content: 'Contents';
     }
 
-    ul {
+    ol {
+      list-style: decimal-leading-zero;
       padding-left: 0;
       margin-top: 0;
       line-height: 0.9 * $basefont;
@@ -305,8 +320,9 @@ blockquote {
         color: $highlightcolor;
       }
 
-      li {
+      & > li {
         margin-top: 8px;
+        margin-left: 1.5em;
       }
 
       li:first-of-type {
@@ -316,6 +332,7 @@ blockquote {
       ul {
         margin-top: 5px;
         padding-left: 0;
+        margin-left: -1.8em;
         font-size: 0.7 * $basefont;
         line-height: 0.7 * $basefont;
         font-style: italic;
