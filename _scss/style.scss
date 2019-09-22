@@ -638,6 +638,12 @@ header {
   }
 }
 
+@media print, screen and (max-width: 600px) {
+  #toc::before {
+    visibility: hidden;
+  }
+}
+
 @media print, screen and (max-width: 550px) {
   h2.title.front {
     font-size: 1.4 * $basefont;
@@ -645,10 +651,6 @@ header {
 
   p.header-image-caption {
     font-size: 0.5 * $basefont;
-  }
-
-  #toc::before {
-    visibility: hidden;
   }
 }
 
