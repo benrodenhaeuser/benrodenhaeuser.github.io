@@ -27,7 +27,8 @@ kramdown:
 defaults:
   -
     scope:
-      path: "" # an empty string here means all files in the project
+      path: "" 
       type: "posts"
     values:
-      layout: "post" # i.e., unless specified, use "post" layout
+      layout: "post"
+      toc: true

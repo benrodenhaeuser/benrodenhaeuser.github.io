@@ -2,7 +2,6 @@
 title: SetMap
 case-study: true
 type: major
-toc: true
 description: A generic implementation of classical sets, multisets and fuzzy sets in Ruby.
 date: 2017-12-18
 external-links:
@@ -266,8 +265,6 @@ The `SetMap` class discussed in the [previous entry][7] essentially serves as a 
 What remains to be implemented is all the interesting operations on sets! The remaining part of the interface will, however, not interact with the internally used hash table directly, but only through the interface developed so far.
 
 For the purpose of implementing those additional operations, we open a new module `SetLike`, which we include in `SetMap`. Since our target classes `ClassicalSet`, `FuzzySet` and `MultiSet` inherit from `SetMap`, they will also be able to access the functionality provided by `SetLike`.
-
-### Division of Labor
 
 The division of labor we adopt here takes a cue from the place the `Enumerable` module occupies in Ruby's design. `Enumerable` provides a number of useful methods for working with collections to any class that chooses to include it. In doing so, `Enumerable` assumes that the class implements an `each` method, which forms the basis for all the methods `Enumerable` defines. Beyond this, however, `Enumerable` does not (need to) know anything about the class using it. Here, we do something very similar:
 

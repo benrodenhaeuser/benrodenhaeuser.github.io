@@ -356,8 +356,6 @@ blockquote {
   }
 }
 
-
-
 // Personal details
 
 .personal-details {
@@ -593,7 +591,6 @@ header {
   background: rgba(255,255,255,0.8);
   width: 100vw;
   height: 100vh;
-  visibility: hidden;
   cursor: pointer;
 }
 
@@ -603,7 +600,7 @@ header {
 }
 
 
-// RESPONSIVE
+// Rules for Responsive Design
 
 @media print, screen and (max-width: 850px) {
   main {
@@ -630,6 +627,10 @@ header {
 
   p.header-image-caption {
     font-size: 0.5 * $basefont;
+  }
+
+  #toc::before {
+    visibility: hidden;
   }
 }
 
