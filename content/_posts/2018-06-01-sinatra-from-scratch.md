@@ -161,7 +161,7 @@ Run the code (the file is [here][6]), point your browser to `localhost:8080` (80
 
 So we got ourselves the beginnings of a web framework, or the beginnings of a „tool for solving HTTP“, if you prefer. But, of course, we are just getting started.
 
-## Frankie Reaches for the Stars: The Top-Level DSL
+## Frankie Reaches for the Stars: the Top-Level DSL
 
 Let’s turn to some aspects of the top-level DSL for which Sinatra is often praised. To get a Sinatra application going, all you really need to do is `require 'sinatra'` at the top of your file, and go forth writing routes like the following:
 
