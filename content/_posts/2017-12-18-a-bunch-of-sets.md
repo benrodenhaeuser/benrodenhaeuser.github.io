@@ -2,15 +2,12 @@
 title: SetMap
 case-study: true
 type: major
+toc: true
 description: A generic implementation of classical sets, multisets and fuzzy sets in Ruby.
 date: 2017-12-18
 external-links:
   github: https://github.com/benrodenhaeuser/sets
 ---
-
-> * TOC
-> {:toc}
-{: .toc}
 
 ## Introduction
 

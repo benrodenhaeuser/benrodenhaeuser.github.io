@@ -226,8 +226,6 @@ a small {
   display:block;
 }
 
-// Blockquotes
-
 blockquote {
   margin: (0.75 * $baseline) 0;
   font-size: 0.9 * $basefont;
@@ -274,75 +272,87 @@ blockquote {
       color: $highlightcolor;
     }
   }
-}
 
-// Table of Contents
+  &#toc {
+    position: relative;
 
-blockquote.toc {
-  position: relative;
-
-  &::before {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    padding: 0 10px;
-    background-color: #d3d3d3;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-size: 0.5 * $basefont;
-    content: 'Contents';
-  }
-
-  ul#markdown-toc {
-    padding-left: 0;
-    margin-top: 0;
-    line-height: 0.9 * $basefont;
-
-    a, code {
-      color: $bodycolor;
-    }
-
-    a:hover, code:hover {
-      color: $highlightcolor;
-    }
-
-    li {
-      margin-top: 8px;
-    }
-
-    li:first-of-type {
-      margin-top: 0;
+    &::before {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      padding: 0 10px;
+      background-color: #d3d3d3;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 0.5 * $basefont;
+      content: 'Contents';
     }
 
     ul {
-      margin-top: 5px;
       padding-left: 0;
-      font-size: 0.7 * $basefont;
-      line-height: 0.7 * $basefont;
-      font-style: italic;
-    }
+      margin-top: 0;
+      line-height: 0.9 * $basefont;
 
-    ul li {
-      display: inline;
-    }
+      a, code {
+        color: $bodycolor;
+      }
 
-    ul li::after {
-      content: " —";
-    }
+      a:hover, code:hover {
+        color: $highlightcolor;
+      }
 
-    ul li:last-of-type::after {
-      content: "";
-    }
+      li {
+        margin-top: 8px;
+      }
 
-    li > ul {
-      font-weight: normal;
-    }
+      li:first-of-type {
+        margin-top: 0;
+      }
 
-    li::before {
-      content: '';
+      ul {
+        margin-top: 5px;
+        padding-left: 0;
+        font-size: 0.7 * $basefont;
+        line-height: 0.7 * $basefont;
+        font-style: italic;
+      }
+
+      ul li {
+        display: inline;
+      }
+
+      ul li::after {
+        content: " —";
+      }
+
+      ul li:last-of-type::after {
+        content: "";
+      }
+
+      li > ul {
+        font-weight: normal;
+      }
+
+      li::before {
+        content: '';
+      }
+    }
+  }
+
+  &.notes {
+    font-family: 'Source Code Pro';
+    text-align: left;
+    background-color: yellow;
+    font-size: 0.8 * $basefont;
+
+    a {
+      color: $bodycolor;
+      text-decoration: underline;
     }
   }
 }
+
+
 
 // Personal details
 

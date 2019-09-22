@@ -41,7 +41,9 @@
     <hr class="line" />
     <div class="content-inner">
       {% if page.toc %}
-        {% include toc.html %}
+      <blockquote id="toc">
+        {% include toc.html html=page.content %}
+      </blockquote>
       {% endif %}
       {{ page.content }}
     </div>
