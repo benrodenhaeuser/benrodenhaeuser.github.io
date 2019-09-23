@@ -27,8 +27,9 @@ kramdown:
 defaults:
   -
     scope:
-      path: "" 
+      path: ""
       type: "posts"
     values:
       layout: "post"
       toc: true
+      case-study: true

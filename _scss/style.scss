@@ -5,6 +5,8 @@ $basefont: 21px;
 $baseline: 30px;
 $bodycolor: #595959;
 $highlightcolor: #FF7F50;
+$linkcolor: #50d0ff;
+$headercolor: #c3c3c3; 
 
 body {
   background-color: white;
@@ -24,7 +26,7 @@ h1 {
   line-height: 1.5 * $baseline;
 
   &.site-title {
-    color: #c3c3c3;
+    color: $headercolor;
     font-size: $basefont;
     display: inline;
   }
@@ -36,10 +38,10 @@ h2 {
   line-height: 1.2 * 1.2 * $basefont;
   font-size: 1.2 * 1.2 * $basefont;
   margin-top: 1.2 * 1.2 * $baseline;
-  color: #FF7F50;
+  color: $highlightcolor;
 
   code {
-    color: #FF7F50;
+    color: $highlightcolor;
     font-weight: normal;
   }
 
@@ -70,7 +72,7 @@ h5 {
   font-weight: bold;
   font-size: 1.2 * $basefont;
   margin-top: 0.74 * $baseline;
-  color: #FF7F50;
+  color: $highlightcolor;
 }
 
 h3, h4 {
@@ -132,7 +134,7 @@ header a:hover {
 }
 
 .description.site-description {
-  color: #c3c3c3;
+  color: $headercolor;
   font-size: 0.5 * $basefont;
   font-family: 'Source Sans Pro', sans-serif;
   text-transform: uppercase;
@@ -178,7 +180,7 @@ ul.external-links li::before {
 }
 
 a code {
-  color: #FF7F50;
+  color: $highlightcolor;
 }
 
 a code:hover {
@@ -222,7 +224,7 @@ p.terminal {
 }
 
 a {
-  color: #FF7F50;
+  color: $linkcolor;
   text-decoration: none;
 }
 
@@ -463,7 +465,7 @@ hr {
 }
 
 hr.line {
-  border-top: 2px solid #FF7F50;
+  border-top: 2px solid $highlightcolor;
   width: 35px;
 }
 

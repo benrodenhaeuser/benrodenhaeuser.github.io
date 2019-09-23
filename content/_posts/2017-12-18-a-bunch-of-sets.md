@@ -1,6 +1,5 @@
 ---
 title: SetMap
-case-study: true
 type: major
 description: A generic implementation of classical sets, multisets and fuzzy sets in Ruby.
 date: 2017-12-18
