@@ -6,7 +6,7 @@ $baseline: 30px;
 $bodycolor: #595959;
 $highlightcolor: #FF7F50;
 $linkcolor: #50d0ff;
-$headercolor: #c3c3c3; 
+$headercolor: #c3c3c3;
 
 body {
   background-color: white;
@@ -180,7 +180,7 @@ ul.external-links li::before {
 }
 
 a code {
-  color: $highlightcolor;
+  color: $linkcolor;
 }
 
 a code:hover {
