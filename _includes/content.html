@@ -22,16 +22,17 @@
 
   {% if page.external-links %}
   <div class="external-links">
+    {% if page.external-links.demo %}
+    <a href="{{ page.external-links.demo }}">
+      {% include icons/demo-version-icon.html %}
+      <p>Try the Demo</p>
+    </a>
+    {% endif %}
+
     {% if page.external-links.github %}
     <a href="{{ page.external-links.github }}">
       {% include icons/github-icon.html %}
       <p>Repository</p>
-    </a>
-    {% endif %}
-    {% if page.external-links.demo %}
-    <a href="{{ page.external-links.demo }}">
-      {% include icons/demo-version-icon.html %}
-      <p>Demo</p>
     </a>
     {% endif %}
   </div>
@@ -41,7 +42,7 @@
     <hr class="line" />
       {% if page.toc %}
       <blockquote id="toc">
-        {% include toc.html html=page.content class="toc" h_max=3 %}
+        {% include toc.html html=page.content class="toc" h_min=2 h_max=3 %}
       </blockquote>
       {% endif %}
       {{ page.content }}

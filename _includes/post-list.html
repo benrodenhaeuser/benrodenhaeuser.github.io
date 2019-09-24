@@ -29,7 +29,14 @@
     {% if page.case-study %}
     <a href="{{ page.url }}">
       {% include icons/case-study-icon.html %}
-      <p>Case Study</p>
+      <p>Read More</p>
+    </a>
+    {% endif %}
+
+    {% if page.external-links.demo %}
+    <a href="{{ page.external-links.demo }}">
+      {% include icons/demo-version-icon.html %}
+      <p>Try the Demo</p>
     </a>
     {% endif %}
 
@@ -40,15 +47,9 @@
     </a>
     {% endif %}
 
-    {% if page.external-links.demo %}
-    <a href="{{ page.external-links.demo }}">
-      {% include icons/demo-version-icon.html %}
-      <p>Demo</p>
-    </a>
-    {% endif %}
   </div>
 
-  <hr class="line" />
+  <hr class="line front" />
 
   {% endfor %}
 

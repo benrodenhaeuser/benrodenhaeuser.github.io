@@ -8,9 +8,9 @@ external-links:
 ---
 
 ## Introduction
-{: .no_toc }
+{: .no-toc }
 
-Ruby comes with a [`Set` class][1] as part of its standard library, and there is also a [`Multiset` class][2] available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of our discussion—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don't care much for lengthy explanations, head [straight to Github][3] to have a look at the code.
+Ruby comes with a [Set` class`][1] as part of its standard library, and there is also a [`Multiset` class][2] available as a gem. Both classes uses hashes internally. However, the two libraries are completely separate, so, of course, they do not share any code. This is somewhat regrettable, since—as we will see during the course of our discussion—sets and multisets have quite a bit in common. For this reason, I thought that it would be a nice exercise to write a more generic set class from scratch that would allow us to derive the functionality provided by the above-mentioned classes by inheritance. For good measure, I decided to throw fuzzy sets into the mix, another type of set with useful applications. The result could be called a polymorphic approach to modeling various types of sets in Ruby. This post is a tutorial-style presentation of what I came up with. If you don't care much for lengthy explanations, head [straight to Github][3] to have a look at the code.
 
 The first section introduces our topic by discussing the three types of sets we would like to capture. We then develop a unified model for those types. The third and final section discusses how to implement the typical operations on sets in this model.
 
