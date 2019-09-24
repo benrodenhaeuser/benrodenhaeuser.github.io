@@ -200,7 +200,7 @@ img.mark {
     counter-increment: h2counter;
   }
 
-  h2.no_toc:before {
+  h2.no-toc:before {
     content: none;
     counter-increment: none;
   }
