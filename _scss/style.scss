@@ -9,7 +9,7 @@ $linkcolor: #50d0ff;
 $headercolor: #c3c3c3;
 
 body {
-  background-color: white;
+  background-color: #fffffb;
   color: $bodycolor;
   font-family: 'Source Sans Pro', sans-serif;
   font-size: $basefont;
@@ -85,16 +85,26 @@ h3, h4 {
   vertical-align: bottom;
 }
 
-h3:after, h4:after {
+h3::after, h4::after {
   content: ".";
   padding-right: 2px;
+}
+
+h3 + p::after, h4 + p::after {
+  content: "\A";
+  white-space: pre-line;
+}
+
+// TODO: this does not seem to do anything. maybe it's not specific enough?
+h3 + p:last-of-type::after, h4 + p:last-of-type::after {
+  content: "";
 }
 
 p:first-of-type {
   margin-top: 0.75 * $baseline;
 }
 
-h3+p, h4+p {
+h3 + p, h4 + p {
   display: inline;
   vertical-align: bottom;
 }
@@ -183,7 +193,7 @@ a code {
   color: $linkcolor;
 }
 
-a code:hover {
+a:hover code {
   color: #494949;
 }
 
@@ -374,6 +384,22 @@ blockquote {
       text-decoration: underline;
     }
   }
+
+  &.todo {
+    font-family: 'Source Code Pro';
+    text-align: left;
+    background-color: yellow;
+    font-size: 0.8 * $basefont;
+
+    a {
+      color: $bodycolor;
+      text-decoration: underline;
+    }
+
+    p::before {
+      content: 'TODO: ';
+    }
+  }
 }
 
 // Personal details
@@ -384,6 +410,14 @@ blockquote {
   h3 {
     font-weight: normal;
   }
+
+  a {
+    color: $highlightcolor;
+  }
+
+  a:hover {
+    color: $bodycolor;
+  }
 }
 
 code,
@@ -392,7 +426,7 @@ pre {
   color:#333;
 }
 
-p code {
+p code, li code {
   font-size: $basefont * 0.9;
   overflow-wrap: break-word;
 }
@@ -433,11 +467,7 @@ img {
   max-width: 100%;
 }
 
-main {
-  margin: 150px auto;
-}
-
-img.header-image ~ main {
+img.header-image ~ article {
   margin-top: 20px;
 }
 
@@ -446,8 +476,9 @@ header {
   -webkit-font-smoothing: subpixel-antialiased;
 }
 
-main {
+main, article {
   width: 800px;
+  margin: 150px auto;
   padding-bottom: 50px;
 }
 
@@ -624,7 +655,7 @@ header {
 // Rules for Responsive Design
 
 @media print, screen and (max-width: 850px) {
-  main {
+  main, article {
     margin-left: 20px;
     margin-right: 20px;
     width: initial;
@@ -668,7 +699,7 @@ header {
     font-size: 0.5 * $basefont;
   }
 
-  main {
+  main, article {
     margin-top: 30px;
   }
 }
