@@ -1,5 +1,5 @@
 ---
-title: Pen Case Study
+title: Pen
 type: major
 description: Designing a vector design tool that live-syncs a drawing canvas with an SVG markup editor from scratch.
 abstract: Pen is a vector design tool that live-syncs a drawing canvas with an SVG markup editor. I built it from scratch in JavaScript, developing a custom application framework based on finite state machines and the „hexagonal architecture“ pattern, with a simple Sinatra/MongoDB backend for storage.
@@ -112,27 +112,6 @@ These features lie at the intersection of what I felt was feasible and what I de
 
 ## Design Problems
 
-This section aims to tease out some of the main problems Pen has to solve. 
-
-### Document structure
-
-> Text
-{: .todo}
-
-- need a data structure that is inherently *composable* (in the sense of the Gang of Four[Composite pattern][11]).
-
-### User interface
-
-> Text
-{: .todo}
-
-### Data storage
-
-> Text
-{: .todo}
-
-### Event management
-
 > Text
 {: .todo}
 
@@ -141,12 +120,12 @@ This section aims to tease out some of the main problems Pen has to solve.
 This section draws the results of the preceding analysis together in a blueprint for Pen. 
 
 ### The onion model
-The high-level design I settled on is captured by an onion diagram with nested concentric circles (see below). It is heavily inspired by Alistair Cockburn’s hexagonal architecture (also known as the „ports and adapters pattern“), whose original intent was to [„allow an application to equally be driven by users, programs, automated test or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases“][12], and to avoid an [„entanglement between the business logic and the interaction with external entities“][13], where an „external entity“ could be either the user interface or a database, or another service hooked up with the application.
+The high-level design I settled on is captured by an onion diagram with nested concentric circles (see below). It is heavily inspired by Alistair Cockburn’s hexagonal architecture (also known as the „ports and adapters pattern“), whose original intent was to [„allow an application to equally be driven by users, programs, automated test or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases“][11], and to avoid an [„entanglement between the business logic and the interaction with external entities“][12], where an „external entity“ could be either the user interface or a database, or another service hooked up with the application.
 
 > Insert onion image here.
 {: .todo}
 
-The basic idea here is that „ignorance is bliss“: inner and outer layers of the onion know as little as possible about each other, and interact via „gates“ that are as narrowly construed as possible. So what I call the onion model facilitates a strong isolation of onion layers. As described [in the next section][14], this gives us tight control over the way data flows through our application. But before going into that, this section describes the onion layers, and the role they play in Pen, from the outside moving inwards.
+The basic idea here is that „ignorance is bliss“: inner and outer layers of the onion know as little as possible about each other, and interact via „gates“ that are as narrowly construed as possible. So what I call the onion model facilitates a strong isolation of onion layers. As described [in the next section][13], this gives us tight control over the way data flows through our application. But before going into that, this section describes the onion layers, and the role they play in Pen, from the outside moving inwards.
 
 ### The environment
 
@@ -184,7 +163,7 @@ The basic idea here is that „ignorance is bliss“: inner and outer layers of 
 - *What role does it play in Pen?*
 	- Holds the scene graph/editor tree. 
 	- This is where the document structure described earlier is situated.
-	- The editor tree is implemented as a mutable object. This goes slightly against the grain of recent trends towards immutable data structures that play an important role in frameworks such as React. This is a trade-off, since [immutability in the context of a Web app enables sophisticated change detection techniques to be implemented simply and cheaply][15], and we will have to make up for that (details below). On the other hand, working with mutable state, we gain the advantage of bundling the data that makes up our domain state with the methods operating on that data (encapsulation). Like other object-oriented languages, JavaScript facilitates this style of programming, and I will show below how we are able to handle any remaining issues.
+	- The editor tree is implemented as a mutable object. This goes slightly against the grain of recent trends towards immutable data structures that play an important role in frameworks such as React. This is a trade-off, since [immutability in the context of a Web app enables sophisticated change detection techniques to be implemented simply and cheaply][14], and we will have to make up for that (details below). On the other hand, working with mutable state, we gain the advantage of bundling the data that makes up our domain state with the methods operating on that data (encapsulation). Like other object-oriented languages, JavaScript facilitates this style of programming, and I will show below how we are able to handle any remaining issues.
 
 ## Data flows
 
@@ -253,7 +232,7 @@ This appendix gives an overview of the GoF design patterns mentioned in this cas
 {: .todo}
 
 ### Adapter
-> The Design Patterns book contains a description of the generic Adapter pattern: "Convert the interface of a class into another interace clients expect." The ports-and-adapters pattern is a particular use of the Adapter pattern. [Alistair Cockburn][16]
+> The Design Patterns book contains a description of the generic Adapter pattern: "Convert the interface of a class into another interace clients expect." The ports-and-adapters pattern is a particular use of the Adapter pattern. [Alistair Cockburn][15]
 {: .quote}
 
 ### Composite
@@ -273,12 +252,11 @@ The way peripheral devices and application are linked up in Pen follow the Obser
 [8]:	https://css-tricks.com/svg-path-syntax-illustrated-guide/
 [9]:	https://classic.framer.com
 [10]:	http://patrickbrosset.com/articles/2017-02-01-where-is-devtools-headed.html
-[11]:	http://www.blackwasp.co.uk/gofpatterns.aspx
+[11]:	https://web.archive.org/web/20060711221010/http://alistair.cockburn.us:80/index.php/Hexagonal_architecture
 [12]:	https://web.archive.org/web/20060711221010/http://alistair.cockburn.us:80/index.php/Hexagonal_architecture
-[13]:	https://web.archive.org/web/20060711221010/http://alistair.cockburn.us:80/index.php/Hexagonal_architecture
-[14]:	TO%20BE%20SUPPLIED
-[15]:	https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability
-[16]:	https://web.archive.org/web/20060711221010/http://alistair.cockburn.us:80/index.php/Hexagonal_architecture
+[13]:	TO%20BE%20SUPPLIED
+[14]:	https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability
+[15]:	https://web.archive.org/web/20060711221010/http://alistair.cockburn.us:80/index.php/Hexagonal_architecture
 
 [image-1]:	/assets/images/pen/out.gif
 [image-2]:	/assets/images/pen/framer.png

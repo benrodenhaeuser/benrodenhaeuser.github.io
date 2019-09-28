@@ -112,7 +112,7 @@ Basics
 - Allow to manipulate shapes and groups of shapes
 - Easy to render
 - Take into account hierarchical relations between shapes: compose shapes into groups and be able to treat the group as a single whole
-- Not tied up to a particular rendering engine
+- Not tied up to a particular rendering engine (why?)
 - Extensible: besides grouping as an operation for composing shapes, there are more advanced operations like intersecting shapes or taking their union (*Boolean operations*), or using one shape as a clipping mask for another
 - While Pen does not implement these features, we require extensibility in the sense that implementing some of these advanced features should not force us to start from scratch
 
@@ -138,6 +138,8 @@ Document representations:
 - We don’t want to be forced to fix the interface upfront. 
 - Particular choices in this area tend to be ephemeral
 - We don’t want to have to change internals as we change the application.
+
+(*this is very generic*)
 
 ### Persistence layer („document management“)
 - Global persistence
