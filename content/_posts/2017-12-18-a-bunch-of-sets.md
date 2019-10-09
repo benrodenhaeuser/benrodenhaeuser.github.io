@@ -1,6 +1,6 @@
 ---
 title: SetMap
-type: major
+docstyle: article
 description: A generic implementation of classical sets, multisets and fuzzy sets in Ruby.
 date: 2017-12-18
 external-links:
@@ -22,12 +22,15 @@ Let's first get an overview of the types of collections we are interested in by 
 
 Supppose we wanted to concisely represent the letters occuring in a word, while disregarding their sequential order as well as the number of times they occur in the word. A classical set would be a good choice of data structure for this task. For instance, the word "learner" could be represented by the set
 
-> `{ a, e, l, r, n }`.
+```ruby
+{ a, e, l, r, n }
+```
 
 The word "learn" corresponds to the same classical set, as it contains the same letters. The word "land", on the other hand, corresponds to the set
 
-> `{ a, l, n, d }`.
-
+```ruby
+{ a, l, n, d }
+```
 
 Taking the intersection of the two sets, which collects the elements occuring in both of them, we obtain the set `{ a, l, n }`, which captures the overlap of the two words in terms of letters contained—a crude measure of what they have in common. So sets allow us to zoom in on questions of membership, while disregarding other aspects of particular entities we wish to study.
 
@@ -35,17 +38,23 @@ Taking the intersection of the two sets, which collects the elements occuring in
 
 Suppose now we would like to count *how often* letters occur in a given word or text, while (still) disregarding their order. A multiset would be an appropriate data structure to accomplish this. For example, the above word "learner" corresponds to the multiset
 
-> `{ a, e, e, l, r, r, n }`.
+```ruby
+{ a, e, e, l, r, r, n }
+```
 
 Notice that the word "learn" would be represented by a different multiset, namely
 
-> `{ a, e, l, r, n }`.
+```ruby
+{ a, e, l, r, n }
+```
 
 So multisets make finer distinctions than classical sets.
 
 A more concise way to represent a multiset is by means of key-value notation. In this notation, our multiset representation of the word "learner" would be written as
 
-> `{ a: 1, e: 2, l: 1, r: 2, n: 1 }`
+```ruby
+{ a: 1, e: 2, l: 1, r: 2, n: 1 }
+```
 
 In a programming context, the elements of a set (be it a classical set or a multiset) are often called *keys*. The above multiset has five distinct keys: "a", "e", "l", "r" and "n". In a multiset, each key comes with a count, the value associated with the key, which we will refer to as the *score* for that key. The score for the key "e" in the above multiset, for example, is 2.
 
@@ -62,7 +71,9 @@ To see how this can be useful, take this example: consider the words "learner", 
 
 For the sake of exposition, let us settle on 3 as the—pretty arbitrarily chosen—treshold from which onwards two words to be considered completely dissimilar, or "not similar at all". Then we can map our edit counts to a scale from 0 to 1, and represent our findings as a fuzzy set which scores the key "learner" with 1.0, "learned" with 0.66, "learn" with 0.33 and "lean" with 0.0, or, using key-value notation:
 
-> `{ learner: 1.0, learned: 0.66, learn: 0.33, lean: 0.0 }`
+```ruby
+{ learner: 1.0, learned: 0.66, learn: 0.33, lean: 0.0 }
+```
 
 
 In this fuzzy set, the degree of each element is to be interpreted as the degree of similarity to our target word "learner".
@@ -75,7 +86,9 @@ Equipped with some basic understanding of our problem domain established in [par
 
 What do the three types of sets have in common? At first glance, it seems that their internal structure is pretty different: multisets and fuzzy sets have been presented above as consisting of key-value pairs, while classical sets simply consist of a bunch of keys. However, this is merely a matter of representation. In fact, it is rather common to represent a classical set by means of a *characteristic function*, which maps the members of the set to 1, while all other objects from a given domain are mapped to 0. Taking a cue from this, we extend our key-value notation to classical sets, writing the set `{ 0, 1, 2 }`, for example, as
 
-> `{ 0: 1, 1: 1, 2: 1 }`.
+```ruby
+{ 0: 1, 1: 1, 2: 1 }
+```
 
 From this perspective, it becomes obvious that the membership information for a set—be it a fuzzy set, a classical set, or a multiset—may be stored in a hash table:
 
@@ -219,6 +232,7 @@ def retrieve(key)
 end
 alias [] retrieve
 ```
+
 The `retrieve` method (which we alias as `[]`) wraps the element reference method of our internal hash. If the hash does not contain a certain key, `@hash[key]` will return `nil`. In that case, `retrieve(key)` (or, equivalently as per our alias, `self[key]`) will return `0`. Alternatively, we could haver set a default value for `@hash`, but the current way seems slightly more explicit.
 
 Observe that key retrieval is fast: accessing a hash key takes constant time on average ([disregarding some fine-print][6]), i.e., as the number of keys in a hash increases, the average time necessary to recover the value for a key does not increase. This is one of the main reasons why using hash tables to model sets is an attractive choice.

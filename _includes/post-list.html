@@ -1,7 +1,5 @@
 <div class="post-list" id="post-list">
-  {% assign major_projects = site.posts | where: "type", "major" %}
-  {% assign minor_projects = site.posts | where: "type", "minor" %}
-  {% assign projects = major_projects | concat: minor_projects %}
+  {% assign projects = site.posts %}
 
   {% for page in projects %}
 

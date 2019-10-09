@@ -1,0 +1,677 @@
+{
+  "editor": {
+    "type": "editor",
+    "children": [
+      {
+        "type": "doc",
+        "children": [
+          {
+            "type": "canvas",
+            "children": [
+              {
+                "type": "shape",
+                "children": [
+                  {
+                    "type": "spline",
+                    "children": [
+                      {
+                        "type": "segment",
+                        "children": [
+                          {
+                            "type": "anchor",
+                            "children": [],
+                            "props": {
+                              "key": "6kl130nt9ajk1g8qk9e",
+                              "class": [],
+                              "vector": {
+                                "x": 215.53884887695312,
+                                "y": 56.641605377197266
+                              }
+                            }
+                          },
+                          {
+                            "type": "handleOut",
+                            "children": [],
+                            "props": {
+                              "key": "z1wh0leyl1pk1g8qke3",
+                              "class": [],
+                              "vector": {
+                                "x": 214.53634643554688,
+                                "y": 94.7368392944336
+                              }
+                            }
+                          },
+                          {
+                            "type": "handleIn",
+                            "children": [],
+                            "props": {
+                              "key": "fpb7o9cgz96k1g8qke4",
+                              "class": [],
+                              "vector": {
+                                "x": 216.54135131835938,
+                                "y": 18.546371459960938
+                              }
+                            }
+                          }
+                        ],
+                        "props": {
+                          "key": "a2hdmf9bbbrk1g8qk9e",
+                          "class": []
+                        }
+                      },
+                      {
+                        "type": "segment",
+                        "children": [
+                          {
+                            "type": "anchor",
+                            "children": [],
+                            "props": {
+                              "key": "dayc8lu6lt9k1g8ql7n",
+                              "class": [],
+                              "vector": {
+                                "x": 437.0927429199219,
+                                "y": 60.65163040161133
+                              }
+                            }
+                          },
+                          {
+                            "type": "handleOut",
+                            "children": [],
+                            "props": {
+                              "key": "ng51ve5xrpk1g8qlbf",
+                              "class": [
+                                "tip"
+                              ],
+                              "vector": {
+                                "x": 437.0927429199219,
+                                "y": 98.74686431884766
+                              }
+                            }
+                          },
+                          {
+                            "type": "handleIn",
+                            "children": [],
+                            "props": {
+                              "key": "8z6g9ngd9ojk1g8qlbf",
+                              "class": [],
+                              "vector": {
+                                "x": 437.0927429199219,
+                                "y": 22.556396484375
+                              }
+                            }
+                          }
+                        ],
+                        "props": {
+                          "key": "f6cg08kbp3sk1g8ql7n",
+                          "class": [
+                            "containsTip"
+                          ]
+                        }
+                      }
+                    ],
+                    "props": {
+                      "key": "5dt892bg62bk1g8qk9e",
+                      "class": [],
+                      "closed": false,
+                      "bounds": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 0,
+                        "height": 0
+                      }
+                    }
+                  }
+                ],
+                "props": {
+                  "key": "q76cagphds8k1g8qk9d",
+                  "class": [
+                    "pen",
+                    "frontier"
+                  ],
+                  "splitter": {
+                    "x": -1000,
+                    "y": -1000
+                  },
+                  "fill": "none",
+                  "stroke": "#000",
+                  "height": 1,
+                  "bounds": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 0,
+                    "height": 0
+                  }
+                }
+              }
+            ],
+            "props": {
+              "key": "kb1mzhzv1wnk1g8qiwu",
+              "class": [
+                "penCursor"
+              ],
+              "xmlns": "http://www.w3.org/2000/svg",
+              "height": 0,
+              "viewBox": {
+                "x": 0,
+                "y": 0,
+                "width": 800,
+                "height": 1600
+              },
+              "cursor": "penCursor"
+            }
+          }
+        ],
+        "props": {
+          "key": "yubu3jv5kh8k1g8qiwu",
+          "class": [],
+          "_id": "m14kwndgpok1g8qiwu",
+          "canvasWidth": 798
+        }
+      },
+      {
+        "type": "tools",
+        "children": [
+          {
+            "children": [],
+            "props": {
+              "key": "jithqoc0smk1g8qiww",
+              "class": [
+                "active"
+              ],
+              "name": "Pen",
+              "iconPath": "/assets/buttons/pen.svg",
+              "toolType": "penButton"
+            }
+          },
+          {
+            "children": [],
+            "props": {
+              "key": "37ilrftlqeok1g8qiww",
+              "class": [],
+              "name": "Select",
+              "iconPath": "/assets/buttons/select.svg",
+              "toolType": "selectButton"
+            }
+          },
+          {
+            "children": [],
+            "props": {
+              "key": "k4gi6copx8k1g8qiww",
+              "class": [],
+              "name": "Undo",
+              "iconPath": "/assets/buttons/undo.svg",
+              "toolType": "getPrevious"
+            }
+          },
+          {
+            "children": [],
+            "props": {
+              "key": "a2jsx8td1ilk1g8qiww",
+              "class": [],
+              "name": "Redo",
+              "iconPath": "/assets/buttons/redo.svg",
+              "toolType": "getNext"
+            }
+          },
+          {
+            "children": [],
+            "props": {
+              "key": "v81cnl5uzpek1g8qiww",
+              "class": [],
+              "name": "New",
+              "iconPath": "/assets/buttons/new.svg",
+              "toolType": "newDocButton"
+            }
+          },
+          {
+            "children": [],
+            "props": {
+              "key": "xauuht9h2fk1g8qiww",
+              "class": [],
+              "name": "Open",
+              "iconPath": "/assets/buttons/open.svg",
+              "toolType": "docListButton"
+            }
+          }
+        ],
+        "props": {
+          "key": "34wsv6jbqx2k1g8qiwv",
+          "class": []
+        }
+      },
+      {
+        "type": "docs",
+        "children": [
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "bn5tpzzji4ck1g8qj16",
+              "class": [],
+              "_id": "zbq9wk5ym4ek046bfem"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "a7jh726liqk1g8qj16",
+              "class": [],
+              "_id": "sfbxhs6f4erk04vpdpt"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "nfyrzvpt9yk1g8qj16",
+              "class": [],
+              "_id": "8fhzl1parrok04vxcf5"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "knwpafayxufk1g8qj16",
+              "class": [],
+              "_id": "mn6hiswmh8k04vxtw7"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "dvh0k7esvdok1g8qj16",
+              "class": [],
+              "_id": "arvaox2gpsk04vxy9k"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "c25wcxa6vd7k1g8qj16",
+              "class": [],
+              "_id": "jbp8u9xtpidk04vznef"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "sg96s3wiz7ak1g8qj16",
+              "class": [],
+              "_id": "3ylbfcjc7mtk04x5h9w"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "z6y8tgcgihk1g8qj16",
+              "class": [],
+              "_id": "6ijph2ydkk04x7nf7"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "dgbou6obdlik1g8qj16",
+              "class": [],
+              "_id": "piedvzvcr7ek04xk1zv"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "lerqpe9ifglk1g8qj16",
+              "class": [],
+              "_id": "laooh75bjzk04xl0vu"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "4qykoe1ep4k1g8qj16",
+              "class": [],
+              "_id": "3f6y8exyav6k051h832"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "4gjoeldi227k1g8qj16",
+              "class": [],
+              "_id": "6i28etis99yk055t76r"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "g1fqwzpwduk1g8qj16",
+              "class": [],
+              "_id": "uczbbouty9ak055vtt5"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "70hqqxkvrttk1g8qj16",
+              "class": [],
+              "_id": "q260r6kqipk055xj50"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "3i3ge0e26z7k1g8qj16",
+              "class": [],
+              "_id": "yly5azlik8k059wg4k"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "2qbqkkt1ggxk1g8qj16",
+              "class": [],
+              "_id": "w0wape25zfck059wqq8"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "ifhtyfthwk1g8qj16",
+              "class": [],
+              "_id": "cf2mt4oedtnk05prw43"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "timrxj96xdk1g8qj16",
+              "class": [],
+              "_id": "3rj10p6s6a4k10flxg9"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "54oruu417zfk1g8qj16",
+              "class": [],
+              "_id": "wrciekhgdnk10g2l9j"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "t4b7e450q2sk1g8qj16",
+              "class": [],
+              "_id": "u8s650omiujk10g2nz4"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "kb3qyzfzzhk1g8qj16",
+              "class": [],
+              "_id": "2vh84hgsgdxk1amyfwm"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "ay5r63aohcak1g8qj16",
+              "class": [],
+              "_id": "53wbqafl11nk1an0te3"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "rfaertb1ack1g8qj16",
+              "class": [],
+              "_id": "ypktra5qdvok1an1im8"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "31gt4rc1b5tk1g8qj16",
+              "class": [],
+              "_id": "hsknoy04llik1an1kq1"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "kohp3k4bh6sk1g8qj16",
+              "class": [],
+              "_id": "prj1x1y1nlk1an1r2k"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "m37l04io11k1g8qj16",
+              "class": [],
+              "_id": "s0cwvhsnegk1d9aypv"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "5vfghekm7jek1g8qj16",
+              "class": [],
+              "_id": "lhu7narwapk1g8jqyk"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "n8funuply5pk1g8qj17",
+              "class": [],
+              "_id": "zh5nllm58blk1g8k8xz"
+            }
+          },
+          {
+            "type": "identifier",
+            "children": [],
+            "props": {
+              "key": "x2lelur8enk1g8qj17",
+              "class": [],
+              "_id": "91nc1lvn16k1g8mi18"
+            }
+          }
+        ],
+        "props": {
+          "key": "wweuuzrcr6ck1g8qiww",
+          "class": []
+        }
+      },
+      {
+        "type": "message",
+        "children": [],
+        "props": {
+          "key": "fn9nfeunrobk1g8qiww",
+          "class": [],
+          "text": ""
+        }
+      }
+    ],
+    "props": {
+      "key": "p40biels7prk1g8qiwt",
+      "class": []
+    }
+  },
+  "description": {
+    "mode": "pen",
+    "label": "idle",
+    "input": {
+      "source": "message",
+      "type": "wipeMessage"
+    },
+    "update": "wipeMessage",
+    "layout": {
+      "menuVisible": false
+    }
+  },
+  "temp": {
+    "target": {
+      "type": "shape",
+      "children": [
+        {
+          "type": "spline",
+          "children": [
+            {
+              "type": "segment",
+              "children": [
+                {
+                  "type": "anchor",
+                  "children": [],
+                  "props": {
+                    "key": "6kl130nt9ajk1g8qk9e",
+                    "class": [],
+                    "vector": {
+                      "x": 215.53884887695312,
+                      "y": 56.641605377197266
+                    }
+                  }
+                },
+                {
+                  "type": "handleOut",
+                  "children": [],
+                  "props": {
+                    "key": "z1wh0leyl1pk1g8qke3",
+                    "class": [],
+                    "vector": {
+                      "x": 214.53634643554688,
+                      "y": 94.7368392944336
+                    }
+                  }
+                },
+                {
+                  "type": "handleIn",
+                  "children": [],
+                  "props": {
+                    "key": "fpb7o9cgz96k1g8qke4",
+                    "class": [],
+                    "vector": {
+                      "x": 216.54135131835938,
+                      "y": 18.546371459960938
+                    }
+                  }
+                }
+              ],
+              "props": {
+                "key": "a2hdmf9bbbrk1g8qk9e",
+                "class": []
+              }
+            },
+            {
+              "type": "segment",
+              "children": [
+                {
+                  "type": "anchor",
+                  "children": [],
+                  "props": {
+                    "key": "dayc8lu6lt9k1g8ql7n",
+                    "class": [],
+                    "vector": {
+                      "x": 437.0927429199219,
+                      "y": 60.65163040161133
+                    }
+                  }
+                },
+                {
+                  "type": "handleOut",
+                  "children": [],
+                  "props": {
+                    "key": "ng51ve5xrpk1g8qlbf",
+                    "class": [
+                      "tip"
+                    ],
+                    "vector": {
+                      "x": 437.0927429199219,
+                      "y": 98.74686431884766
+                    }
+                  }
+                },
+                {
+                  "type": "handleIn",
+                  "children": [],
+                  "props": {
+                    "key": "8z6g9ngd9ojk1g8qlbf",
+                    "class": [],
+                    "vector": {
+                      "x": 437.0927429199219,
+                      "y": 22.556396484375
+                    }
+                  }
+                }
+              ],
+              "props": {
+                "key": "f6cg08kbp3sk1g8ql7n",
+                "class": [
+                  "containsTip"
+                ]
+              }
+            }
+          ],
+          "props": {
+            "key": "5dt892bg62bk1g8qk9e",
+            "class": [],
+            "closed": false,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          }
+        }
+      ],
+      "props": {
+        "key": "q76cagphds8k1g8qk9d",
+        "class": [
+          "pen",
+          "frontier"
+        ],
+        "splitter": {
+          "x": -1000,
+          "y": -1000
+        },
+        "fill": "none",
+        "stroke": "#000",
+        "height": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      }
+    }
+  },
+  "snapshots": {}
+}

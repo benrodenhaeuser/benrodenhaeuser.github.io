@@ -1,0 +1,162 @@
+{
+  "type": "doc",
+  "children": [
+    {
+      "type": "canvas",
+      "children": [
+        {
+          "type": "shape",
+          "children": [
+            {
+              "type": "spline",
+              "children": [
+                {
+                  "type": "segment",
+                  "children": [
+                    {
+                      "type": "anchor",
+                      "children": [],
+                      "props": {
+                        "key": "n215ayb094k1g8xvja",
+                        "class": [],
+                        "vector": {
+                          "x": 298.7468566894531,
+                          "y": 50.62656784057617
+                        }
+                      }
+                    },
+                    {
+                      "type": "handleOut",
+                      "children": [],
+                      "props": {
+                        "key": "fuy6t6tgp1lk1g8xvo4",
+                        "class": [],
+                        "vector": {
+                          "x": 298.7468566894531,
+                          "y": 82.7067642211914
+                        }
+                      }
+                    },
+                    {
+                      "type": "handleIn",
+                      "children": [],
+                      "props": {
+                        "key": "cdedc94toxk1g8xvo4",
+                        "class": [],
+                        "vector": {
+                          "x": 298.7468566894531,
+                          "y": 18.546371459960938
+                        }
+                      }
+                    }
+                  ],
+                  "props": {
+                    "key": "a0tb2f02v1jk1g8xvj8",
+                    "class": []
+                  }
+                },
+                {
+                  "type": "segment",
+                  "children": [
+                    {
+                      "type": "anchor",
+                      "children": [],
+                      "props": {
+                        "key": "3xp86iawa0ek1g8xwj0",
+                        "class": [],
+                        "vector": {
+                          "x": 409.0225524902344,
+                          "y": 63.659149169921875
+                        }
+                      }
+                    },
+                    {
+                      "type": "handleOut",
+                      "children": [],
+                      "props": {
+                        "key": "hu92wnwfwgsk1g8xwkz",
+                        "class": [],
+                        "vector": {
+                          "x": 405.0125427246094,
+                          "y": 103.7593994140625
+                        }
+                      }
+                    },
+                    {
+                      "type": "handleIn",
+                      "children": [],
+                      "props": {
+                        "key": "cnx093n7s2k1g8xwl0",
+                        "class": [],
+                        "vector": {
+                          "x": 413.0325622558594,
+                          "y": 23.55889892578125
+                        }
+                      }
+                    }
+                  ],
+                  "props": {
+                    "key": "o3ki67h51sek1g8xwj0",
+                    "class": []
+                  }
+                }
+              ],
+              "props": {
+                "key": "z1swy1vlaqfk1g8xvj8",
+                "class": [],
+                "closed": false,
+                "bounds": {
+                  "x": 298.7468566894531,
+                  "y": 49.13194363852684,
+                  "width": 110.37880655515863,
+                  "height": 14.527205531395033
+                }
+              }
+            }
+          ],
+          "props": {
+            "key": "ywkqbke8ltk1g8xvj7",
+            "class": [
+              "selected",
+              "frontier"
+            ],
+            "splitter": {
+              "x": -1000,
+              "y": -1000
+            },
+            "fill": "none",
+            "stroke": "#000",
+            "height": 1,
+            "bounds": {
+              "x": 298.7468566894531,
+              "y": 49.13194363852684,
+              "width": 110.37880655515863,
+              "height": 14.527205531395033
+            }
+          }
+        }
+      ],
+      "props": {
+        "key": "4mfbo0df92nk1g8xu42",
+        "class": [
+          "selectCursor"
+        ],
+        "xmlns": "http://www.w3.org/2000/svg",
+        "height": 0,
+        "viewBox": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 1600
+        },
+        "cursor": "selectCursor"
+      }
+    }
+  ],
+  "props": {
+    "key": "e472ekoglbkk1g8xu42",
+    "class": [],
+    "_id": "q37e5be1kcpk1g8xu42",
+    "canvasWidth": 798
+  }
+}

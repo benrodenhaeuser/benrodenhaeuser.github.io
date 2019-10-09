@@ -20,4 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleModalVisibility();
   });
 
+
+  const linenos = document.querySelectorAll('.lineno');
+  console.log(linenos);
+
+  for (let lineno of linenos) {
+    if (lineno.textContent.trim() === '1') {
+      lineno.parentNode.style.display = 'none';
+      lineno.parentNode.parentNode.parentNode.parentNode.style.width = '100%';
+    }
+  }
+
 });
