@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   const linenos = document.querySelectorAll('.lineno');
-  console.log(linenos);
 
   for (let lineno of linenos) {
     if (lineno.textContent.trim() === '1') {
@@ -30,5 +29,4 @@ document.addEventListener('DOMContentLoaded', () => {
       lineno.parentNode.parentNode.parentNode.parentNode.style.width = '100%';
     }
   }
-
 });
