@@ -434,7 +434,7 @@ p code, li code {
 .highlight {
   width: 100%;
   max-width: 100%;
-  overflow: scroll;
+  overflow: auto;
 }
 
 pre:not(.highlight) {
