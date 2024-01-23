@@ -9,7 +9,7 @@ I am a software engineer that
 - likes to carefully analyze trade-offs (but does not get stuck in analysis paralysis),
 - takes the work very serious (but not too serious).
 
-I am based in Berlin and currently open for remote or hybrid opportunities. I love working on the frontend, but am always eager to learn any skills required to get the job done.
+I am based in Berlin and currently open for remote or hybrid opportunities. I love working on the web platform, but am always eager to learn any skills required to get the job done.
 
 Most recently, I was employed at [Pitch][1] for four years, where I helped ship a number of important user-facing features such as animations, video and image cropping, but also worked on several “under-the-hood” projects including frontend modularization, client-side routing and data exchange formats.
 
