@@ -1,5 +1,5 @@
 ---
-title: Frankie
+title: Sinatra from Scratch
 docstyle: article
 description: Building a toy version of a Ruby web framework from scratch.
 abstract: "A toy version of the \"Sinatra\" web framework built from the ground up: handling requests, the top-level DSL, parametrized routes and Rack middleware."
