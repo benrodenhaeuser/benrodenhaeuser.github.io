@@ -30,6 +30,12 @@ h1 {
     font-size: $basefont;
     display: inline;
   }
+
+  &.post-list-headline {
+    font-size: 1.3 * $baseline;
+    line-height: 1.3 * $baseline;
+    margin-bottom: $baseline;
+  }
 }
 
 h2 {
