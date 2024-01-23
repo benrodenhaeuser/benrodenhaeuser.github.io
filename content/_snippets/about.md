@@ -7,7 +7,7 @@ I am a software engineer that
 - gets energized from shipping (but does not sacrifice thoughtfulness for velocity),
 - has unlimited energy to get to the bottom of things (but knows when to stop digging deeper),
 - likes to carefully analyze trade-offs (but does not get stuck in analysis paralysis),
-- takes the work very serious (but not too serious).
+- takes the work very seriously (but not too seriously).
 
 I am based in Berlin and currently open for remote or hybrid opportunities. I love working on the web platform, but am always eager to learn any skills required to get the job done.
 
