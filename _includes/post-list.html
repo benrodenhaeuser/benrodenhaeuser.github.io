@@ -1,29 +1,21 @@
 <div class="post-list" id="post-list">
+  <hr class="line post-list" />
   <h1 class="post-list-headline">Building from scratch</h1>
 
-  I am a big fan of the "building from scratch" approach as a tool for learning. Given some free time and energy, I have found it to be one of the best approaches to grow as an engineer, and develop better mental models. Below are three projects I did some years ago in this direction.
-
-  {% assign projects = site.posts %}
-
-  {% for page in projects %}
-
-  {% if page.case-study %}
+  I am a big fan of the "building from scratch" approach as a tool for learning.
+  Given some free time and energy, I have found it to be one of the best
+  approaches to grow as an engineer, and develop better mental models. Below are
+  three projects I did some years ago in this direction. {% assign projects =
+  site.posts %} {% for page in projects %} {% if page.case-study %}
   <a href="{{ page.url }}">
-    <h2 class="title">
-      {{ page.title }}
-    </h2>
+    <h2 class="title">{{ page.title }}</h2>
   </a>
   {% else %}
-    <h2 class="title">
-      {{ page.title }}
-    </h2>
+  <h2 class="title">{{ page.title }}</h2>
   {% endif %}
 
   <div class="description">
-    {% if page.abstract %}
-      {{ page.abstract }}
-    {% else %}
-      {{ page.description }}
+    {% if page.abstract %} {{ page.abstract }} {% else %} {{ page.description }}
     {% endif %}
   </div>
 
@@ -33,26 +25,20 @@
       {% include icons/case-study-icon.html %}
       <p>Read More</p>
     </a>
-    {% endif %}
-
-    {% if page.external-links.demo %}
+    {% endif %} {% if page.external-links.demo %}
     <a href="{{ page.external-links.demo }}">
       {% include icons/demo-version-icon.html %}
       <p>Live Demo</p>
     </a>
-    {% endif %}
-
-    {% if page.external-links.github %}
+    {% endif %} {% if page.external-links.github %}
     <a href="{{ page.external-links.github }}">
       {% include icons/github-icon.html %}
       <p>Repository</p>
     </a>
     {% endif %}
-
   </div>
 
   <hr class="line front" />
 
   {% endfor %}
-
 </div>
