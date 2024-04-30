@@ -3,7 +3,7 @@ title: Hello! My name is Ben.
 snippet: about
 ---
 
-I am a software engineer based in Berlin and currently open for remote or hybrid opportunities. I love working on the web platform. Projects at the intersection of engineering and design holds a special place in my heart.
+I am a software engineer based in Berlin and currently open for remote or hybrid opportunities. I love working on the web platform, and projects at the intersection of engineering and design hold a special place in my heart.
 
 Most recently, I was employed at [Pitch][1] for four years, where I helped ship a number of important user-facing features in areas such as animations, video blocks, and image editing, but also worked on several “under-the-hood” projects including frontend modularization, client-side routing and data exchange formats.
 
